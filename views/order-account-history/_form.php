@@ -126,7 +126,7 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);           // b
     ?>
 
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <?= $form->field($model, 'client_id')->widget(\kartik\select2\Select2::class, [
               'data' => $model->getClients(),
               'disabled' => true,
@@ -137,19 +137,19 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);           // b
               'pluginOptions' => ['allowClear' => true],
           ])->label('Mijoz') ?>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <?= $form->field($model, 'total_debt_old')->textInput([
               'value'   => $client_total_debt,
               'id'      => 'total_debts',
               'readonly'=> true,
           ]) ?>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <?= $form->field($model, 'date')->textInput(['required'=>true,'readonly'=>true]) ?>
         </div>
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
           <?= $form->field($model, 'exchange_rate')->textInput(['type'=>'number','required'=>true]) ?>
-        </div>
+        </div> -->
       </div>
 
       <div class="col-md-12">
@@ -288,8 +288,12 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);           // b
               'type' => 'number',
           ])->label('Jami chegirma ($)') ?>
         </div>
-
-        <div class="col-md-2">
+        <div class="col-md-8">
+          <?= $form->field($model, 'driver_info')->textInput([
+              'id'=>'id-driver-info'
+          ])->label("Haydovchi ma'lumotlari") ?>
+        </div>
+        <!-- <div class="col-md-2">
           <?php
           $sumTransfersVal = ($model->sum_transfers && $model->sum_transfers != 0) ? $model->sum_transfers : '';
           echo $form->field($model, 'sum_transfers')->textInput([
@@ -323,46 +327,30 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);           // b
               'required' => true,
           ])->label("Summa kartada");
           ?>
-        </div>
+        </div> -->
       </div>
 
-      <div class="row">
-          <div class="col-md-2">
-          <?php
-          $zdachaDollarVal = ($model->zdacha_dollar && $model->zdacha_dollar != 0) ? $model->zdacha_dollar : '';
-          echo $form->field($model, 'zdacha_dollar')->textInput([
-              // 'type' => 'number',
-              'id' => 'qaytim-dollar',
-              'value' => $zdachaDollarVal,
-              'required' => true,
-          ])->label("Qaytim ($)");
-          ?>
+    <div class="row align-items-center">
+        <div class="col-md-9">
+            <?= $form->field($model, 'comment')->textInput([
+                'id' => 'id-comment',
+                'required' => true
+            ])->label('Izoh') ?>
         </div>
-          <div class="col-md-2">
-          <?php
-          $zdachaSumVal = ($model->zdacha_sum && $model->zdacha_sum != 0) ? $model->zdacha_sum : '';
-          echo $form->field($model, 'zdacha_sum')->textInput([
-              'type' => 'number',
-              'id' => 'qaytim-som',
-              'value' => $zdachaSumVal,
-              'required' => true,
-          ])->label("Qaytim so'mda");
-          ?>
-        </div>
-        <div class="col-md-4">
-          <?= $form->field($model, 'comment')->textInput([
-              'id'=>'id-comment',
-              'required'=>true
-          ])->label('Izoh') ?>
-        </div>
-        <div class="col-md-4">
-          <?= $form->field($model, 'driver_info')->textInput([
-              'id'=>'id-driver-info'
-          ])->label("Haydovchi ma'lumotlari") ?>
-        </div>
-      </div>
 
-      <div class="row">
+        <div class="col-md-3 d-flex align-items-center" style="margin-top: 25px;">
+            <?= $form->field($model, 'fast_order', [
+                'options' => ['class' => 'mb-0'] // form-group past bo'shligi yo'q
+            ])->checkbox(['style' => 'transform: scale(1.2); margin-left:10px;'])
+              ->label("<b style='font-size:16px;color:#f59c1a;margin-right:8px;'>Tezda tayyorlash:</b>", [
+                  'style' => 'margin-bottom:0;'
+              ]) ?>
+        </div>
+    </div>
+
+
+
+      <!-- <div class="row">
         <div class="col-md-4">
           <?= $form->field($model,'order_account_status')
               ->checkbox(['disabled'=>($model->order_account_status == 1)])
@@ -374,7 +362,7 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);           // b
               ->checkbox()
               ->label("<b style='font-size:16px;color:#f59c1a;margin-top:-230px'>Tezda tayyorlash: </b>") ?>
         </div>
-      </div>
+      </div> -->
 
       <?php if (!Yii::$app->request->isAjax){ ?>
         <div class="form-group">

@@ -137,11 +137,11 @@ CrudAsset::register($this);
                             <?php  foreach ($warehouse as $model) { $i = 1; $allCount = 0; $allGivenCount = 0; $allSumm = 0; $allRealSumm = 0;  $allProfitSumm = 0;?>
                                 <tr>
                                     <?php if(Yii::$app->user->identity->permission == 1){?>
-                                        <td colspan="9" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                        <td style="background-color:#a0d9ea;"></td>
+                                        <td colspan="9" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                        <td style="background-color:#ccdefa;"></td>
                                     <?php }else{?>
-                                        <td colspan="6" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                        <td style="background-color:#a0d9ea;"></td>
+                                        <td colspan="6" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                        <td style="background-color:#ccdefa;"></td>
                                     <?php }?>
                                 </tr>
                                 <?php  foreach ($warehouses = ProductAccountHistory::find()

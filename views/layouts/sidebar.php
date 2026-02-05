@@ -176,11 +176,11 @@ $menuItems[] = [
         //     'url' => ['/order-account-history/export'],
         //     'visible' => $model && in_array($model->permission, [1,2,6]),
         // ],
-        // [
-        //     'label' => 'To\'langan qarzlar',
-        //     'url' => ['/debt-repayment/index'],
-        //     'visible' => $model && in_array($model->permission, [1,2,6]),
-        // ],
+        [
+            'label' => 'To\'langan qarzlar',
+            'url' => ['/debt-repayment/index'],
+            'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
         // [
         //     'label' => 'Klientlar tarixi',
         //     'url' => ['/order-account-history/client-history'],

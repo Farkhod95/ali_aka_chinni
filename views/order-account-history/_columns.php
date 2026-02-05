@@ -93,7 +93,7 @@ return [
         ],
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -143,7 +143,7 @@ return [
         ],
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -176,7 +176,7 @@ return [
         'attribute'=>'all_product_sum',
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -204,11 +204,11 @@ return [
     [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'all_summ_dollar',
-        'width' => '150px',
+        'width' => '300px',
         // 'format'=>['decimal',2],
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -232,33 +232,33 @@ return [
             }
         }
     ],
-    [
-        'class'=>'\kartik\grid\DataColumn',
-        'attribute'=>'zdacha_dollar',
-        'width' => '150px',
-        // 'format'=>['decimal',2],
-        'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
-            if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
-                    return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
-                }
-            }else{
-                return [];
-            }
+    // [
+    //     'class'=>'\kartik\grid\DataColumn',
+    //     'attribute'=>'zdacha_dollar',
+    //     'width' => '150px',
+    //     // 'format'=>['decimal',2],
+    //     'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
+    //         if ($model->fast_order == 1){
+    //             if ( $model->status_order_sklad == 1){
+    //                 return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
+    //             }
+    //         }else{
+    //             return [];
+    //         }
  
-        },
-        'content'=> function($data){
-            if ($data->update_status == 2){
-                if ($data->date) {
-                    return   $data->zdacha_dollar?('<b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_dollar?Yii::$app->formatter->asDecimal($data->zdacha_dollar, 1):0).'$</b>'. ' ( <b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_sum?Yii::$app->formatter->asDecimal($data->zdacha_sum, 0):0).'</b> )'):'';
-                }
-            }elseif ($data->order_account_status == 1) {
-                return $data->zdacha_dollar?('<b style="font-size: 14px">'.($data->zdacha_dollar?Yii::$app->formatter->asDecimal($data->zdacha_dollar, 1):0).'$</b>'. ' ( <b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_sum?Yii::$app->formatter->asDecimal($data->zdacha_sum, 0):0).'</b> )'):'';
-            }else{
-                return   $data->zdacha_dollar?('<b style="font-size: 14px;color:red">'.($data->zdacha_dollar?Yii::$app->formatter->asDecimal($data->zdacha_dollar, 1):0).'$</b>'. ' ( <b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_sum?Yii::$app->formatter->asDecimal($data->zdacha_sum, 0):0).'</b> )'):'';
-            }
-        }
-    ],
+    //     },
+    //     'content'=> function($data){
+    //         if ($data->update_status == 2){
+    //             if ($data->date) {
+    //                 return   $data->zdacha_dollar?('<b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_dollar?Yii::$app->formatter->asDecimal($data->zdacha_dollar, 1):0).'$</b>'. ' ( <b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_sum?Yii::$app->formatter->asDecimal($data->zdacha_sum, 0):0).'</b> )'):'';
+    //             }
+    //         }elseif ($data->order_account_status == 1) {
+    //             return $data->zdacha_dollar?('<b style="font-size: 14px">'.($data->zdacha_dollar?Yii::$app->formatter->asDecimal($data->zdacha_dollar, 1):0).'$</b>'. ' ( <b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_sum?Yii::$app->formatter->asDecimal($data->zdacha_sum, 0):0).'</b> )'):'';
+    //         }else{
+    //             return   $data->zdacha_dollar?('<b style="font-size: 14px;color:red">'.($data->zdacha_dollar?Yii::$app->formatter->asDecimal($data->zdacha_dollar, 1):0).'$</b>'. ' ( <b style="font-size: 14px;color:#f59c1a">'.($data->zdacha_sum?Yii::$app->formatter->asDecimal($data->zdacha_sum, 0):0).'</b> )'):'';
+    //         }
+    //     }
+    // ],
     // [
     //     'class'=>'\kartik\grid\DataColumn',
     //     'attribute'=>'sum_som',
@@ -282,7 +282,7 @@ return [
     //     'width' => '200px',
     //     'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
     //         if ($model->fast_order == 1){
-    //             if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+    //             if ( $model->status_order_sklad == 1){
     //                 return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
     //             }
     //         }else{
@@ -336,7 +336,7 @@ return [
         'width' => '150px',
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -364,10 +364,10 @@ return [
     [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'all_total_debt_sum',
-        'width' => '128px',
+        'width' => '200px',
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -390,7 +390,7 @@ return [
         'visible' => \Yii::$app->user->identity->isAdminRight(\Yii::$app->user->identity->id),
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -421,7 +421,7 @@ return [
     //     'attribute'=>'date',
     //     'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
     //         if ($model->fast_order == 1){
-    //             if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+    //             if ( $model->status_order_sklad == 1){
     //                 return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
     //             }
     //         }else{
@@ -451,7 +451,7 @@ return [
         'attribute'=>'cr_date',
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -480,7 +480,7 @@ return [
         'attribute'=>'status_order',
         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
             if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
+                if ( $model->status_order_sklad == 1){
                     return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
                 }
             }else{
@@ -489,14 +489,14 @@ return [
  
         },
         'content' => function ($data) {
-            if ($data->status_order_dukon || $data->status_order_sklad){
+            if ($data->status_order_sklad){
                 $dukon_status = '';
                 $sklad_status = '';
-                if ($data->status_order_dukon == 1) {
-                    $dukon_status = '<b>Do\'kon: </b><b style="font-size: 14px;color:#ef6360">Jarayonda</b> <br/>';
-                } elseif ($data->status_order_dukon == 2) {
-                    $dukon_status = '<b>Do\'kon: </b><b style="font-size: 14px;color:#398787">Tayyor<br/></b>';
-                }
+                // if ($data->status_order_dukon == 1) {
+                //     $dukon_status = '<b>Do\'kon: </b><b style="font-size: 14px;color:#ef6360">Jarayonda</b> <br/>';
+                // } elseif ($data->status_order_dukon == 2) {
+                //     $dukon_status = '<b>Do\'kon: </b><b style="font-size: 14px;color:#398787">Tayyor<br/></b>';
+                // }
                 
                 if ($data->status_order_sklad == 1) {
                     $sklad_status = '<b>Sklad: </b><b style="font-size: 14px;color:#ef6360">&nbsp; Jarayonda</b>';
@@ -505,35 +505,35 @@ return [
                 }
                 
                 // Ikkala holatni qaytarish
-                return $dukon_status . $sklad_status;
+                return $sklad_status;
             }
         },
     ], 
-    [
-        'class' => '\kartik\grid\DataColumn',
-        'header' => 'Keshbek ($)',
-        'format' => 'raw',
-        'visible' => \Yii::$app->user->identity->isAdminRight(\Yii::$app->user->identity->id),
-         'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
-            if ($model->fast_order == 1){
-                if ($model->status_order_dukon == 1 || $model->status_order_sklad == 1){
-                    return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
-                }
-            }else{
-                return [];
-            }
+    // [
+    //     'class' => '\kartik\grid\DataColumn',
+    //     'header' => 'Keshbek ($)',
+    //     'format' => 'raw',
+    //     'visible' => \Yii::$app->user->identity->isAdminRight(\Yii::$app->user->identity->id),
+    //      'contentOptions' => function ($model, $key, $index, $column) use ($dataProvider) {
+    //         if ($model->fast_order == 1){
+    //             if ( $model->status_order_sklad == 1){
+    //                 return ['style' => 'background-color: #bfeeb7ff; font-weight: bold;', 'title' => "Tezda buyurtmani tayyorlash kerak",];
+    //             }
+    //         }else{
+    //             return [];
+    //         }
  
-        },
-        'value' => function($data){
-            $sum = (float) KeshbekHistory::find()
-                ->where(['client_id' => $data->client_id])
-                ->sum('keshbek_sum');
+    //     },
+    //     'value' => function($data){
+    //         $sum = (float) KeshbekHistory::find()
+    //             ->where(['client_id' => $data->client_id])
+    //             ->sum('keshbek_sum');
 
-            return '<b style="color:green;font-size:14px">'
-                . Yii::$app->formatter->asDecimal($sum, 2)
-                . ' $</b>';
-        }
-    ],
+    //         return '<b style="color:green;font-size:14px">'
+    //             . Yii::$app->formatter->asDecimal($sum, 2)
+    //             . ' $</b>';
+    //     }
+    // ],
     [
         'class' => 'kartik\grid\ActionColumn',
         'dropdown' => false,
@@ -545,19 +545,17 @@ return [
         },
         'buttons'=>[
             'leadOrderStatus' => function ($url, $model) {
-                if(\Yii::$app->user->identity->permission == 6){
-                    if ($model->status_order_dukon == 1){
-                        $url = Url::to(['/order-account-history/order-check-dokon' , 'id' => $model->id]);
-                        return Html::a('<span class="glyphicon glyphicon-check"></span>', $url, [ 'data-pjax' => 0, 'data-toggle'=>'tooltip', 'title'=>'Tayyor buyurtmani tasdiqlash','class'=>'btn btn-xs','style' => 'background-color: #a71629; color: white;']);
-                    }
-                }
+                // if(\Yii::$app->user->identity->permission == 6){
+                //     if ($model->status_order_dukon == 1){
+                //         $url = Url::to(['/order-account-history/order-check-dokon' , 'id' => $model->id]);
+                //         return Html::a('<span class="glyphicon glyphicon-check"></span>', $url, [ 'data-pjax' => 0, 'data-toggle'=>'tooltip', 'title'=>'Tayyor buyurtmani tasdiqlash','class'=>'btn btn-xs','style' => 'background-color: #a71629; color: white;']);
+                //     }
+                // }
                 
                 
-                if(\Yii::$app->user->identity->permission == 5){
-                    if ($model->status_order_sklad == 1){
-                        $url = Url::to(['/order-account-history/order-check-sklad' , 'id' => $model->id]);
-                        return Html::a('<span class="glyphicon glyphicon-check"></span>', $url, [ 'data-pjax' => 0, 'data-toggle'=>'tooltip', 'title'=>'Tayyor buyurtmani tasdiqlash','class'=>'btn btn-xs','style' => 'background-color: #a71629; color: white;']);
-                    }
+                if ($model->status_order_sklad == 1){
+                    $url = Url::to(['/order-account-history/order-check-sklad' , 'id' => $model->id]);
+                    return Html::a('<span class="glyphicon glyphicon-check"></span>', $url, [ 'data-pjax' => 0, 'data-toggle'=>'tooltip', 'title'=>'Tayyor buyurtmani tasdiqlash','class'=>'btn btn-xs','style' => 'background-color: #a71629; color: white;']);
                 }
             },
            'leadUpdateStatus' => function ($url, $model) {

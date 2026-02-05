@@ -380,8 +380,8 @@ class WarehouseController extends Controller
         $warehouse = $warehouses[0] ?? null;
 
         $html =  '<tr>
-                <td colspan="4" style="background-color:#a0d9ea;" ><b style="color:red">' . $warehouse->brand->name . '</b></td>
-                <td style="background-color:#a0d9ea;"></td>
+                <td colspan="4" style="background-color:#ccdefa;" ><b style="color:red">' . $warehouse->brand->name . '</b></td>
+                <td style="background-color:#ccdefa;"></td>
             </tr>';
 
             $i = 1; $allCount = 0;

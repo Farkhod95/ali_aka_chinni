@@ -68,8 +68,8 @@ $allMarkPrice = 0;
                         <tbody>
                             <?php  foreach ($warehouse as $model) { $i = 1; $allCount = 0; $allPrice = 0;?>
                                 <tr>
-                                    <td colspan="5" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                    <td style="background-color:#a0d9ea;"></td>
+                                    <td colspan="5" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                    <td style="background-color:#ccdefa;"></td>
                                 </tr>
                                 <?php  foreach ($warehouses = WarehouseHistory::find()->andWhere(['brand_id' => $model->brand->id])->andWhere(['sklad_id' => $id])->all() as $model1) { ?>
                                     <tr>

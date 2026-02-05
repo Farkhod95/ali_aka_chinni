@@ -41,8 +41,8 @@ $this->title = 'Mahsulotlar ro\'yxati';
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="4" style="background-color:#a0d9ea;" ><b style="color:red">FD-2</b></td>
-                                <td style="background-color:#a0d9ea;"><b style="color:red">480</b></td>
+                                <td colspan="4" style="background-color:#ccdefa;" ><b style="color:red">FD-2</b></td>
+                                <td style="background-color:#ccdefa;"><b style="color:red">480</b></td>
                             </tr>
                             <tr>
                                 <td>1</td>
@@ -73,8 +73,8 @@ $this->title = 'Mahsulotlar ro\'yxati';
                                 <td>120</td>
                             </tr> -->
                             <tr>
-                                <td colspan="4" style="background-color:#a0d9ea;"><b style="color:red">Z</b></td>
-                                <td style="background-color:#a0d9ea;"><b style="color:red">600</b></td>
+                                <td colspan="4" style="background-color:#ccdefa;"><b style="color:red">Z</b></td>
+                                <td style="background-color:#ccdefa;"><b style="color:red">600</b></td>
                             </tr>
                             <tr>
                                 <td>1</td>
@@ -112,8 +112,8 @@ $this->title = 'Mahsulotlar ro\'yxati';
                                 <td>120</td>
                             </tr> -->
                             <tr>
-                                <td colspan="4" style="background-color:#a0d9ea;"><b style="color:red">M</b></td>
-                                <td style="background-color:#a0d9ea;"><b style="color:red">1200</b></td>
+                                <td colspan="4" style="background-color:#ccdefa;"><b style="color:red">M</b></td>
+                                <td style="background-color:#ccdefa;"><b style="color:red">1200</b></td>
                             </tr>
                             <tr>
                                 <td>1</td>

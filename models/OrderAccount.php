@@ -269,9 +269,6 @@ class OrderAccount extends \yii\db\ActiveRecord
                     <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
                 </tr>
                 <tr>
-                    <td rowspan="5" style="text-align: left; width: 150px!important;"><img src="../views/image/logo4.jpg" style="height:100px; border-radius:20%;"></td>
-                </tr>
-                <tr>
                     <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                     <td  ><b >{t_p},</b></td>
                     <td style="width: 10px;"></td>
@@ -389,7 +386,7 @@ class OrderAccount extends \yii\db\ActiveRecord
         $allSumm = 0;
         
         $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <tr style="background-color:#a0d9ea;" >
+                    <tr style="background-color:#ccdefa;" >
                         <td style="height: 20px;text-align: center; width: 15%; border: 1px solid #000;"><b>JOY</b></td>
                         <td style="height: 20px;text-align: center; width: 15%; border: 1px solid #000;"><b>MODEL</b></td>
                         <td style="height: 20px;text-align: center; width: 15%; border: 1px solid #000;"><b>NOMI</b></td>

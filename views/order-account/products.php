@@ -22,8 +22,8 @@ $allMarkSumm = 0;
             <!-- begin panel-heading -->
             <div class="panel-heading">
                 <div class="panel-heading-btn">
-                    <a href="/order-account/debtors" class="btn btn-xs  btn-info"> <i class="fa fa-reply"></i> Orqaga qaytish</a>
-                    <a href="<?= Url::to(['/order-account/print2', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-warning"> <i class="fa fa-download"></i> Chop qilish Xodim uchun </a>
+                    <a href="/order-account/index" class="btn btn-xs  btn-info"> <i class="fa fa-reply"></i> Orqaga qaytish</a>
+                    <!-- <a href="<?= Url::to(['/order-account/print2', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-warning"> <i class="fa fa-download"></i> Chop qilish Xodim uchun </a>
                     <?php
                         $userPermission = Yii::$app->user->identity->permission;
                         $isPartner = $orderAccount->client->type;
@@ -33,7 +33,7 @@ $allMarkSumm = 0;
                             <a href="<?= Url::to(['/order-account/print', 'id' => $order_id]) ?>" target="_blank" class="btn btn-xs btn-warning">
                                 <i class="fa fa-download"></i> Chop qilish Mijoz uchun
                             </a>
-                    <?php } ?>
+                    <?php } ?> -->
                     <?php /* if(Yii::$app->user->identity->permission == 1 || Yii::$app->user->identity->permission == 2){?>
                         <a class="btn btn-xs  btn-danger" href="<?= Url::toRoute(['/orders/check', 'id' => $order_id])?>"><i class="fa fa-trash-o"> </i> Buyurtmani bekor qilish</a>
                     <?php }*/?>
@@ -54,41 +54,41 @@ $allMarkSumm = 0;
                     <h5>Hisobot</h5>
                     <?php if(Yii::$app->user->identity->permission == 1){?>
                         <table class="table">   
-                            <tr>
-                                <th nowrap style="text-align: left; width: 300px; color:#c05050">Dollar kursi:</th>
+                            <!-- <tr>
+                                <th nowrap style="text-align: left; width: 500px; color:#c05050">Dollar kursi:</th>
                                 <td ><b style="color:#c05050"><?= $orderAccount->exchange_rate ?></b></td>
-                                <td style="width: 10px;"></td>
-                                <th nowrap style="text-align: left; color:#474ba0">  </th>
+                                <td style="width: 10px;"></td> -->
+                                <!-- <th nowrap style="text-align: left; color:#474ba0">  </th>
                                 <td ><b style="color:#474ba0"> </b></td>
-                            </tr>
+                            </tr> -->
                             <tr>
-                                <th nowrap style="text-align: left; width: 150px; color:#f59c1a">Jami to'lanadigan summa ($):</th>
-                                <td ><b style="color:#f59c1a"><?= Yii::$app->formatter->asDecimal($orderAccount->all_product_sum, 2) ?> $</b></td>
-                                <td style="width: 10px;"></td>
+                                <th nowrap style="text-align: left; width: 150px;">Jami to'lanadigan summa ($):</th>
+                                <td ><b ><?= Yii::$app->formatter->asDecimal($orderAccount->all_product_sum, 2) ?> $</b></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left; color:#474ba0">To'langan summa dollarda ($):</th>
-                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_dollar,2) ?> $</b></td>
+                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_dollar,2) ?> $</b></td> -->
                             </tr>
                             <tr>
-                                <th nowrap style="text-align: left; width: 150px;color:#f59c1a">To'langan summa ($):</th>
-                                <td ><b style="color:#f59c1a" ><?= Yii::$app->formatter->asDecimal($orderAccount->all_summ_dollar, 2) ?> $</b></td>
+                                <th nowrap style="text-align: left; width: 150px;">To'langan summa ($):</th>
+                                <td ><b  ><?= Yii::$app->formatter->asDecimal($orderAccount->all_summ_dollar, 2) ?> $</b></td>
                                 
-                                <td style="width: 10px;"></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left;color:#474ba0">To'langan summa so'mda:</th>
-                                <td  ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_som,2) ?></b></td>
+                                <td  ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_som,2) ?></b></td> -->
                             </tr>
                             <tr>
-                                <th nowrap style="text-align: left; width: 200px; color:#f59c1a">Chegirma ($):</th>
-                                <td  ><b style="color:#f59c1a"><?= $orderAccount->discount_amount?>  $</b></td>
-                                <td style="width: 10px;"></td>
+                                <th nowrap style="text-align: left; width: 200px; ">Chegirma ($):</th>
+                                <td  ><b ><?= $orderAccount->discount_amount?>  $</b></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left; color:#474ba0">To'langan summa kartada:</th>
-                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_cart, 2)?></b></td>
+                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_cart, 2)?></b></td> -->
                             </tr>
                             <tr>
-                                <th nowrap style="text-align: left; width: 150px;color:#f59c1a">Qolgan qarz ($):</th>
-                                <td ><b style="color:#f59c1a"><?=  Yii::$app->formatter->asDecimal($orderAccount->total_debt, 2) ?> $</b></td>
-                                <td style="width: 10px;"></td>
+                                <th nowrap style="text-align: left; width: 150px;color:red">Qolgan qarz ($):</th>
+                                <td ><b style="color:red"><?=  Yii::$app->formatter->asDecimal($orderAccount->total_debt, 2) ?> $</b></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left;color:#474ba0">To'langan summa transferda:</th>
-                                <td   ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_transfers,2)?></b></td>
+                                <td   ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_transfers,2)?></b></td> -->
                             </tr>
                             <tr>                            
                         </table>
@@ -112,11 +112,11 @@ $allMarkSumm = 0;
                             <?php  foreach ($warehouse as $model) { $i = 1; $allCount = 0; $allSumm = 0;?>
                                 <tr>
                                     <?php if(Yii::$app->user->identity->permission == 1){?>
-                                        <td colspan="7" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                        <td style="background-color:#a0d9ea;"></td>
+                                        <td colspan="7" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                        <td style="background-color:#ccdefa;"></td>
                                     <?php }else{?>
-                                        <td colspan="6" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                        <td style="background-color:#a0d9ea;"></td>
+                                        <td colspan="6" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                        <td style="background-color:#ccdefa;"></td>
                                     <?php }?>
                                     
                                 </tr>

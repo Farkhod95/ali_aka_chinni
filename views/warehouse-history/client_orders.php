@@ -50,8 +50,8 @@ $allMarkCount = 0;
                         <tbody>
                             <?php  foreach ($array_Products as $model) { $i = 1; $allCount = 0;?>
                                 <tr>
-                                    <td colspan="4" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model['brand_name'] ?></b> -<b> <?= $model['cr_date'] ?> sanadagi</b></td>
-                                    <td style="background-color:#a0d9ea;"></td>
+                                    <td colspan="4" style="background-color:#ccdefa;" ><b style="color:red"><?= $model['brand_name'] ?></b> -<b> <?= $model['cr_date'] ?> sanadagi</b></td>
+                                    <td style="background-color:#ccdefa;"></td>
                                 </tr>
                                 <?php  foreach ($warehouses = OrderProducts::find()
                                                 ->andWhere(['brand_id' => $model['brand_id']])

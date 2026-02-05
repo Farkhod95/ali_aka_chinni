@@ -115,11 +115,11 @@ $sumDebtRepaymentAllSummDollar = (float)($debtQuery->sum('dr.all_summ_dollar') ?
 <div class="panel panel-inverse user-index">
     <div class="panel-heading">
         <div class="panel-heading-btn">
-            <?php if(\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->permission == 6){?>
+            <!-- <?php if(\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->permission == 6){?>
                 <?= Html::a('<span class="btn btn-info btn-xs m-r-5"><i class="fa fa-usd"></i> Dollar kursni o\'zgartirish</span>', ['/exchange-rate/update', 'id' => 1], ['role'=>'modal-remote', 'data-toggle'=>'tooltip']); ?>
                 <?= Html::a('<span class="btn btn-warning btn-xs m-r-5"><i class="fa fa-exclamation-triangle" style="color: white;"></i> Narxdagi farq</span>', ['order-account-history/index', 'large_price' => 1], ['data-pjax' => 0, 'data-toggle'=>'tooltip']); ?>
                 <?= Html::a('<span class="btn btn-success btn-xs m-r-5"><i class="fa fa-list" style="color: white;"></i> Hammasi</span>', ['order-account-history/index'], ['data-pjax' => 0, 'data-toggle'=>'tooltip']); ?>
-            <?php }?>
+            <?php }?> -->
 
             <a href="javascript:;" title="Во весь экран" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
             <a href="javascript:;" title="Обновить" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
@@ -316,12 +316,12 @@ $sumDebtRepaymentAllSummDollar = (float)($debtQuery->sum('dr.all_summ_dollar') ?
                     'lastPageLabel'  => 'Oxirgi'
                 ],
                 'rowOptions' => function ($model) {
-                    if ((int)$model->day_seq === 1 && $model->fast_order != 1) {
-                        return [
-                            'class' => 'day-seq-1-row',
-                            'title' => 'Kun bo‘yicha 1-chi buyurtma',
-                        ];
-                    }
+                    // if ((int)$model->day_seq === 1 && $model->fast_order != 1) {
+                    //     return [
+                    //         'class' => 'day-seq-1-row',
+                    //         'title' => 'Kun bo‘yicha 1-chi buyurtma',
+                    //     ];
+                    // }
                     return [];
                 },
                 'responsiveWrap' => false,

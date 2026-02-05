@@ -54,8 +54,8 @@ $allDebtSum = 0;
                         <tbody>
                             <?php  foreach ($array_Products as $model) { $i = 1; $allCount = 0;$alltotal_debt = 0;?>
                                 <tr>
-                                    <td colspan="4" style="background-color:#a0d9ea;" ><b> <?= $model['date'] ?> sanadagi</b></td>
-                                    <td style="background-color:#a0d9ea;"></td>
+                                    <td colspan="4" style="background-color:#ccdefa;" ><b> <?= $model['date'] ?> sanadagi</b></td>
+                                    <td style="background-color:#ccdefa;"></td>
                                 </tr>
                                 <?php  foreach ($warehouses = DebtRepayment::find()
                                                     ->where(['client_id' => $model['client_id']])

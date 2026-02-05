@@ -291,9 +291,6 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                 <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
             </tr>
             <tr>
-                <td rowspan="5" style="text-align: left; width: 150px!important;"><img src="../views/image/logo4.jpg" style="height:100px; border-radius:20%;"></td>
-            </tr>
-            <tr>
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                 <td  ><b >{t_p},</b></td>
                 <td style="width: 10px;"></td>
@@ -414,9 +411,6 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
             </tr>
             <tr>
                 <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
-            </tr>
-            <tr>
-                <td rowspan="5" style="text-align: left; width: 150px!important;"><img src="../views/image/logo4.jpg" style="height:100px; border-radius:20%;"></td>
             </tr>
             <tr>
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
@@ -578,9 +572,6 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                 <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
             </tr>
             <tr>
-                <td rowspan="5" style="text-align: left; width: 150px!important;"><img src="../views/image/logo4.jpg" style="height:100px; border-radius:20%;"></td>
-            </tr>
-            <tr>
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                 <td  ><b >{t_p},</b></td>
                 <td style="width: 10px;"></td>
@@ -702,18 +693,18 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
         $debtRepaymentall_sum = $debtRepaymentall != 0 ?'To\'langan qarz ($):': '';
         $debt_repayment_all = $debtRepaymentall != 0 ?$debtRepaymentall.' $,': '';
-        if($sum>0){
-            $keshbek_tr = '
-            <br/><br/><br/>
-             <table style="width: 100%; text-align: right; font-size:14px;">   
+        // if($sum>0){
+        //     $keshbek_tr = '
+        //     <br/><br/><br/>
+        //      <table style="width: 100%; text-align: right; font-size:14px;">   
                 
-                <tr> <td colspan="4" style="text-align: left;"><b style="font-size:16px;">Xaridingiz uchun rahmat!</b></td> </tr>
-                <tr> <td colspan="4" style="text-align: left;"><b style="font-size:16px;color:green">Sizdagi Keshbek: '.Yii::$app->formatter->asDecimal($sum, 2).'$</b></td> </tr>
-            </table> ';
-        }else{
-            $keshbek_tr = '';
-        }
-        
+        //         <tr> <td colspan="4" style="text-align: left;"><b style="font-size:16px;">Xaridingiz uchun rahmat!</b></td> </tr>
+        //         <tr> <td colspan="4" style="text-align: left;"><b style="font-size:16px;color:green">Sizdagi Keshbek: '.Yii::$app->formatter->asDecimal($sum, 2).'$</b></td> </tr>
+        //     </table> ';
+        // }else{
+        //     $keshbek_tr = '';
+        // }
+        $keshbek_tr = '';
 
         $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;font-size:12px">
                     <tr style="">
@@ -764,66 +755,40 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                 <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:20px;">{cr_date_time}<br/></b></td>
             </tr>
             <tr>
-                <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:20px; color:red;">{customer_fio}<br/></b></td>
+                <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:20px; color:red;">{customer_fio}</b> (<b >{customer_phone}</b>) <br/></td>
             </tr>
             <tr>
                 <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
             </tr>
             <tr>
-                <td rowspan="5" style="text-align: left; width: 150px!important;"><img src="../views/image/logo4.jpg" style="height:100px; border-radius:20%;"></td>
-            </tr>
-            <tr>
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                 <td  ><b >{t_p},</b></td>
                 <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left;font-size:14px; color:green;">Dollar kursi:</th>
-                <td ><b style="text-align: left;font-size:14px; color:green;">{exchange_rate} so\'m</b></td>
-            </tr>
-            <tr>
-                <th nowrap style="text-align: left;">Firma:</th>
-                <td ><b >{postavshik},</b></td>
-                <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left; width: 150px;">Manzil:</th>
-                <td ><b >{customer_region}, {customer_district}</b></td>
-            </tr>
-            <tr>
-                <th nowrap style="text-align: left; width: 150px;">Telefon nomer1:</th>
+                <th nowrap style="text-align: left; width: 150px;">Telefon nomer:</th>
                 <td ><b >{phone},</b></td>
-                <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left;">Telefon:</th>
-                <td   ><b >{customer_phone}</b></td>
             </tr>
            
         </table>
         '.$table.'<br>
         <table style="width: 100%; text-align: right; font-size:12px;">   
                 <tr>
-                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">Ostatka  ($):</th>
-                    <td ><b style="font-size:16px;color:#f59c1">{total_debt_old} $,</b></td>
-                    
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0">To\'langan summa dollarda ($):</th>
-                    <td ><b style="color:#474ba0">{sum_dollar} $</b></td>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#474ba0">Ostatka  ($):</th>
+                    <td ><b style="font-size:16px;color:#474ba0">{total_debt_old} $,</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px; color:#f59c1">Olingan tavarlar summasi ($):</th>
-                    <td ><b style="color:#f59c1">{all_product_sum} $,</b></td>
+                    <th nowrap style="text-align: left; width: 150px; ">Olingan tavarlar summasi ($):</th>
+                    <td ><b style="">{all_product_sum} $,</b></td>
                     
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left;color:#474ba0"></th>
-                    <td  ><b style="color:#474ba0"></b></td>
+             
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px;color:#f59c1">Jami to\'langan summa ($):</th>
-                    <td ><b style="color:#f59c1" >{all_summ_dollar} $,</b></td>
+                    <th nowrap style="text-align: left; width: 150px;">Jami to\'langan summa ($):</th>
+                    <td ><b style="" >{all_summ_dollar} $,</b></td>
         
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0"></th>
-                    <td ><b style="color:#474ba0"></b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px;color:#f59c1">'.$discount_amount_sum.'</th>
-                    <td ><b style="color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
+                    <th nowrap style="text-align: left; width: 150px;">'.$discount_amount_sum.'</th>
+                    <td ><b style="" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
                 <tr>
                     <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
@@ -893,7 +858,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         }
 
         $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <tr style="background-color:#a0d9ea;" >
+                    <tr style="background-color:#ccdefa;" >
                         <td style="height: 20px;text-align: center; width: 10%; border: 1px solid #000;"><b>JOY</b></td>
                         <td style="height: 20px;text-align: center; width: 15%; border: 1px solid #000;"><b>MODEL</b></td>
                         <td style="height: 20px;text-align: center; width: 15%; border: 1px solid #000;"><b>NOMI</b></td>
@@ -903,7 +868,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                     </tr>';
         foreach ($warehouse as $model1) { 
             foreach ($orderProduct = ProductAccountHistory::find()->andWhere(['order_account_history_id' => $id])->andWhere(['brand_id' => $model1->brand_id])->all() as $model1){ 
-                $type_color = $model1->type_sklad_id ==1?'<tr style="background-color:#67a38569">':'<tr style="">';
+                $type_color = '<tr style="">';//$model1->type_sklad_id ==1?'<tr style="background-color:#67a38569">':'<tr style="">';
                 if ($model1->count == $model1->given_count) {
                     $colorCount = 'blue';
                 }else {
@@ -1069,9 +1034,6 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
             </tr>
             <tr>
                 <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
-            </tr>
-            <tr>
-                <td rowspan="5" style="text-align: left; width: 150px!important;"><img src="../views/image/logo4.jpg" style="height:100px; border-radius:20%;"></td>
             </tr>
             <tr>
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>

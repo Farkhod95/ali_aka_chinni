@@ -103,8 +103,8 @@ if ($link == "client-product-history") {
                         <tbody>
                             <?php  foreach ($orderProducts as $model) { $i = 1; $allCount = 0;?>
                                 <tr>
-                                    <td colspan="4" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                    <td style="background-color:#a0d9ea;"></td>
+                                    <td colspan="4" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                    <td style="background-color:#ccdefa;"></td>
                                 </tr>
                                 <?php  foreach ($orderProduct = ProductAccountHistory::find()->andWhere(['brand_id' => $model->brand->id])->andWhere(['order_account_history_id' => $order_id])->andWhere(['cr_date' => $cr_date])->all() as $model1) { ?>
                                     <tr>

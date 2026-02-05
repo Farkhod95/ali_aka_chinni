@@ -100,8 +100,8 @@ $productCategory = new ProductCategory();
                             $ii = 0;
                             $allPriceSum = 0; foreach ($orderProducts as $model) { $i = 1; $allCount = 0; $priceSum = 0;?>
                                 <tr class="handle-header">
-                                    <td colspan="4" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                    <td style="background-color:#a0d9ea;"></td>
+                                    <td colspan="4" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                    <td style="background-color:#ccdefa;"></td>
                                 </tr>
                                 <?php  
                                 

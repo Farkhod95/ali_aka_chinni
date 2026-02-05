@@ -106,11 +106,11 @@ $catAjaxUrl = Url::to(['product-category/by-brand']);
                 <!-- Brand header qatori -->
                 <tr class="handle-header" data-brand-id="<?= (int)$model->brand->id ?>">
                   <?php if (Yii::$app->user->identity->permission == 1): ?>
-                    <td colspan="6" style="background-color:#a0d9ea;"><b style="color:red"><?= Html::encode($model->brand->name) ?></b></td>
-                    <td style="background-color:#a0d9ea;"></td>
+                    <td colspan="6" style="background-color:#ccdefa;"><b style="color:red"><?= Html::encode($model->brand->name) ?></b></td>
+                    <td style="background-color:#ccdefa;"></td>
                   <?php else: ?>
-                    <td colspan="5" style="background-color:#a0d9ea;"><b style="color:red"><?= Html::encode($model->brand->name) ?></b></td>
-                    <td style="background-color:#a0d9ea;"></td>
+                    <td colspan="5" style="background-color:#ccdefa;"><b style="color:red"><?= Html::encode($model->brand->name) ?></b></td>
+                    <td style="background-color:#ccdefa;"></td>
                   <?php endif; ?>
                 </tr>
 

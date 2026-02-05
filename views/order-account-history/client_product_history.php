@@ -50,8 +50,8 @@ $allMarkCount = 0;
                         <tbody>
                             <?php  foreach ($array_Products as $model) { $i = 1; $allCount = 0;?>
                                 <tr>
-                                    <td colspan="4" style="background-color:#a0d9ea;" ><b> <?= $model['cr_date'] ?> sanadagi</b></td>
-                                    <td style="background-color:#a0d9ea;"></td>
+                                    <td colspan="4" style="background-color:#ccdefa;" ><b> <?= $model['cr_date'] ?> sanadagi</b></td>
+                                    <td style="background-color:#ccdefa;"></td>
                                 </tr>
                                 <?php  foreach ($warehouses = ProductAccountHistory::find()
                                                 ->andWhere(['order_account_history_id' => $model['order_account_history_id']])->all() as $model1) { ?>

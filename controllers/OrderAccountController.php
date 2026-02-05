@@ -118,15 +118,18 @@ class OrderAccountController extends Controller
         $clients_id = $request->post('customer_name');
         $qarz_client_summ = $request->post('qarz_client_summ');
         $qarz_tul_date = $request->post('qarz_tul_date');
-        $dollar_kurs = $request->post('tul_qarz_dollar_kurs');
+        // $dollar_kurs = $request->post('tul_qarz_dollar_kurs');
+        $dollar_kurs = 0;
 
         $tul_qarz_sikidka = $request->post('tul_qarz_sikidka');
         $tul_qarz_sum_dollar = $request->post('tul_qarz_sum_dollar');
         $tul_qarz_sum_som = $request->post('tul_qarz_sum_som');
         $tul_qarz_summ_cart = $request->post('tul_qarz_summ_cart');
         $tul_qarz_sum_transfer = $request->post('tul_qarz_sum_transfer');
-        $tul_qarz_zdacha_dollar = $request->post('tul_qarz_zdacha_dollar');
-        $tul_qarz_zdacha_sum = $request->post('tul_qarz_zdacha_sum');
+        // $tul_qarz_zdacha_dollar = $request->post('tul_qarz_zdacha_dollar');
+        $tul_qarz_zdacha_dollar = 0;
+        // $tul_qarz_zdacha_sum = $request->post('tul_qarz_zdacha_sum');
+        $tul_qarz_zdacha_sum = 0;
 
         $all_tulangan_summa_dollar = round($tul_qarz_sum_dollar + $tul_qarz_sikidka,2);
         // echo '<pre>';
@@ -195,23 +198,32 @@ class OrderAccountController extends Controller
         $clients_id = $request->post('customer_name');
         $total_debts = $request->post('jami_qarzi');
         $dates = $request->post('order_date');
-        $exchange_rates = $request->post('dollar_kurs');
+        // $exchange_rates = $request->post('dollar_kurs');
+        $exchange_rates = 0;
 
         $discount_amounts = $request->post('chegirma_summa');
         $sum_dollars = $request->post('summa_dollor');
-        $dollar_sumda = $request->post('dollar_sumda');
-        $sum_soms = $request->post('summa_som');
+        // $dollar_sumda = $request->post('dollar_sumda');
+        $dollar_sumda = 0;
+        // $sum_soms = $request->post('summa_som');
+        $sum_soms = 0;
         $sum_carts = $request->post('summa_karta');
-        $sum_transferss = $request->post('summa_transfer');
-        $zdacha_dollar = $request->post('zdacha_dollar');
+        $sum_carts = 0;
+        // $sum_transferss = $request->post('summa_transfer');
+        $sum_transferss = 0;
+        // $zdacha_dollar = $request->post('zdacha_dollar');
+        $zdacha_dollar = 0;
         $zdacha_sum = $request->post('zdacha_sum');
+        $zdacha_sum = 0;
+
         $comment = $request->post('comment');
         $driver_info = $request->post('driver_info');
         $fastOrder = $request->post('fast_order');
         // echo '<pre>';
         // print_r($fastOrder);
         // echo '</pre>';
-        $tasdiq_check = $request->post('tasdiq_check');
+        // $tasdiq_check = $request->post('tasdiq_check');
+        $tasdiq_check = 1;
         
         $count = $request->post('count');
         $all_sum = $request->post('all_sum');
@@ -332,11 +344,13 @@ class OrderAccountController extends Controller
             $product_category_list = ProductCategory::find()->where(['id' => $value['product_category_id']])->one();
             $type_sklad_list = TypeSklad::find()->where(['name' => $value['joy']])->one();
 
-            if ($value['joy'] == "Ombor") {
-                $status_order_sklad = 1;
-            } elseif ($value['joy'] == "Dokon") {
-                $status_order_dukon = 1;
-            }
+            // if ($value['joy'] == "Ombor") {
+            //     $status_order_sklad = 1;
+            // } elseif ($value['joy'] == "Dokon") {
+            //     $status_order_dukon = 1;
+            // }
+            $status_order_sklad = 1;
+            $status_order_dukon = 1;
 
             $typeId = $orderAccount->getTypeNameView($value['tip']);
             $size   = (float)$value['size'];

@@ -260,7 +260,7 @@ class VozvratOrder extends \yii\db\ActiveRecord
                 <td ><b >{customer_region}, {customer_district}</b></td>
             </tr>
             <tr>
-                <th nowrap style="text-align: left; width: 150px;">Telefon nomer1:</th>
+                <th nowrap style="text-align: left; width: 150px;">Telefon nomer:</th>
                 <td ><b >{phone},</b></td>
                 <td style="width: 10px;"></td>
                 <th nowrap style="text-align: left;">Telefon:</th>
@@ -444,7 +444,7 @@ class VozvratOrder extends \yii\db\ActiveRecord
                 <td ><b >{customer_region}, {customer_district}</b></td>
             </tr>
             <tr>
-                <th nowrap style="text-align: left; width: 150px;">Telefon nomer1:</th>
+                <th nowrap style="text-align: left; width: 150px;">Telefon nomer:</th>
                 <td ><b >{phone},</b></td>
                 <td style="width: 10px;"></td>
                 <th nowrap style="text-align: left;">Telefon:</th>

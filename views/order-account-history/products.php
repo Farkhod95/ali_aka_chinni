@@ -30,11 +30,11 @@ CrudAsset::register($this);
             <div class="panel-heading">
                 <div class="panel-heading-btn">
                     <a href="/order-account-history/<?= $type?>" class="btn btn-xs  btn-info"> <i class="fa fa-reply"></i> Orqaga qaytish </a>
-                    <a href="<?= Url::to(['/order-account-history/print2', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-warning"> <i class="fa fa-download"></i> Chop qilish Xodim uchun </a>
-                    <?php if(Yii::$app->user->identity->permission == 1){?>
+                    <a href="<?= Url::to(['/order-account-history/print2', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-primary"> <i class="fa fa-download"></i> Chop qilish Xodim uchun </a>
+                    <!-- <?php if(Yii::$app->user->identity->permission == 1){?>
                         <a href="<?= Url::to(['/order-account-history/print-sklad', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-primary"> <i class="fa fa-download"></i> Chop qilish Sklad uchun</a>
                         
-                    <?php }?>
+                    <?php }?> -->
                     <?php
                         $userPermission = Yii::$app->user->identity->permission;
                         $isPartner = $orderAccount->client->type;
@@ -43,10 +43,10 @@ CrudAsset::register($this);
                         ?>
                             <a href="<?= Url::to(['/order-account-history/print', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-warning"> <i class="fa fa-download"></i> Chop qilish Mijoz uchun</a>
                     <?php } ?>
-                     <?php if(Yii::$app->user->identity->permission == 1){?>
+                     <!-- <?php if(Yii::$app->user->identity->permission == 1){?>
                         <a href="<?= Url::to(['/order-account-history/print-profit', 'id' => $order_id]) ?>" target ="_blank" class="btn btn-xs  btn-danger"> <i class="fa fa-download"></i> Chop qilish Admin uchun</a>
                         
-                    <?php }?>
+                    <?php }?> -->
                     <?php /* if(Yii::$app->user->identity->permission == 1 || Yii::$app->user->identity->permission == 2){?>
                         <a class="btn btn-xs  btn-danger" href="<?= Url::toRoute(['/orders/check', 'id' => $order_id])?>"><i class="fa fa-trash-o"> </i> Buyurtmani bekor qilish</a>
                     <?php }*/?>
@@ -67,46 +67,46 @@ CrudAsset::register($this);
                     <h5>Hisobot</h5>
                     <?php if(Yii::$app->user->identity->permission == 1){?>
                         <table class="table">   
-                            <tr>
+                            <!-- <tr>
                                 <th nowrap style="text-align: left; width: 300px; color:#f59c1a">Dollar kursi:</th>
                                 <td ><b style="color:#f59c1a"><?= $orderAccount->exchange_rate ?></b></td>
                                 <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left; color:#474ba0">  </th>
                                 <td ><b style="color:#474ba0"> </b></td>
-                            </tr>
+                            </tr> -->
                             <tr>
-                                <th nowrap style="text-align: left; width: 150px; color:#f59c1a">Jami to'lanadigan summa ($):</th>
+                                <th nowrap style="text-align: left; width:500px; color:#f59c1a">Jami to'lanadigan summa ($):</th>
                                 <td ><b style="color:#f59c1a"><?= Yii::$app->formatter->asDecimal($orderAccount->all_product_sum, 2) ?> $</b></td>
-                                <td style="width: 10px;"></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left; color:#474ba0">To'langan summa dollarda ($):</th>
-                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_transfers,2) ?>  $</b></td>
+                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_transfers,2) ?>  $</b></td> -->
                             </tr>
                             <tr>
                                 <th nowrap style="text-align: left; width: 150px;color:#f59c1a">To'langan summa ($):</th>
                                 <td ><b style="color:#f59c1a" ><?= Yii::$app->formatter->asDecimal($orderAccount->all_summ_dollar, 2) ?> $ </b></td>
                                 
-                                <td style="width: 10px;"></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left;color:#474ba0">To'langan summa so'mda:</th>
-                                <td  ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_som, 2) ?></b></td>
+                                <td  ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_som, 2) ?></b></td> -->
                             </tr>
                             <tr>
                                 <th nowrap style="text-align: left; width: 200px; color:#f59c1a">Chegirma ($):</th>
                                 <td  ><b style="color:#f59c1a"><?= $orderAccount->discount_amount?>  $</b></td>
-                                <td style="width: 10px;"></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align: left; color:#474ba0">To'langan summa kartada:</th>
-                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_cart, 2)?></b></td>
+                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($orderAccount->sum_cart, 2)?></b></td> -->
                             </tr>
                             <tr>
                                 <th nowrap style="text-align: left; width: 150px;color:#f59c1a">Qolgan qarz ($):</th>
                                 <td ><b style="color:#f59c1a"><?=  Yii::$app->formatter->asDecimal($orderAccount2->total_debt, 2) ?> $</b></td>
-                                <td style="width: 10px;"></td>
+                                <!-- <td style="width: 10px;"></td>
                                 <th nowrap style="text-align:left;color:#474ba0">Qaytim:</th>
                                 <td>
                                     <b style="color:#474ba0">
                                         <?= Yii::$app->formatter->asDecimal(($orderAccount->zdacha_sum?$orderAccount->zdacha_sum:''), 0) ?>
                                         (<?= Yii::$app->formatter->asDecimal(($orderAccount->zdacha_dollar?$orderAccount->zdacha_dollar:''), 2) ?> $)
                                     </b>
-                                </td>
+                                </td> -->
                             </tr>
                             <tr>                            
                         </table>
@@ -126,7 +126,7 @@ CrudAsset::register($this);
                                 <th nowrap>O'lchami</th>
                                 <th nowrap>Tip</th>
                                 <th nowrap>Soni</th>
-                                <th nowrap>Berilgan soni</th>
+                                <!-- <th nowrap>Berilgan soni</th> -->
                                 <?php if(Yii::$app->user->identity->permission == 1){?>
                                 <th nowrap>Narxi ($)</th>
                                 <th nowrap>Asl Narxi ($)</th>
@@ -139,11 +139,11 @@ CrudAsset::register($this);
                             <?php  foreach ($warehouse as $model) { $i = 1; $allCount = 0; $allGivenCount = 0; $allSumm = 0; $allRealSumm = 0;  $allProfitSumm = 0;?>
                                 <tr>
                                     <?php if(Yii::$app->user->identity->permission == 1){?>
-                                        <td colspan="10" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                        <td style="background-color:#a0d9ea;"></td>
+                                        <td colspan="9" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                        <td style="background-color:#ccdefa;"></td>
                                     <?php }else{?>
-                                        <td colspan="7" style="background-color:#a0d9ea;" ><b style="color:red"><?= $model->brand->name ?></b></td>
-                                        <td style="background-color:#a0d9ea;"></td>
+                                        <td colspan="6" style="background-color:#ccdefa;" ><b style="color:red"><?= $model->brand->name ?></b></td>
+                                        <td style="background-color:#ccdefa;"></td>
                                     <?php }?>
                                 </tr>
                                 <?php  foreach ($warehouses = ProductAccountHistory::find()
@@ -193,7 +193,7 @@ CrudAsset::register($this);
                                         <?php }else{?>
                                             <td> <b ><?= $model1->count ?></b></td>
                                         <?php }?>
-                                        <?php if($model1->type_sklad_id ==1){ 
+                                        <!-- <?php if($model1->type_sklad_id ==1){ 
                                             if ($model1->count == $model1->given_count) {
                                                 $colorCount = 'green';
                                             }else {
@@ -236,7 +236,7 @@ CrudAsset::register($this);
                                                         ]
                                                     ) ?>
                                                 </td>
-                                        <?php }?>
+                                        <?php }?> -->
                                         <?php if(Yii::$app->user->identity->permission == 1){?>
                                             <?php if($model1->type_sklad_id ==1){ ?> 
                                             <td style="color:<?= ($model1->price < $model1->real_price) ? '#e70f0fff;font-size: 15px;' : ''?>"> <b > <?= $model1->price ?> <?= $largePrice ?></b></td>
@@ -265,7 +265,7 @@ CrudAsset::register($this);
                                     } ?>
                                 <tr>
                                     <?php if(Yii::$app->user->identity->permission == 1){?>
-                                        <td colspan="5"  ><b ></b></td>
+                                        <td colspan="4"  ><b ></b></td>
                                         <td ><b style="color:#000;font-size: 15px" >Jami:</b></td>
                                         <td ><b style="color:#000;font-size: 15px"><?= $allCount ?></b></td>
                                         <td ><b style="color:#000;font-size: 15px"><?= $allGivenCount ?></b></td>
@@ -273,7 +273,7 @@ CrudAsset::register($this);
                                         <td ><b style="color:#000;font-size: 15px"><?= $allRealSumm ?></b></td>
                                         <td ><b style="color:#000;font-size: 15px"><?= $allProfitSumm ?></b></td>
                                     <?php }else{?>
-                                        <td colspan="4"  ><b ></b></td>
+                                        <td colspan="3"  ><b ></b></td>
                                         <td ><b style="color:#000;font-size: 15px" >Jami:</b></td>
                                         <td ><b style="color:#000;font-size: 15px"><?= $allCount ?></b></td>
                                         <td ><b style="color:#000;font-size: 15px"><?= $allGivenCount ?></b></td>
@@ -287,14 +287,14 @@ CrudAsset::register($this);
                          
                             <tr>
                                 <?php if(Yii::$app->user->identity->permission == 1){?>
-                                    <td colspan="6" style="background-color:#2d353c;"><b style="color:white">Jami:</b></td>
+                                    <td colspan="5" style="background-color:#2d353c;"><b style="color:white">Jami:</b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkCount ?></b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkGivenCount ?></b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkSumm ?></b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkRealSumm ?></b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkProfitSumm ?></b></td>
                                 <?php }else{?>
-                                    <td colspan="6" style="background-color:#2d353c;"><b style="color:white">Jami:</b></td>
+                                    <td colspan="4" style="background-color:#2d353c;"><b style="color:white">Jami:</b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkCount ?></b></td>
                                     <td style="background-color:#2d353c;"><b style="color:white"><?= $allMarkGivenCount ?></b></td>
                                 <?php }?>
