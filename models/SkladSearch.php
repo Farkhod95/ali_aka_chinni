@@ -45,7 +45,7 @@ class SkladSearch extends Sklad
     public function search($params)
     {
         $query = Sklad::find()
-            ->where(['!=', 'actived', 0])
+            // ->where(['!=', 'actived', 0])
             ->orderBy([
                 // Birinchi status bo'yicha custom tartiblash
                 new Expression("CASE 

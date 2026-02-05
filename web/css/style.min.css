@@ -68,7 +68,7 @@ h4,
 h5,
 h6 {
     font-weight: 500;
-    color: #398787
+    color: #276e9c
 }
 
 h1 small,
@@ -91,7 +91,7 @@ a {
 }
 
 label {
-    color: #398787
+    color: #276e9c
 }
 
 .page-header-fixed {
@@ -235,7 +235,7 @@ label {
 }
 
 .navbar.navbar-inverse {
-    background: #398787;
+    background: #276e9c;
 }
 
 .navbar.navbar-inverse .navbar-brand,
@@ -428,7 +428,7 @@ label {
 
 .sidebar,
 .sidebar-bg {
-    background: #398787;
+    background: #276e9c;
     left: 0;
     width: 220px;
     top: 0;
@@ -468,7 +468,7 @@ label {
 }
 
 .sidebar.sidebar-grid .nav>li.active>a {
-    border-color: #398787;
+    border-color: #276e9c;
     z-index: 10
 }
 
@@ -839,7 +839,7 @@ label {
 }
 
 .content {
-    margin-left: 220px;
+    /* margin-left: 220px; */
     padding: 20px 25px
 }
 
@@ -1312,14 +1312,14 @@ legend {
 
 .badge.badge-inverse,
 .label.label-inverse {
-    background: #398787
+    background: #276e9c
 }
 
 .pager li>a,
 .pager li>span,
 .pagination>li>a {
     border-color: #e2e7eb;
-    color: #398787
+    color: #276e9c
 }
 
 .pager.pager-without-border li>a,
@@ -1342,7 +1342,7 @@ legend {
 }
 
 .pagination>li>a {
-    color: #398787;
+    color: #276e9c;
     margin-left: 5px;
     -webkit-border-radius: 3px !important;
     -moz-border-radius: 3px !important;
@@ -1371,7 +1371,7 @@ legend {
 .pager li>span:hover,
 .pagination>li>a:focus,
 .pagination>li>a:hover {
-    color: #398787;
+    color: #276e9c;
     background: #e2e7eb;
     border-color: #d8dde1
 }
@@ -1382,8 +1382,8 @@ legend {
 .pagination>.active>span,
 .pagination>.active>span:focus,
 .pagination>.active>span:hover {
-    background: #398787 !important;
-    border-color: #398787 !important
+    background: #276e9c !important;
+    border-color: #276e9c !important
 }
 
 .progress {
@@ -1439,7 +1439,7 @@ legend {
 }
 
 .progress-bar.progress-bar-inverse {
-    background-color: #398787
+    background-color: #276e9c
 }
 
 .nav>li>a {
@@ -1470,7 +1470,7 @@ legend {
 .nav-tabs>li.active>a,
 .nav-tabs>li.active>a:focus,
 .nav-tabs>li.active>a:hover {
-    color: #398787
+    color: #276e9c
 }
 
 .nav-tabs {
@@ -1487,7 +1487,7 @@ legend {
 }
 
 .nav-tabs.nav-tabs-inverse {
-    background: #398787
+    background: #276e9c
 }
 
 .nav-tabs.nav-justified>li>a {
@@ -1497,7 +1497,7 @@ legend {
 .nav-tabs.nav-tabs-inverse>li.active>a,
 .nav-tabs.nav-tabs-inverse>li.active>a:focus,
 .nav-tabs.nav-tabs-inverse>li.active>a:hover {
-    color: #398787;
+    color: #276e9c;
     background: #fff
 }
 
@@ -1532,7 +1532,7 @@ legend {
 .nav-pills>li.active>a,
 .nav-pills>li.active>a:focus,
 .nav-pills>li.active>a:hover {
-    background: #398787
+    background: #276e9c
 }
 
 .nav-stacked>li+li {
@@ -1705,8 +1705,8 @@ legend {
 
 .btn.btn-inverse {
     color: #fff;
-    background: #398787;
-    border-color: #398787
+    background: #276e9c;
+    border-color: #276e9c
 }
 
 .btn-inverse.active,
@@ -1714,13 +1714,13 @@ legend {
 .btn-inverse:focus,
 .btn-inverse:hover,
 .open .dropdown-toggle.btn-inverse {
-    background: #398787;
-    border-color: #398787
+    background: #276e9c;
+    border-color: #276e9c
 }
 
 .btn-group .btn.btn-inverse:not(.active)+.btn.btn-inverse,
 .input-group-btn .btn.btn-inverse:not(.active)+.btn.btn-inverse {
-    border-left-color: #398787
+    border-left-color: #276e9c
 }
 
 .btn.btn-primary {
@@ -2002,7 +2002,7 @@ legend {
 }
 
 .panel-inverse>.panel-heading {
-    background: #398787
+    background: #276e9c
 }
 
 .panel-success>.panel-heading {
@@ -2253,7 +2253,7 @@ legend {
 .media a:not(.btn):focus .media-heading,
 .media a:not(.btn):hover,
 .media a:not(.btn):hover .media-heading {
-    color: #398787;
+    color: #276e9c;
     text-decoration: none
 }
 
@@ -2277,7 +2277,7 @@ ul.tagit li.tagit-choice .tagit-close:hover {
 }
 
 .table>thead>tr>th {
-    color: #398787;
+    color: #276e9c;
     font-weight: 600;
     border-bottom: 2px solid #e2e7eb !important
 }
@@ -2453,7 +2453,7 @@ a.list-group-item.active:hover {
 
 .nav-pills>.active>a>.badge,
 a.list-group-item.active>.badge {
-    color: #398787
+    color: #276e9c
 }
 
 .nav.nav-pills.nav-sm>li {
@@ -3414,7 +3414,7 @@ code {
 }
 
 .text-inverse {
-    color: #398787 !important
+    color: #276e9c !important
 }
 
 a.text-inverse:focus,
@@ -3493,11 +3493,11 @@ a.text-white:hover {
 }
 
 .bg-black {
-    background: #398787 !important
+    background: #276e9c !important
 }
 
 .bg-black-darker {
-    background: #398787 !important
+    background: #276e9c !important
 }
 
 .bg-black-lighter {
@@ -3894,7 +3894,7 @@ a.text-white:hover {
 
 .dataTables_wrapper table.dataTable.dtr-inline.collapsed>tbody>tr>td:first-child:before,
 .dataTables_wrapper table.dataTable.dtr-inline.collapsed>tbody>tr>th:first-child:before {
-    background: #398787;
+    background: #276e9c;
     border-radius: 3px;
     border: none;
     top: 10px;
@@ -3990,7 +3990,7 @@ table.dataTable td.focus,
 table.dataTable th.focus {
     position: relative;
     z-index: 1000;
-    outline: #398787 solid 2px !important
+    outline: #276e9c solid 2px !important
 }
 
 .datepicker table tr td.today,
@@ -4055,7 +4055,7 @@ table.dataTable th.focus {
 .irs-from,
 .irs-single,
 .irs-to {
-    background: #398787 !important
+    background: #276e9c !important
 }
 
 .colorpicker {
@@ -4211,7 +4211,7 @@ ul.tagit li.tagit-choice-editable {
 }
 
 ul.tagit.inverse li.tagit-choice-editable {
-    background: #398787 !important
+    background: #276e9c !important
 }
 
 ul.tagit.white li.tagit-choice-editable {
@@ -4415,7 +4415,7 @@ ul.tagit.inverse li.tagit-choice .tagit-close:hover .ui-icon-close:before {
 .fc-event-list .fc-event {
     background: 0 0;
     border: none;
-    color: #398787;
+    color: #276e9c;
     padding: 10px 15px;
     font-size: 12px;
     margin-left: -15px;
@@ -4426,7 +4426,7 @@ ul.tagit.inverse li.tagit-choice .tagit-close:hover .ui-icon-close:before {
 
 .fc-event-list .fc-event:focus,
 .fc-event-list .fc-event:hover {
-    color: #398787;
+    color: #276e9c;
     cursor: pointer;
     background: #f0f3f5
 }
@@ -4447,7 +4447,7 @@ ul.tagit.inverse li.tagit-choice .tagit-close:hover .ui-icon-close:before {
 
 body .fc button {
     font-weight: 400;
-    color: #398787;
+    color: #276e9c;
     background: #fff;
     border-color: #e2e7eb;
     box-shadow: none;
@@ -4491,7 +4491,7 @@ body .fc button:active {
 
 .fc th {
     padding: 3px 15px;
-    color: #398787;
+    color: #276e9c;
     font-weight: 600;
     background: #f0f3f5
 }
@@ -4654,7 +4654,7 @@ body .fc button:active {
     width: 240px;
     padding: 0;
     overflow: hidden;
-    background: #398787;
+    background: #276e9c;
     vertical-align: middle
 }
 
@@ -4868,7 +4868,7 @@ body .fc button:active {
     content: '\f14a';
     opacity: .4;
     filter: alpha(opacity=40);
-    color: #398787
+    color: #276e9c
 }
 
 .todolist>li.active>a .todolist-input i:before,
@@ -5034,7 +5034,7 @@ body .fc button:active {
 
 .invoice-price .invoice-price-right {
     width: 25%;
-    background: #398787;
+    background: #276e9c;
     color: #fff;
     font-size: 28px;
     text-align: right;
@@ -5090,7 +5090,7 @@ body .fc button:active {
 .login .login-header .brand {
     padding: 0;
     font-size: 28px;
-    color: #398787
+    color: #276e9c
 }
 
 .login .login-header .brand .logo {
@@ -5321,7 +5321,7 @@ body .fc button:active {
 
 .error-code {
     bottom: 60%;
-    color: #398787;
+    color: #276e9c;
     font-size: 96px;
     line-height: 100px
 }
@@ -5330,7 +5330,7 @@ body .fc button:active {
     top: 40%;
     bottom: 0;
     padding-top: 15px;
-    background: #398787
+    background: #276e9c
 }
 
 .error-message {
@@ -5355,7 +5355,7 @@ body .fc button:active {
     top: 5px;
     bottom: 5px;
     width: 5px;
-    background: #398787;
+    background: #276e9c;
     left: 20%;
     margin-left: -2.5px
 }
@@ -5390,7 +5390,7 @@ body .fc button:active {
 .timeline .timeline-time .time {
     line-height: 28px;
     font-size: 24px;
-    color: #398787
+    color: #276e9c
 }
 
 .timeline .timeline-icon {
@@ -5413,7 +5413,7 @@ body .fc button:active {
     line-height: 40px;
     color: #fff;
     font-size: 14px;
-    border: 5px solid #398787;
+    border: 5px solid #276e9c;
     transition: background .2s linear;
     -moz-transition: background .2s linear;
     -webkit-transition: background .2s linear
@@ -5513,7 +5513,7 @@ body .fc button:active {
 
 .timeline-footer a:not(.btn):focus,
 .timeline-footer a:not(.btn):hover {
-    color: #398787
+    color: #276e9c
 }
 
 .coming-soon .brand {
@@ -5773,7 +5773,7 @@ body .fc button:active {
 
 .range-max,
 .range-min {
-    color: #398787 !important
+    color: #276e9c !important
 }
 
 .range-handle {
@@ -5801,7 +5801,7 @@ body .fc button:active {
 }
 
 .black .range-quantity {
-    background: #398787 !important
+    background: #276e9c !important
 }
 
 .datetimepicker table tr span.active,
@@ -6120,15 +6120,15 @@ body .fc button:active {
 }
 
 .list-group-item.list-group-item-inverse {
-    background: #398787;
-    border-color: #398787;
+    background: #276e9c;
+    border-color: #276e9c;
     color: #fff;
     font-weight: 300
 }
 
 .list-group-item.list-group-item-inverse .badge-inverse,
 .list-group-item.list-group-item-inverse .label-inverse {
-    background: #398787;
+    background: #276e9c;
     background: rgba(0, 0, 0, .4)
 }
 
@@ -6201,7 +6201,7 @@ body .fc button:active {
 .bootstrap-calendar .calendar .icon-arrow-left:hover,
 .bootstrap-calendar .calendar .icon-arrow-right:focus,
 .bootstrap-calendar .calendar .icon-arrow-right:hover {
-    color: #398787
+    color: #276e9c
 }
 
 .bootstrap-calendar .calendar .icon-arrow-left:before {
@@ -6240,7 +6240,7 @@ body .fc button:active {
 .bootstrap-calendar .calendar .event:focus,
 .bootstrap-calendar .calendar .event:hover {
     text-shadow: none;
-    color: #398787;
+    color: #276e9c;
     box-shadow: none;
     font-weight: 400
 }
@@ -6439,14 +6439,14 @@ body .fc button:active {
     left: 50%;
     bottom: 0;
     border: 10px solid transparent;
-    border-bottom-color: #398787;
+    border-bottom-color: #276e9c;
     margin-left: -10px
 }
 
 .superbox-show {
     text-align: center;
     position: relative;
-    background: #398787;
+    background: #276e9c;
     width: 100%;
     float: left;
     padding: 25px;
@@ -6534,7 +6534,7 @@ body .fc button:active {
 }
 
 .list-email>li.list-group-item.inverse:before {
-    background-color: #398787
+    background-color: #276e9c
 }
 
 .list-email>li.list-group-item.warning:before {
@@ -6594,7 +6594,7 @@ body .fc button:active {
 
 .list-email .email-title,
 .list-email .email-title a {
-    color: #398787
+    color: #276e9c
 }
 
 .list-email .email-time {
@@ -6676,7 +6676,7 @@ body .fc button:active {
 }
 
 .attached-document .document-name a {
-    color: #398787
+    color: #276e9c
 }
 
 .attached-document>li img {
@@ -7144,7 +7144,7 @@ body.flat-black {
 .nav.nav-tabs.nav-tabs-inverse>li>a:hover,
 .tab-overflow .nav-tabs-inverse .next-button>a,
 .tab-overflow .nav-tabs-inverse .prev-button>a {
-    background: #398787
+    background: #276e9c
 }
 
 .flat-black .nav.nav-tabs.nav-tabs-inverse>li>a,
@@ -7159,7 +7159,7 @@ body.flat-black {
 .nav.nav-tabs.nav-tabs-inverse>li.active>a:focus,
 .nav.nav-tabs.nav-tabs-inverse>li.active>a:hover {
     background: #fff;
-    color: #398787
+    color: #276e9c
 }
 
 .tab-overflow.overflow-left .prev-button,
@@ -7182,12 +7182,12 @@ body.flat-black {
 
 .flat-black .page-with-light-sidebar .sidebar .nav>li>a,
 .page-with-light-sidebar .sidebar .nav>li>a {
-    color: #398787
+    color: #276e9c
 }
 
 .page-with-light-sidebar .sidebar .nav>li.nav-profile {
     background: #f0f3f4;
-    color: #398787
+    color: #276e9c
 }
 
 .page-sidebar-minified.page-with-light-sidebar .sidebar .nav li.has-sub>.sub-menu,
@@ -7225,7 +7225,7 @@ body.flat-black {
 .page-with-light-sidebar.page-sidebar-minified .sidebar .nav>li.active:hover>a,
 .page-with-light-sidebar.page-sidebar-minified .sidebar .nav>li.active>a {
     color: #fff;
-    background: #398787
+    background: #276e9c
 }
 
 .flat-black .page-with-light-sidebar .sidebar .nav>li .sidebar-minify-btn,
@@ -7321,7 +7321,7 @@ body.flat-black {
 
 .jstree-open>.jstree-anchor>.fa-folder:before {
     content: '\f07c';
-    color: #398787
+    color: #276e9c
 }
 
 .jstree-default .jstree-checkbox {
@@ -7364,7 +7364,7 @@ body.flat-black {
     line-height: 16px;
     font-size: 12px;
     font-style: initial;
-    color: #398787
+    color: #276e9c
 }
 
 .dropdown.dropdown-lg {
@@ -7380,7 +7380,7 @@ body.flat-black {
 .dropdown-header {
     font-size: 14px;
     font-weight: 700;
-    color: #398787;
+    color: #276e9c;
     padding: 0;
     margin: 0 0 10px
 }
@@ -7503,7 +7503,7 @@ body.flat-black {
 }
 
 .login.login-with-news-feed .login-header .brand {
-    color: #398787
+    color: #276e9c
 }
 
 .login.login-with-news-feed .login-header .brand small {
@@ -7535,7 +7535,7 @@ body.flat-black {
 
 .daterangepicker .ranges li,
 .select2-container--default .select2-results__group {
-    color: #398787 !important
+    color: #276e9c !important
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
@@ -7674,7 +7674,7 @@ body.flat-black {
     border: none;
     padding-top: 7px;
     padding-bottom: 7px;
-    color: #398787
+    color: #276e9c
 }
 
 .table.table-profile>tbody>tr>td.field {
@@ -7741,7 +7741,7 @@ body .bootstrap-datetimepicker-widget .timepicker-second {
 
 body .bootstrap-datetimepicker-widget a[data-action],
 body .bootstrap-datetimepicker-widget.dropdown-menu {
-    color: #398787
+    color: #276e9c
 }
 
 body .bootstrap-datetimepicker-widget table td {
@@ -7809,7 +7809,7 @@ body .bootstrap-datetimepicker-widget table td {
 }
 
 .top-menu {
-    background: #398787;
+    background: #276e9c;
     height: 40px;
     position: fixed;
     top: 54px;
@@ -7932,7 +7932,7 @@ body .bootstrap-datetimepicker-widget table td {
     position: absolute;
     top: 0;
     width: 40px;
-    background: #398787;
+    background: #276e9c;
     height: 40px;
     margin: 0
 }
@@ -8145,7 +8145,7 @@ body .bootstrap-datetimepicker-widget table td {
 
 .dropzone .dz-message {
     font-weight: 500 !important;
-    color: #398787 !important;
+    color: #276e9c !important;
     font-size: 24px !important;
     text-align: center !important;
     margin: 45px 0 !important

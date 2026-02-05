@@ -40,11 +40,11 @@ $allMarkCount = 0
                     <table class="table">
                         <thead >
                             <tr >
-                                <th style="background-color:#90e6e6;"><b>#</b></th>
-                                <th nowrap style="background-color:#90e6e6;"><b>Model</b></th>
-                                <th nowrap style="background-color:#90e6e6;"><b>Nomi</b></th>
-                                <th nowrap style="background-color:#90e6e6;"><b>O'lchami</b></th>
-                                <th nowrap style="background-color:#90e6e6;"><b>Soni</b></th>
+                                <th style="background-color:#e1c8a4;"><b>#</b></th>
+                                <th nowrap style="background-color:#e1c8a4;"><b>Model</b></th>
+                                <th nowrap style="background-color:#e1c8a4;"><b>Nomi</b></th>
+                                <th nowrap style="background-color:#e1c8a4;"><b>O'lchami</b></th>
+                                <th nowrap style="background-color:#e1c8a4;"><b>Soni</b></th>
                             </tr>
                         </thead>
                         <tbody id="showRes">
@@ -106,11 +106,11 @@ $allMarkCount = 0
                     <table class="table">
                         <thead>
                             <tr>
-                                <th style="background-color:#90e6e6;"><b>#</b></th>
-                                <th style="background-color:#90e6e6;" nowrap><b>Model</b></th>
-                                <th style="background-color:#90e6e6;" nowrap><b>Nomi</b></th>
-                                <th style="background-color:#90e6e6;" nowrap><b>O'lchami</b></th>
-                                <th style="background-color:#90e6e6;" nowrap><b>Soni</b></th>
+                                <th style="background-color:#e1c8a4;"><b>#</b></th>
+                                <th style="background-color:#e1c8a4;" nowrap><b>Model</b></th>
+                                <th style="background-color:#e1c8a4;" nowrap><b>Nomi</b></th>
+                                <th style="background-color:#e1c8a4;" nowrap><b>O'lchami</b></th>
+                                <th style="background-color:#e1c8a4;" nowrap><b>Soni</b></th>
                             </tr>
                         </thead>
                         <tbody id="backet" data-count="0" data-increment="0">

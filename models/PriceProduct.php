@@ -98,10 +98,10 @@ class PriceProduct extends \yii\db\ActiveRecord
     public function getType()
     {
         return ArrayHelper::map([
-            ['id' => '1', 'type' => 'Dona',],
             ['id' => '2', 'type' => 'Karobka',],
             ['id' => '3', 'type' => 'Komplekt',],
             ['id' => '4', 'type' => 'Pochka',],
+            ['id' => '1', 'type' => 'Dona',],
         ],
         'id', 'type');
     }

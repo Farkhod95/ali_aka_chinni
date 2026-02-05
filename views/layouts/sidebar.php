@@ -1,315 +1,266 @@
-<?php 
-use app\widgets\Menu;
+<?php
+use yii\helpers\Html;
+use yii\bootstrap\Nav;
+use yii\bootstrap\NavBar;
 use app\models\Users;
+
 $model = Users::findOne(Yii::$app->user->identity->id);
- ?>
 
-<div id="sidebar" class="sidebar sidebar-transparent">
-    <div data-scrollbar="true" data-height="100%" >
-        <ul class="nav">
-            <li class="nav-profile">
-                <a href="javascript:;" data-toggle="nav-profile" >
-                    <div class="cover with-shadow"></div>
-                    <div class="image">
-                        <img src="<?= $model != null ? $model->getAvatar() : ''?>" alt="" />
-                    </div>
-                    <div class="info">
-                        <?= $model != null ? $model->getFio() : '' ?>
-                        <small><?= $model != null ? $model->getRoleDescription() : '' ?></small>
-                    </div>
-                </a>
-            </li>
-            
-        </ul>
-        <?= Menu::widget(
-            [
-                'options' => ['class' => 'nav'],
-                'items' => [
-                    // [
-                    //     'label' => 'Bosh Sahifa', 
-                    //     'icon' => 'dashboard', 
-                    //     'url' => ['/site/index'],
-                    //     'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 3 || $model->permission == 5 ? true : false,
-                    // ],
-                    [
-                        'label' => 'Ombor mahsulotlari', 
-                        'icon' => 'th', 
-                        'url' => ['/warehouse/all-list'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 3 || $model->permission == 4 || $model->permission == 5 || $model->permission == 6? true : false,
-                    ],
-                    [
-                        'label' => 'Buyurtma qilish', 
-                        'icon' => 'shopping-cart', 
-                        'url' => ['/order-account/orders'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6 ? true : false,
-                    ],
+NavBar::begin([
+    'brandLabel' => '<i class="fa fa-bar-chart"></i> <strong>Optom Chinni</strong>',
+    'brandUrl' => Yii::$app->homeUrl,
+    'options' => [
+        'class' => 'navbar-inverse navbar-fixed-top',
+        'style' => 'border-radius:0;',
+    ],
+    'brandOptions' => ['style' => 'color:white; font-size:18px'],
+    'renderInnerContainer' => true,
+    'innerContainerOptions' => ['class' => 'container-fluid'],
+]);
 
-                    // [
-                    //     'label' => 'Ombor', 
-                    //     'icon' => 'cubes', 
-                    //     'url' => ['/warehouse/index'],
-                    //     'visible' => $model->permission == 1 || $model->permission == 5|| $model->permission == 2 ? true : false,
-                    // ],
-                    // [
-                    //     'label' => 'Omborxona hisobi', 
-                    //     'icon' => 'tags', 
-                    //     'url' => ['/sklad/index'],
-                    //     'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 ? true : false,
-                    // ],
-                    [
-                        'label' => 'Mijoz buyurtmalar tarixi', 
-                        'icon' => 'list-ul', 
-                        'url' => ['/order-account-history/index'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6? true : false,
-                    ],
-                    [
-                        'label' => 'Mijozdan qarzdorlik', 
-                        'icon' => 'balance-scale', 
-                        'url' => ['/order-account-history/index-deptor'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6? true : false,
-                    ],
-                    [
-                        'label' => 'Buyurtmalar va qarzlar', 
-                        'icon' => 'pie-chart', 
-                        'url' => ['/order-account-history/order-and-debt'],
-                        'visible' => $model->permission == 1  ? true : false,
-                    ],
-                     [
-                        'label' => 'Vozvrat', 
-                        'icon' => 'history', 
-                        'url' => ['/vozvrat-order/vozvrat'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6 ? true : false,
-                    ],
-                     [
-                        'label' => 'Vozvrat buyurmalar tarixi', 
-                        'icon' => 'list-alt', 
-                        'url' => ['/vozvrat-order/index'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6 ? true : false,
-                    ],
-                    [
-                        'label' => 'Mijoz umumiy buyurtmasi', 
-                        'icon' => 'shopping-basket', 
-                        'url' => ['/order-account/index'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6? true : false,
-                    ],
-                    
-                    // [
-                    //     'label' => 'Buyurtmalar tarixi', 
-                    //     'icon' => 'shopping-basket', 
-                    //     'url' => ['/orders/index'],
-                    //     'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 ? true : false,
-                    // ],
-                    [
-                        'label' => 'Tovarlar va Narxlar', 
-                        'icon' => 'cubes', 
-                        'url' => ['/warehouse/index'],
-                        'visible' => $model->permission == 1 || $model->permission == 5|| $model->permission == 2 ? true : false,
-                    ],
-                    [
-                        'label' => 'Omborxona hisobi', 
-                        'icon' => 'university', 
-                        'url' => ['/sklad/index'],
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 || $model->permission == 6 ? true : false,
-                    ],
-                    
-                    [
-                        'label' => 'Mening qarzlarim', 
-                        'icon' => 'bookmark', 
-                        'url' => ['/my-total-debt/index'],
-                        'visible' => $model->permission == 1  ? true : false,
-                    ],
-                    
-                    
-                    
-                    
-                    // [
-                    //     'label' => 'Kalkulyator', 
-                    //     'icon' => 'calculator', 
-                    //     'url' => ['/site/calculator'],
-                    //     'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 3 || $model->permission == 4 || $model->permission == 5 ? true : false,
-                    // ],                    
-                    [
-                        "label" => "Tizim boshqaruvi",
-                        "url" => "#",
-                        "icon" => "bars",
-                        'visible' => $model->permission == 1 || $model->permission == 6 ? true : false,
-                        "items" => [
-                   
-                      
-                            [
-                                'label' => 'Mahsulot toifalari', 
-                                'icon' => 'product-hunt', 
-                                'url' => ['/product-category/index'],
-                                'visible' => $model->permission == 1 || $model->permission == 6? true : false,
-                            ],
-                            [
-                                'label' => 'Modellar', 
-                                'icon' => 'bookmark', 
-                                'url' => ['/brands/index'],
-                                'visible' => $model->permission == 1  || $model->permission == 6? true : false,
-                            ],
-                            [
-                                'label' => 'Mahsulot o\'lchami', 
-                                'icon' => 'list-ol', 
-                                'url' => ['/brands-size/index'],
-                                'visible' => $model->permission == 1  || $model->permission == 6? true : false,
-                            ],
-                        
-                            [
-                                'label' => 'O\'zgarishlar hisobi', 
-                                'icon' => 'warning', 
-                                'url' => ['/elegant-history-update/index'],
-                                'visible' => $model->permission == 1 ? true : false,
-                            ],
-                    
-                         
-                            [
-                                'label' => 'Foydalanuvchilar', 
-                                'icon' => 'users', 
-                                'url' => ['/users/index'],
-                                'visible' => $model->permission == 1 ? true : false,
-                            ],
-                            [
-                                'label' => 'Foyda va zarar', 
-                                'icon' => 'bar-chart', 
-                                'url' => ['/loss-of-profit/index'],
-                                'visible' => $model->permission == 1  ? true : false,
-                            ],
-                            [
-                                'label' => 'Xarajatlar', 
-                                'icon' => 'align-left', 
-                                'url' => ['/expenses/index'],
-                                'visible' => $model->permission == 1  ? true : false,
-                            ],
-                            [
-                                'label' => 'Yuk chiquvchi joy', 
-                                'icon' => 'th-large', 
-                                'url' => ['/type-sklad/index'],
-                                'visible' => $model->permission == 1 ? true : false,
-                            ],
-                            [
-                                'label' => 'Xarajat turi', 
-                                'icon' => 'bars', 
-                                'url' => ['/type-expense/index'],
-                                'visible' => $model->permission == 1  ? true : false,
-                            ],
-                            [
-                                'label' => 'Biz haqimizda', 
-                                'icon' => 'home', 
-                                'url' => ['/about/index'],
-                                'visible' => $model->permission == 1  ? true : false,
-                            ],
-                            
-                        ],
-                    ],
-                    [
-                        "label" => "Sozlamalar",
-                        "url" => "#",
-                        "icon" => "cogs",
-                        'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 6 ? true : false,
-                        "items" => [
-                            // [
-                            //     'label' => 'Tekshirishlar tarixi', 
-                            //     'icon' => 'check', 
-                            //     'url' => ['/check/index'],
-                            //     'visible' => $model->permission == 1  ? true : false,
-                            // ],
-                            
-                            [
-                                'label' => 'Mijozlar', 
-                                'icon' => 'user', 
-                                'url' => ['/client/index'],
-                                'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 6? true : false,
-                            ],
-                            // [
-                            //     'label' => 'Mijoz Keshbeklari', 
-                            //     'icon' => 'percent', 
-                            //     'url' => ['/keshbek-history/client-keshbek'],
-                            //     'visible' => $model->permission == 1  || $model->permission == 6? true : false,
-                            // ],
-                            [
-                                'label' => 'Sotilgan tovarlar tarixi', 
-                                'icon' => 'history', 
-                                'url' => ['/order-account-history/export'],
-                                'visible' => $model->permission == 1 || $model->permission == 2  || $model->permission == 6? true : false,
-                            ],
-                            [
-                                'label' => 'To\'langan qarzlar', 
-                                'icon' => 'pie-chart', 
-                                'url' => ['/debt-repayment/index'],
-                                'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 6   ? true : false,
-                            ],
-                            
-                            [
-                                'label' => 'Klientlar tarixi', 
-                                'icon' => 'history', 
-                                'url' => ['/order-account-history/client-history'],
-                                'visible' => $model->permission == 1 || $model->permission == 2  || $model->permission == 6? true : false,
-                            ],
-                            // Bu menyuda dateto dan date fromga cha bo'lgan oraliqdan qaysi kilent qancha maxsulot olganini ko'rsatadi
-                            // [
-                            //     'label' => 'Klientlar tarixi', 
-                            //     'icon' => 'history', 
-                            //     'url' => ['/order-account-history/client'],
-                            //     'visible' => $model->permission == 1 || $model->permission == 2  || $model->permission == 6? true : false,
-                            // ],
-                            [
-                                'label' => 'Kunlik sotilgan tovarlar', 
-                                'icon' => 'history', 
-                                'url' => ['/order-account-history/day-orders'],
-                                'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
-                            ],
-                            // [
-                            //     'label' => 'Kunlik sotilgan tovarlar', 
-                            //     'icon' => 'history', 
-                            //     'url' => ['/order-account-history/client-product-history-old'],
-                            //     'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
-                            // ],
-                            // [
-                            //     'label' => 'Kunlik sotilgan tovarlar', 
-                            //     'icon' => 'history', 
-                            //     'url' => ['/warehouse-history/product'],
-                            //     'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
-                            // ],
-                            // [
-                            //     'label' => 'Import tovarlar tarixi', 
-                            //     'icon' => 'history', 
-                            //     'url' => ['/warehouse-history/import'],
-                            //     'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
-                            // ],
-                            [
-                                'label' => 'Top mijozlar', 
-                                'icon' => 'history', 
-                                'url' => ['/order-account/top-client'],
-                                'visible' => $model->permission == 1  ? true : false,
-                            ],
-                            [
-                                'label' => 'Qarzdorlar ro\'yxati', 
-                                'icon' => 'history', 
-                                'url' => ['/order-account/debtors'],
-                                'visible' => $model->permission == 1 || $model->permission == 2  || $model->permission == 6? true : false,
-                            ],
-                            [
-                                'label' => 'Mijoz Buyurtma Karzinka', 
-                                'icon' => 'trash-o', 
-                                'url' => ['/order-account-history/trash-o'],
-                                'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 6? true : false,
-                            ],
-                            [
-                                'label' => 'To\'langan Qarz Karzinka', 
-                                'icon' => 'trash-o', 
-                                'url' => ['/debt-repayment/trash-o'],
-                                'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 6? true : false,
-                            ],
-                           
-                            
-                        ],
-                    ],
-                    
-                ],
-            ]
-        ) ?>
-        <li style="list-style: none;"><a href="javascript:;" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="fa fa-angle-double-left"></i></a></li>
-    </div>
-</div>
-<div class="sidebar-bg"></div>
+$menuItems = [];
+
+// ====== ASOSIY MENYU (sidebar dagi itemlar) ======
+$menuItems[] = [
+    'label' => 'Ombor mahsulotlari',
+    'url' => ['/warehouse/all-list'],
+    'visible' => $model && in_array($model->permission, [1,2,3,4,5,6]),
+];
+
+$menuItems[] = [
+    'label' => 'Buyurtma qilish',
+    'url' => ['/order-account/orders'],
+    'visible' => $model && in_array($model->permission, [1,2,5,6]),
+];
+
+$menuItems[] = [
+    'label' => 'Mijoz buyurtmalar tarixi',
+    'url' => ['/order-account-history/index'],
+    'visible' => $model && in_array($model->permission, [1,2,5,6]),
+];
+
+// $menuItems[] = [
+//     'label' => 'Mijozdan qarzdorlik',
+//     'url' => ['/order-account-history/index-deptor'],
+//     'visible' => $model && in_array($model->permission, [1,2,5,6]),
+// ];
+
+// $menuItems[] = [
+//     'label' => 'Buyurtmalar va qarzlar',
+//     'url' => ['/order-account-history/order-and-debt'],
+//     'visible' => $model && ($model->permission == 1),
+// ];
+
+// $menuItems[] = [
+//     'label' => 'Vozvrat',
+//     'url' => ['/vozvrat-order/vozvrat'],
+//     'visible' => $model && in_array($model->permission, [1,2,5,6]),
+// ];
+
+// $menuItems[] = [
+//     'label' => 'Vozvrat buyurmalar tarixi',
+//     'url' => ['/vozvrat-order/index'],
+//     'visible' => $model && in_array($model->permission, [1,2,5,6]),
+// ];
+
+$menuItems[] = [
+    'label' => 'Mijoz umumiy buyurtmasi',
+    'url' => ['/order-account/index'],
+    'visible' => $model && in_array($model->permission, [1,2,5,6]),
+];
+
+$menuItems[] = [
+    'label' => 'Mahsulotlar',
+    'url' => ['/warehouse/index'],
+    'visible' => $model && in_array($model->permission, [1,2,5]),
+];
+
+$menuItems[] = [
+    'label' => 'Sklad hisobi',
+    'url' => ['/sklad/index'],
+    'visible' => $model && in_array($model->permission, [1,2,5,6]),
+];
+
+$menuItems[] = [
+    'label' => 'Mening qarzlarim',
+    'url' => ['/my-total-debt/index'],
+    'visible' => $model && ($model->permission == 1),
+];
+
+// ====== TIZIM BOSHQARUVI (dropdown) ======
+$menuItems[] = [
+    'label' => 'Tizim boshqaruvi',
+    'url' => '#',
+    'items' => [
+         [
+            'label' => 'Modellar',
+            'url' => ['/brands/index'],
+            'visible' => $model && in_array($model->permission, [1,6]),
+        ],
+        [
+            'label' => 'Mahsulot toifalari',
+            'url' => ['/product-category/index'],
+            'visible' => $model && in_array($model->permission, [1,6]),
+        ],
+        [
+            'label' => 'Mahsulot o\'lchami',
+            'url' => ['/brands-size/index'],
+            'visible' => $model && in_array($model->permission, [1,6]),
+        ],
+        [
+            'label' => 'O\'zgarishlar hisobi',
+            'url' => ['/elegant-history-update/index'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+        [
+            'label' => 'Foydalanuvchilar',
+            'url' => ['/users/index'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+        // [
+        //     'label' => 'Foyda va zarar',
+        //     'url' => ['/loss-of-profit/index'],
+        //     'visible' => $model && ($model->permission == 1),
+        // ],
+        [
+            'label' => 'Xarajatlar',
+            'url' => ['/expenses/index'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+        [
+            'label' => 'Yuk chiquvchi joy',
+            'url' => ['/type-sklad/index'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+        [
+            'label' => 'Xarajat turi',
+            'url' => ['/type-expense/index'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+        // [
+        //     'label' => 'Ombor', 
+        //     'url' => ['/warehouse/index'],
+        //     'visible' => $model->permission == 1 || $model->permission == 5|| $model->permission == 2 ? true : false,
+        // ],
+        // [
+        //     'label' => 'Sklad tarixi', 
+        //     'url' => ['/sklad/index'],
+        //     'visible' => $model->permission == 1 || $model->permission == 2 || $model->permission == 5 ? true : false,
+        // ],
+        [
+            'label' => 'Biz haqimizda',
+            'url' => ['/about/index'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+    ],
+    'visible' => $model && in_array($model->permission, [1,6]),
+];
+
+// ====== SOZLAMALAR (dropdown) ======
+$menuItems[] = [
+    'label' => 'Sozlamalar',
+    'url' => '#',
+    'items' => [
+        [
+            'label' => 'Mijozlar',
+            'url' => ['/client/index'],
+            'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
+           [
+            'label' => 'Yuk jo\'natuvchilar', 
+            'url' => ['/consignor/index'],
+            'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
+        ],
+        // [
+        //     'label' => 'Sotilgan tovarlar tarixi',
+        //     'url' => ['/order-account-history/export'],
+        //     'visible' => $model && in_array($model->permission, [1,2,6]),
+        // ],
+        // [
+        //     'label' => 'To\'langan qarzlar',
+        //     'url' => ['/debt-repayment/index'],
+        //     'visible' => $model && in_array($model->permission, [1,2,6]),
+        // ],
+        // [
+        //     'label' => 'Klientlar tarixi',
+        //     'url' => ['/order-account-history/client-history'],
+        //     'visible' => $model && in_array($model->permission, [1,2,6]),
+        // ],
+        // [
+        //     'label' => 'Kunlik sotilgan tovarlar',
+        //     'url' => ['/order-account-history/day-orders'],
+        //     'visible' => $model && in_array($model->permission, [1,2]),
+        // ],
+        [
+            'label' => 'Top mijozlar',
+            'url' => ['/order-account/top-client'],
+            'visible' => $model && ($model->permission == 1),
+        ],
+        [
+            'label' => 'Qarzdorlar ro\'yxati',
+            'url' => ['/order-account/debtors'],
+            'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
+        [
+            'label' => 'Mijoz Buyurtma Karzinka',
+            'url' => ['/order-account-history/trash-o'],
+            'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
+        [
+            'label' => 'To\'langan Qarz Karzinka',
+            'url' => ['/debt-repayment/trash-o'],
+            'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
+    ],
+    'visible' => $model && in_array($model->permission, [1,2,6]),
+];
+
+// ====== PROFIL (o'ng tomonda dropdown) ======
+$menuItems[] = [
+    'label' => '<i class="fa fa-user"></i> ' . Html::encode($model ? $model->getFio() : 'Profil'),
+    'items' => [
+        // [
+        //     'label' => '<i class="fa fa-user"></i> Profil',
+        //     'url' => ['/users/view', 'id' => $model ? $model->id : null],
+        //     'visible' => (bool)$model,
+        // ],
+        // '<li class="divider"></li>',
+        [
+            'label' => '<i class="fa fa-sign-out"></i> Chiqish',
+            'url' => ['/site/logout'],
+            'linkOptions' => ['data-method' => 'post'],
+        ],
+    ],
+    'encode' => false,
+];
+
+echo Nav::widget([
+    'options' => ['class' => 'navbar-nav navbar-right'],
+    'items' => array_filter($menuItems, function($item){
+        // visible false bo'lsa chiqarib tashlaymiz
+        return !isset($item['visible']) || $item['visible'];
+    }),
+    'encodeLabels' => false,
+]);
+
+NavBar::end();
+?>
+
+<style>
+/* Header menu hover/active style */
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus{
+    background-color: #235c80 !important;
+    color: #ffffff !important;
+    border-radius: 4px;
+}
+
+/* Dropdown ichidagi linklar */
+.navbar-inverse .dropdown-menu > li > a:hover{
+    background-color: #235c80 !important;
+    color: #fff !important;
+}
+</style>

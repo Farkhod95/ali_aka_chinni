@@ -29,7 +29,7 @@ $fieldOptions2 = [
                 <div class="logo-icon">
                     <i class="fa fa-shield"></i>
                 </div>
-                <h1><?= Html::encode(Yii::$app->name) ?></h1>
+                <h1 style="color: #ffffff;"><?= Html::encode(Yii::$app->name) ?></h1>
                 <p>Xavfsiz va ishonchli boshqaruv tizimi. Platformamizga xush kelibsiz!</p>
             </div>
             

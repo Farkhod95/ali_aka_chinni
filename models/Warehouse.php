@@ -105,10 +105,10 @@ class Warehouse extends \yii\db\ActiveRecord
     public static function getProductTypeForWH()
     {
         return ArrayHelper::map([
-            ['id' => '2', 'type' => 'Dona',],
             ['id' => '2', 'type' => 'Karobka',],
             ['id' => '3', 'type' => 'Komplekt',],
-            ['id' => '2', 'type' => 'Pochka',],
+            ['id' => '4', 'type' => 'Pochka',],
+            ['id' => '1', 'type' => 'Dona',],
         ],
         'id', 'type');
     }
@@ -116,10 +116,10 @@ class Warehouse extends \yii\db\ActiveRecord
     public static function getProductTypeForClient()
     {
         return ArrayHelper::map([
-            ['id' => '1', 'type' => 'Dona',],
-            ['id' => '2', 'type' => 'Karobka',],
-            ['id' => '3', 'type' => 'Komplekt',],
-            ['id' => '4', 'type' => 'Pochka',],
+            ['id' => 2, 'type' => 'Karobka',],
+            ['id' => 3, 'type' => 'Komplekt',],
+            ['id' => 4, 'type' => 'Pochka',],
+            ['id' => 1, 'type' => 'Dona',],
         ],
         'id', 'type');
     }
@@ -127,10 +127,10 @@ class Warehouse extends \yii\db\ActiveRecord
     public static function getProductClientType()
     {
         return ArrayHelper::map([
-            ['id' => '1', 'type' => 'Dona',],
             ['id' => '2', 'type' => 'Karobka',],
             ['id' => '3', 'type' => 'Komplekt',],
             ['id' => '4', 'type' => 'Pochka',],
+            ['id' => '1', 'type' => 'Dona',],
         ],
         'id', 'type');
     }
@@ -138,10 +138,10 @@ class Warehouse extends \yii\db\ActiveRecord
     public static function getProductType()
     {
         return ArrayHelper::map([
-            ['id' => '1', 'type' => 'Dona',],
             ['id' => '2', 'type' => 'Karobka',],
             ['id' => '3', 'type' => 'Komplekt',],
             ['id' => '4', 'type' => 'Pochka',],
+            ['id' => '1', 'type' => 'Dona',],
         ],
         'id', 'type');
     }

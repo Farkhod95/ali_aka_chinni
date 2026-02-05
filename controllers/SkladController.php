@@ -270,23 +270,23 @@ class SkladController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Sklad();
+        $sklad = new Sklad();
         
-        if ($model->load(Yii::$app->request->post()) ) {
+        if ($sklad->load(Yii::$app->request->post()) ) {
             $post = Yii::$app->request->post();
             
             $importProducts = $post['Sklad']['allValue'];
 
-            // $my_total_debts = $post['Sklad']['my_total_debts'];
-            $consignor_id = 31;
+            $my_total_debts = $post['Sklad']['my_total_debts'];
+            $consignor_id = $post['Sklad']['consignor_id'];
             $dates = $post['Sklad']['dates'];
             $exchange_rates = $post['Sklad']['exchange_rates'];
-            // $given_sum_dollars = $post['Sklad']['given_sum_dollars'];
-            $given_sum_dollars = 0;
-            // $sum_dollars = $post['Sklad']['sum_dollars'];
-            $sum_dollars = 0;
-            // $discount_amounts = $post['Sklad']['discount_amounts'];
-            $discount_amounts = 0;
+            $given_sum_dollars = $post['Sklad']['given_sum_dollars'];
+            // $given_sum_dollars = 0;
+            $sum_dollars = $post['Sklad']['sum_dollars'];
+            // $sum_dollars = 0;
+            $discount_amounts = $post['Sklad']['discount_amounts'];
+            // $discount_amounts = 0;
             $comments = $post['Sklad']['comments'];
             
             $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $consignor_id])->one();
@@ -300,7 +300,7 @@ class SkladController extends Controller
             
             $consignor = Consignor::find()->where(['id' => $consignor_id])->one();
             
-            $sklad = new Sklad();
+            // $sklad = new Sklad();
             $sklad->created_by = Yii::$app->user->identity->id;
             $sklad->comment = $comments;
             $sklad->given_sum_dollar = 0;
@@ -339,7 +339,7 @@ class SkladController extends Controller
                     $relative->brand_id = $value['brand_id'];
                     $relative->product_category_id = $value['product_category_id'];
                     $relative->size = $value['size'];
-                    $relative->count = 0;
+                    $relative->count = $value['count'];
                     $relative->price = $value['price'];
                     $relative->type = $value['type'];
 
@@ -359,7 +359,7 @@ class SkladController extends Controller
                     $relativeHistory->size = $value['size'];
                     $relativeHistory->type = $value['type'];
                     $relativeHistory->price = $value['price'];
-                    $relativeHistory->count = 0;
+                    $relativeHistory->count = $value['count'];
                     $relativeHistory->cr_date = date('Y-m-d H:i:s');
                     $relativeHistory->cr_date_time = date('Y-m-d H:i:s');
                     $relativeHistory->save(false);
@@ -375,16 +375,16 @@ class SkladController extends Controller
                     $warehouse->all_my_total_debt = 0;
                     $warehouse->all_sum_dollar =0;
                     $warehouse->all_discount_amount = 0;
-                    $warehouse->count = $warehouse->count + 0;
+                    $warehouse->count = $warehouse->count + (float)$value['count'];
                     $warehouse->save(false);
-                    $given_sum_dollars = $given_sum_dollars + (float)$value['price'] * 0;
+                    $given_sum_dollars = $given_sum_dollars + (float)$value['price'] * (float)$value['count'];
 
                     $relativeHistory = new WarehouseHistory();
                     $relativeHistory->sklad_id = $sklad->id;
                     $relativeHistory->brand_id = $value['brand_id'];
                     $relativeHistory->product_category_id = $value['product_category_id'];
                     $relativeHistory->size = $value['size'];
-                    $relativeHistory->count = 0;
+                    $relativeHistory->count = $value['count'];
                     $relativeHistory->type = $value['type'];
                     $relativeHistory->price = $value['price'];
                     $relativeHistory->cr_date = date('Y-m-d H:i:s');
@@ -428,7 +428,7 @@ class SkladController extends Controller
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'model' => $sklad,
         ]);
     }
 

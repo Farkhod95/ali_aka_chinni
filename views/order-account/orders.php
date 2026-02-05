@@ -154,12 +154,12 @@ input:checked + .slider:before {
             <table class="table">
               <thead>
                 <tr>
-                  <th style="background-color:#90e6e6;"><b>#</b></th>
-                  <th nowrap style="background-color:#90e6e6;"><b>Model</b></th>
-                  <th nowrap style="background-color:#90e6e6;"><b>Nomi</b></th>
-                  <th nowrap style="background-color:#90e6e6;"><b>O'lchami</b></th>
-                  <th nowrap style="background-color:#90e6e6;"><b>Sklad soni</b></th>
-                  <th nowrap style="background-color:#90e6e6;"><b>Tip</b></th>
+                  <th style="background-color:#e1c8a4;"><b>#</b></th>
+                  <th nowrap style="background-color:#e1c8a4;"><b>Model</b></th>
+                  <th nowrap style="background-color:#e1c8a4;"><b>Nomi</b></th>
+                  <th nowrap style="background-color:#e1c8a4;"><b>O'lchami</b></th>
+                  <th nowrap style="background-color:#e1c8a4;"><b>Sklad soni</b></th>
+                  <th nowrap style="background-color:#e1c8a4;"><b>Tip</b></th>
                 </tr>
               </thead>
               <tbody id="showRes">
@@ -330,16 +330,16 @@ input:checked + .slider:before {
           <table class="table">
             <thead>
             <tr>
-              <th style="background-color:#90e6e6;width: 5%;"><b>#</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 12%;"><b>Joy</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 18%;"><b>Model</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 15%;"><b>Nomi</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 10%;"><b>O'lcham</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 15%;"><b>Tip</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 10%;"><b>Narxi ($)</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 8%;"><b>Soni</b></th>
-              <th nowrap style="background-color:#90e6e6;width: 10%;"><b>Umum.narxi ($)</b></th>
-              <th style="background-color:#90e6e6;"><b></b></th>
+              <th style="background-color:#e1c8a4;width: 5%;"><b>#</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 12%;"><b>Joy</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 18%;"><b>Model</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 15%;"><b>Nomi</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 10%;"><b>O'lcham</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 15%;"><b>Tip</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 10%;"><b>Narxi ($)</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 8%;"><b>Soni</b></th>
+              <th nowrap style="background-color:#e1c8a4;width: 10%;"><b>Umum.narxi ($)</b></th>
+              <th style="background-color:#e1c8a4;"><b></b></th>
             </tr>
             </thead>
             <tbody id="backet" data-count="0" data-increment="0" data-count-sum="0">

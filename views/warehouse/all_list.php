@@ -86,14 +86,14 @@ $catAjaxUrl = Url::to(['product-category/by-brand']);
           <table class="table">
             <thead>
               <tr>
-                <th style="background-color:#90e6e6;"><b>#</b></th>
-                <th style="background-color:#90e6e6;" nowrap><b>Model</b></th>
-                <th style="background-color:#90e6e6;" nowrap><b>Nomi</b></th>
-                <th style="background-color:#90e6e6;" nowrap><b>O'lchami</b></th>
-                <th style="background-color:#90e6e6;" nowrap><b>Tip</b></th>
-                <th style="background-color:#90e6e6;" nowrap><b>Soni</b></th>
+                <th style="background-color:#e1c8a4;"><b>#</b></th>
+                <th style="background-color:#e1c8a4;" nowrap><b>Model</b></th>
+                <th style="background-color:#e1c8a4;" nowrap><b>Nomi</b></th>
+                <th style="background-color:#e1c8a4;" nowrap><b>O'lchami</b></th>
+                <th style="background-color:#e1c8a4;" nowrap><b>Tip</b></th>
+                <th style="background-color:#e1c8a4;" nowrap><b>Soni</b></th>
                 <?php if (Yii::$app->user->identity->permission == 1): ?>
-                  <th style="background-color:#90e6e6;" nowrap><b>Narxi ($)</b></th>
+                  <th style="background-color:#e1c8a4;" nowrap><b>Narxi ($)</b></th>
                 <?php endif; ?>
               </tr>
             </thead>

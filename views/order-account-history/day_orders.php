@@ -86,11 +86,11 @@ if (!isset($searchModel)) {
                     <table class="table">
                         <thead>
                         <tr>
-                            <th style="background-color:#90e6e6;"><b>#</b></th>
-                            <th style="background-color:#90e6e6;" nowrap><b>Model</b></th>
-                            <th style="background-color:#90e6e6;" nowrap><b>Nomi</b></th>
-                            <th style="background-color:#90e6e6;" nowrap><b>O'lchami</b></th>
-                            <th style="background-color:#90e6e6;" nowrap><b>Soni</b></th>
+                            <th style="background-color:#e1c8a4;"><b>#</b></th>
+                            <th style="background-color:#e1c8a4;" nowrap><b>Model</b></th>
+                            <th style="background-color:#e1c8a4;" nowrap><b>Nomi</b></th>
+                            <th style="background-color:#e1c8a4;" nowrap><b>O'lchami</b></th>
+                            <th style="background-color:#e1c8a4;" nowrap><b>Soni</b></th>
                         </tr>
                         </thead>
                         <tbody id="showRes"></tbody>

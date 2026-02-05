@@ -36,6 +36,30 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);
     <div class="panel-body">
         <?php $form = ActiveForm::begin(['id' => 'order-form', 'options' => ['novalidate' => true]]); ?>
             <div class="row">
+               <div class="col-md-4">
+                    <?= $form->field($model, 'consignor_id')->label()->widget(\kartik\select2\Select2::classname(), [
+                        'data' => $model->getConsignor(),
+                        'options' => [
+                            'placeholder' => Yii::t('app','Tanlang...'),
+                            'onchange'=>'
+                                $.post( "/sklad/qarzs?id='.'"+$(this).val(), function( data ){
+                                    $( "input#total_debts" ).val( data);
+                                    alter(data);
+                                });' 
+                        ],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'allowClear' => true,
+                        ],
+                    ])->label('Yuk jo\'natuvchi <b style="color:red">(Kiritilish majburiy)</b>'); ?> 
+                </div>
+                <div class="col-md-3">
+                    <?php if (\Yii::$app->user->identity->permission == 1) {?>
+                        <?= $form->field($model, 'my_total_debts')->textInput(['id' => 'total_debts'])->label("Mening qarzim ($)") ?>
+                    <?php }else{?>
+                        <?= $form->field($model, 'my_total_debts')->textInput(['id' => 'total_debts', 'style' => 'display:none;'])->label("") ?>
+                    <?php }?>
+                </div>
                 <div class="col-md-3">
                     <?= $form->field($model, 'dates')->widget(DatePicker::classname(), [
                         'options' => ['placeholder' => Yii::t('app','Sanani tanlang...'), 'required'=>True, 'value' => date('d.m.Y')],
@@ -120,7 +144,19 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);
                                     'pluginOptions' => ['allowClear'=>true],
                                 ],
                                 'headerOptions' => ['style'=>'width:300px;']
-                            ],  
+                            ], 
+                             [
+                                'name'  => 'count',
+                                'title' => 'Soni',
+                                'enableError' => true,
+                                'options' => [
+                                    'type' =>'number',
+                                    'class' => 'input-priority target',
+                                    'headerOptions' => [
+                                        'style' => 'font-size: 40px',
+                                    ] ,
+                                ]
+                            ],    
                             [
                                 'name'  => 'price',
                                 'title' => 'Narxi',
@@ -137,11 +173,50 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);
                     ])->label('');?>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <?= $form->field($model, 'comments')->textInput(['id'=>'id-comment','required'=>true])->label('Izoh') ?>
+                  <div class="row">
+                    
+                    <div class="col-md-10">
+                    </div>
+                    <div class="col-md-2">
+                    <?php if (\Yii::$app->user->identity->permission == 1) {?>
+                        <?= $form->field($model, 'sum_all_pro')->textInput([
+                            'readonly' => true, // readonly qilib qo'yamiz
+                            'style' => 'margin-top:-30px; margin-left:0px;width:170px',
+                            'id' => 'sum_all_pro', // input elementga ID qo'yamiz
+                        ]) ?>
+                    <?php }else{?>
+                        <?= $form->field($model, 'sum_all_pro')->textInput([
+                            'readonly' => true, // readonly qilib qo'yamiz
+                            'style' => 'margin-top:-30px; margin-left:0px;width:170px;display:none;',
+                            'id' => 'sum_all_pro', // input elementga ID qo'yamiz
+                        ])->label("") ?>
+                    <?php }?>
+                        
+                    </div>
                 </div>
-            </div>
+                   <div class="row">
+                    <div class="col-md-6">
+                        <?= $form->field($model, 'comments')->textInput(['required' => true])->label("<b style='color:red;'>Import bo'layotgan mahsulotlar bo'yicha izoh kiriting </b>") ?>
+                    </div>
+                    <div class="col-md-2">
+                        <?= $form->field($model, 'given_sum_dollars')->textInput(['type' => 'number', 'value' => 0, 'style' => 'display:none;'])->label("<b style='color:#1748d3'> </b>") ?> 
+                    </div>
+                    <div class="col-md-2">
+                        <?php if (\Yii::$app->user->identity->permission == 1) {?>
+                            <?= $form->field($model, 'sum_dollars')->textInput(['type' => 'number', 'value' => 0])->label("<b style='color:#31701b'>Berilgan Summa ($) </b>") ?> 
+                        <?php }else{?>
+                            <?= $form->field($model, 'sum_dollars')->textInput(['type' => 'number', 'value' => 0, 'style' => 'display:none;'])->label("<b style='color:#31701b'> </b>") ?> 
+                        <?php }?>
+                    </div>
+                    <div class="col-md-2">
+                        <?php if (\Yii::$app->user->identity->permission == 1) {?>
+                            <?= $form->field($model, 'discount_amounts')->textInput(['type' => 'number', 'value' => 0])->label("<b style='color:#f59c1a'>Jami chegirma ($) </b>") ?>
+                        <?php }else{?>
+                            <?= $form->field($model, 'discount_amounts')->textInput(['type' => 'number', 'value' => 0, 'style' => 'display:none;'])->label("<b style='color:#f59c1a'> </b>") ?>
+                        <?php }?>
+                        
+                    </div>
+                </div>
             <?php if (!Yii::$app->request->isAjax){ ?>
                 <div class="form-group">
                     <?= Html::submitButton($model->isNewRecord ? 'Qo\'shish' : 'O\'zgartirish', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary', 'style' => 'width:100%']) ?>
@@ -301,6 +376,30 @@ $(document).on('afterAddRow','#my_id',function(e,row){
   const $r=$(row); fillSelect($r.find('select.mi-category'),[],null); fillSelect($r.find('select.mi-size'),[],null); fillSelect($r.find('select.mi-type'),[],null);
 });
 $(document).ready(initDependentSelects);
+
+
+
+document.getElementById("sum_all_pro").onclick = function() {
+    copyToClipboard(this); // Input ustiga bosilganda nusxalaymiz
+};
+
+var product_details = {};
+$(document).on("change", ".input-priority", function() {
+    const attr_name = $(this).attr('name');
+    let id = attr_name.match(/\d/g).join("");
+    
+    const price = parseFloat($("input[name='Sklad[allValue][" + id + "][price]']").val());
+    const count = parseInt($("input[name='Sklad[allValue][" + id + "][count]']").val());
+    
+    if (price && count) {
+        product_details[id] = price * count; // mavjud bo'lsa yangilanadi, bo'lmasa qo'shiladi
+        // console.log('product_details:', product_details);
+        
+        // Umumiy qiymatni hisoblash
+        const total_sum = Object.values(product_details).reduce((a, b) => a + b, 0);
+        $("input[name='Sklad[sum_all_pro]']").val(total_sum);
+    }
+});
 
 // // --- Jami summa hisoblash ---
 // window.product_details = window.product_details || {};

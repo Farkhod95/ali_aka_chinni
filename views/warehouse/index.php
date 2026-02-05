@@ -19,9 +19,9 @@ CrudAsset::register($this);
 <div class="panel panel-inverse user-index">
     <div class="panel-heading">
         <div class="panel-heading-btn">
-            <?php if(Yii::$app->user->identity->permission == 1){?>
+            <!-- <?php if(Yii::$app->user->identity->permission == 1){?>
                 <a href="/check/create" role="modal-remote" class="btn btn-xs  btn-warning">Tekshirildi <i class="fa fa-check"></i> </a>
-            <?php }?>
+            <?php }?> -->
             <?php if(Yii::$app->user->identity->permission == 1){?>
                 <!-- <a href="/check/create" role="modal-remote" class="btn btn-xs  btn-warning">Tekshirildi <i class="fa fa-check"></i> </a> -->
             

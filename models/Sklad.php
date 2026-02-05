@@ -49,7 +49,8 @@ class Sklad extends \yii\db\ActiveRecord
             [['my_total_debt', 'sum_dollar', 'discount_amount', 'given_sum_dollar', 'old_my_total_debt'], 'number'],
             [['created_by', 'status', 'exchange_rate', 'consignor_id', 'actived'], 'integer'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['consignor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Consignor::className(), 'targetAttribute' => ['consignor_id' => 'id']]
+            [['consignor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Consignor::className(), 'targetAttribute' => ['consignor_id' => 'id']],
+            [['consignor_id'],'required'],
             
         ];
     }
@@ -154,10 +155,10 @@ class Sklad extends \yii\db\ActiveRecord
     public function getProductType()
     {
         return ArrayHelper::map([
-            ['id' => '1', 'type' => 'Dona',],
             ['id' => '2', 'type' => 'Karobka',],
             ['id' => '3', 'type' => 'Komplekt',],
             ['id' => '4', 'type' => 'Pochka',],
+            ['id' => '1', 'type' => 'Dona',],
         ],
         'id', 'type');
     }
@@ -165,10 +166,10 @@ class Sklad extends \yii\db\ActiveRecord
     public function getProductDukonType()
     {
         return ArrayHelper::map([
-            ['id' => '1', 'type' => 'Dona',],
             ['id' => '2', 'type' => 'Karobka',],
             ['id' => '3', 'type' => 'Komplekt',],
             ['id' => '4', 'type' => 'Pochka',],
+            ['id' => '1', 'type' => 'Dona',],
         ],
         'id', 'type');
     }

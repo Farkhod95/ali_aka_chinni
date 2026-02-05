@@ -959,9 +959,9 @@ class OrderAccountHistoryController extends Controller
         $html =  '<table class="table">
         <thead>
             <tr>
-                <th  style="background-color:#90e6e6;" ><b>#</b></th>
-                <th  style="background-color:#90e6e6;" nowrap><b>FIO</b></th>
-                <th  style="background-color:#90e6e6;" nowrap><b>Karobka soni</b></th>
+                <th  style="background-color:#e1c8a4;" ><b>#</b></th>
+                <th  style="background-color:#e1c8a4;" nowrap><b>FIO</b></th>
+                <th  style="background-color:#e1c8a4;" nowrap><b>Karobka soni</b></th>
             </tr>
         </thead>
         <tbody data-count="0" data-increment="0">
