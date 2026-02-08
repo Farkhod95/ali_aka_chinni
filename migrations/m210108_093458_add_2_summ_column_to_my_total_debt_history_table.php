@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Handles adding columns to table `{{%brands}}`.
+ * Handles adding columns to table `{{%my_total_debt_history}}`.
  */
-class m210108_093374_add_2_summ_column_to_my_total_debt_history_table extends Migration
+class m210108_093458_add_2_summ_column_to_my_total_debt_history_table extends Migration
 {
     /**
      * {@inheritdoc}
