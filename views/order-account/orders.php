@@ -280,23 +280,23 @@ input:checked + .slider:before {
               </div>
 
               <div class="row">
-                <div class="col-sm-4">
+                <!-- <div class="col-sm-4">
                   <label><h5><b>Summa ($):</b></h5></label>
                   <input type="number" class="form-control" name="tul_qarz_sum_transfer" step="0.01" min="0" inputmode="decimal">
                   <span class="error_tul_qarz_sum_transfer text-danger err-space"></span>
-                </div>
-
+                </div> -->
+<!-- 
                 <div class="col-sm-4">
                   <label><h5><b>Summa so'm:</b></h5></label>
                   <input type="number" class="form-control" name="tul_qarz_sum_som"/>
                   <span class="error_tul_qarz_sum_som text-danger err-space"></span>
-                </div>
+                </div> -->
 
-                <div class="col-sm-4">
+                <!-- <div class="col-sm-4">
                   <label><h5><b>Summa karta:</b></h5></label>
                   <input type="number" class="form-control" name="tul_qarz_summ_cart"/>
                   <span class="error_tul_qarz_summ_cart text-danger err-space"></span>
-                </div>
+                </div> -->
               </div>
 
               <div class="row">
@@ -671,9 +671,9 @@ $("#qarztul").submit(function(event){
     tul_qarz_sum_dollar: $('input[name="tul_qarz_sum_dollar"]').val(),
     // tul_qarz_dollar_kurs: $('input[name="tul_qarz_dollar_kurs"]').val(),
     tul_qarz_sikidka: $('input[name="tul_qarz_sikidka"]').val(),
-    tul_qarz_sum_som: $('input[name="tul_qarz_sum_som"]').val(),
-    tul_qarz_summ_cart: $('input[name="tul_qarz_summ_cart"]').val(),
-    tul_qarz_sum_transfer: $('input[name="tul_qarz_sum_transfer"]').val(),
+    // tul_qarz_sum_som: $('input[name="tul_qarz_sum_som"]').val(),
+    // tul_qarz_summ_cart: $('input[name="tul_qarz_summ_cart"]').val(),
+    // tul_qarz_sum_transfer: $('input[name="tul_qarz_sum_transfer"]').val(),
     // tul_qarz_zdacha_dollar: $('input[name="tul_qarz_zdacha_dollar"]').val(),
     // tul_qarz_zdacha_sum: $('input[name="tul_qarz_zdacha_sum"]').val(),
   };
@@ -683,17 +683,17 @@ $("#qarztul").submit(function(event){
   if (isNaN(v1) || v1 < 0) { $(".error_tul_qarz_sum_dollar").text("Jami Summa ($) ni kiriting."); hasError = true; }
   else { $(".error_tul_qarz_sum_dollar").text(""); }
 
-  let v2 = parseFloat($('input[name="tul_qarz_sum_transfer"]').val());
-  if (isNaN(v2) || v2 < 0) { $(".error_tul_qarz_sum_transfer").text("Summa ($) ni kiriting."); hasError = true; }
-  else { $(".error_tul_qarz_sum_transfer").text(""); }
+  // let v2 = parseFloat($('input[name="tul_qarz_sum_transfer"]').val());
+  // if (isNaN(v2) || v2 < 0) { $(".error_tul_qarz_sum_transfer").text("Summa ($) ni kiriting."); hasError = true; }
+  // else { $(".error_tul_qarz_sum_transfer").text(""); }
 
-  let v3 = parseFloat($('input[name="tul_qarz_sum_som"]').val());
-  if (isNaN(v3) || v3 < 0) { $(".error_tul_qarz_sum_som").text("Summa so'm ni kiriting."); hasError = true; }
-  else { $(".error_tul_qarz_sum_som").text(""); }
+  // let v3 = parseFloat($('input[name="tul_qarz_sum_som"]').val());
+  // if (isNaN(v3) || v3 < 0) { $(".error_tul_qarz_sum_som").text("Summa so'm ni kiriting."); hasError = true; }
+  // else { $(".error_tul_qarz_sum_som").text(""); }
 
-  let v4 = parseFloat($('input[name="tul_qarz_summ_cart"]').val());
-  if (isNaN(v4) || v4 < 0) { $(".error_tul_qarz_summ_cart").text("Summa karta ni kiriting."); hasError = true; }
-  else { $(".error_tul_qarz_summ_cart").text(""); }
+  // let v4 = parseFloat($('input[name="tul_qarz_summ_cart"]').val());
+  // if (isNaN(v4) || v4 < 0) { $(".error_tul_qarz_summ_cart").text("Summa karta ni kiriting."); hasError = true; }
+  // else { $(".error_tul_qarz_summ_cart").text(""); }
 
   // let v5 = parseFloat($('input[name="tul_qarz_zdacha_dollar"]').val());
   // if (isNaN(v5) || v5 < 0) { $(".error_tul_qarz_zdacha_dollar").text("Qaytim ($) ni kiriting."); hasError = true; }
@@ -964,18 +964,18 @@ $(document).on("click", ".delete-product", function() {
   });
 });
 
-// document.getElementById('toggleSwitch')?.addEventListener('change', function() {
-//   var toggleContent = document.getElementById('toggleContent');
-//   var sellButton = document.getElementById('sellButton');
-//   if (this.checked) {
-//     toggleContent?.classList.remove('hidden');
-//     if (sellButton) sellButton.disabled = true;
-//     $('input[name="tul_qarz_dollar_kurs"]').val($('#dollarToSum').val());
-//   } else {
-//     toggleContent?.classList.add('hidden');
-//     if (sellButton) sellButton.disabled = false;
-//   }
-// });
+document.getElementById('toggleSwitch')?.addEventListener('change', function() {
+  var toggleContent = document.getElementById('toggleContent');
+  var sellButton = document.getElementById('sellButton');
+  if (this.checked) {
+    toggleContent?.classList.remove('hidden');
+    if (sellButton) sellButton.disabled = true;
+    $('input[name="tul_qarz_dollar_kurs"]').val($('#dollarToSum').val());
+  } else {
+    toggleContent?.classList.add('hidden');
+    if (sellButton) sellButton.disabled = false;
+  }
+});
 
 /* productSearch elementi endi yo‘q — himoya bilan qoldiramiz */
 var ps = document.getElementById("productSearch");

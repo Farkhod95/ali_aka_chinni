@@ -122,7 +122,7 @@ class DebtRepayment extends \yii\db\ActiveRecord
                 <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:20px;">{date}<br/></b></td>
             </tr>
             <tr>
-                <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:20px; color:red;">{customer_fio}<br/></b></td>
+                <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:20px; color:red;">{customer_fio}</b><b > ({customer_phone})</b><br/></td>
             </tr>
             <tr>
                 <td colspan="6" style="text-align: center; width: 150px!important;"><hr></td>
@@ -131,22 +131,8 @@ class DebtRepayment extends \yii\db\ActiveRecord
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                 <td  ><b >{t_p},</b></td>
                 <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left;font-size:14px; color:green;">Dollar kursi:</th>
-                <td ><b style="text-align: left;font-size:14px; color:green;">{exchange_rate} so\'m</b></td>
-            </tr>
-            <tr>
-                <th nowrap style="text-align: left;">Firma:</th>
-                <td ><b >{postavshik},</b></td>
-                <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left; width: 150px;">Manzil:</th>
-                <td ><b >{customer_region}, {customer_district}</b></td>
-            </tr>
-            <tr>
                 <th nowrap style="text-align: left; width: 150px;">Telefon nomer:</th>
                 <td ><b >{phone},</b></td>
-                <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left;">Telefon:</th>
-                <td   ><b >{customer_phone}</b></td>
             </tr>
             <tr>                            
         </table>
@@ -154,38 +140,23 @@ class DebtRepayment extends \yii\db\ActiveRecord
         <br>
             <table style="width: 100%; text-align: right; font-size:12px">   
                 <tr>
-                    <td colspan="6" style="text-align: center; width: 150px!important;"><b style="font-size:16px;">To\'langan qarz hisobi:<br/></b><br><br></td>
+                    <td colspan="6" style="text-align: center; "><b style="font-size:16px;">To\'langan qarz hisobi:<br/></b><br><br></td>
                 </tr>
                 <tr>
-                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">Ostatka  ($):</th>
-                    <td ><b style="font-size:16px;color:#f59c1">{total_debt_old} $,</b></td>
-                    
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0">To\'langan summa dollarda ($):</th>
-                    <td ><b style="color:#474ba0">{summ_dollar} $</b></td>
+                    <th nowrap style="font-size:16px;text-align: left; color:#474ba0">Ostatka  ($):</th>
+                    <td ><b style="font-size:16px;color:#474ba0">{total_debt_old} $,</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px;color:#f59c1">'.$discount_amount_sum.'</th>
-                    <td ><b style="color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
-                    
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left;color:#474ba0"></th>
-                    <td  ><b style="color:#474ba0"></b></td>
+                    <th nowrap style="text-align: left;">'.$discount_amount_sum.'</th>
+                    <td ><b style="" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px;color:#f59c1">Jami to\'langan summa ($):</th>
-                    <td ><b style="color:#f59c1" >{all_summ_dollar} $,</b></td>
-
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0"></th>
-                    <td ><b style="color:#474ba0"> </b></td>
+                    <th nowrap style="text-align: left;">Jami to\'langan summa ($):</th>
+                    <td ><b style="" >{all_summ_dollar} $,</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
+                    <th nowrap style="font-size:16px;text-align: left;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{total_debt} $,</b></td>
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left;color:#474ba0"></th>
-                    <td><b style="color:#474ba0"></b></td>
                 </tr>                         
             </table>
       ';

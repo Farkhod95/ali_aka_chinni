@@ -123,9 +123,12 @@ class OrderAccountController extends Controller
 
         $tul_qarz_sikidka = $request->post('tul_qarz_sikidka');
         $tul_qarz_sum_dollar = $request->post('tul_qarz_sum_dollar');
-        $tul_qarz_sum_som = $request->post('tul_qarz_sum_som');
-        $tul_qarz_summ_cart = $request->post('tul_qarz_summ_cart');
-        $tul_qarz_sum_transfer = $request->post('tul_qarz_sum_transfer');
+        // $tul_qarz_sum_som = $request->post('tul_qarz_sum_som');
+        $tul_qarz_sum_som = 0;
+        // $tul_qarz_summ_cart = $request->post('tul_qarz_summ_cart');
+        $tul_qarz_summ_cart = 0;
+        // $tul_qarz_sum_transfer = $request->post('tul_qarz_sum_transfer');
+        $tul_qarz_sum_transfer = 0;
         // $tul_qarz_zdacha_dollar = $request->post('tul_qarz_zdacha_dollar');
         $tul_qarz_zdacha_dollar = 0;
         // $tul_qarz_zdacha_sum = $request->post('tul_qarz_zdacha_sum');

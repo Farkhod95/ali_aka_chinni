@@ -87,6 +87,12 @@ $menuItems[] = [
     'visible' => $model && ($model->permission == 1),
 ];
 
+$menuItems[] = [
+    'label' => 'Xarajatlar',
+    'url' => ['/expenses/index'],
+    'visible' => $model && ($model->permission == 1),
+];
+
 // ====== TIZIM BOSHQARUVI (dropdown) ======
 $menuItems[] = [
     'label' => 'Tizim boshqaruvi',
@@ -122,11 +128,11 @@ $menuItems[] = [
         //     'url' => ['/loss-of-profit/index'],
         //     'visible' => $model && ($model->permission == 1),
         // ],
-        [
-            'label' => 'Xarajatlar',
-            'url' => ['/expenses/index'],
-            'visible' => $model && ($model->permission == 1),
-        ],
+        // [
+        //     'label' => 'Xarajatlar',
+        //     'url' => ['/expenses/index'],
+        //     'visible' => $model && ($model->permission == 1),
+        // ],
         [
             'label' => 'Yuk chiquvchi joy',
             'url' => ['/type-sklad/index'],

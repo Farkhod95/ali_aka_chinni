@@ -132,7 +132,7 @@ return [
         'dropdown' => false,
         'width' => '180px',
         'header' => 'Harakatlar',
-        'template' => '{leadReturn} {leadView} {leadDelete}',
+        'template' => '{leadReturn} {leadDelete}',
         'urlCreator' => function($action, $model, $key, $index) { 
                 return Url::to([$action,'id'=>$key]);
         },

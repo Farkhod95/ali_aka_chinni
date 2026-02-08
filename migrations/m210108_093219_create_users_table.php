@@ -42,7 +42,7 @@ class m210108_093219_create_users_table extends Migration
             'username' => 'admin',
             'email' => 'admin@gmail.com',
             'phone' => '+998998885522',
-            'password' => Yii::$app->security->generatePasswordHash('admin'),
+            'password' => Yii::$app->security->generatePasswordHash('admin123'),
             'permission' => 1,
             'status' => 1,
             'access_token' => Yii::$app->getSecurity()->generateRandomString(),

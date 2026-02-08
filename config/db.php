@@ -1,11 +1,11 @@
 <?php
 
 return [
-    // 'class' => 'yii\db\Connection',
-    // 'dsn' => 'mysql:host=127.0.0.1;port=3308;dbname=host1836067_elegantnew',
-    // 'username' => 'host1836067_user',
-    // 'password' => 'elegant@q12we3',
-    // 'charset' => 'utf8',
+    'class' => 'yii\db\Connection',
+    'dsn' => 'mysql:host=127.0.0.1;port=3308;dbname=host1836067_aliakadb',
+    'username' => 'host1836067_user',
+    'password' => 'elegant@q12we3',
+    'charset' => 'utf8',
 
     // 'class' => 'yii\db\Connection',
     // 'dsn' => 'mysql:host=localhost;dbname=host1836067_elegant',
