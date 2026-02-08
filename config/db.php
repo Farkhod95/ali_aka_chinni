@@ -13,10 +13,10 @@ return [
     // 'password' => 'root_chinni',
     // 'charset' => 'utf8',
 
-    'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=ali_aka_chinni_db',
-    'username' => 'root',
-    'password' => 'root',
-    'charset' => 'utf8',
+    // 'class' => 'yii\db\Connection',
+    // 'dsn' => 'mysql:host=localhost;dbname=ali_aka_chinni_db',
+    // 'username' => 'root',
+    // 'password' => 'root',
+    // 'charset' => 'utf8',
 ];
 
