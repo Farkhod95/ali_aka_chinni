@@ -61,15 +61,18 @@ use yii\widgets\ActiveForm;
                 ]); ?>
             </div>
             <div class="col-md-6 col-xs-6">
-                <?= $form->field($model, 'keshbek')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
             </div>
+            <!-- <div class="col-md-6 col-xs-6">
+                <?= $form->field($model, 'keshbek')->textInput(['maxlength' => true]) ?>
+            </div> -->
         </div>
-        <div class="row"> 
+        <!-- <div class="row"> 
             <div class="col-md-12 col-xs-12">
                 <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
             </div>
-        </div>
-        <div class="row">
+        </div> -->
+        <!-- <div class="row">
             <?php if(\Yii::$app->user->identity->permission == 1){?>
             <div class="col-md-6 col-xs-6">
                 <?= $form->field($model, 'is_profit_loss')->checkbox([
@@ -80,7 +83,7 @@ use yii\widgets\ActiveForm;
             </div>
             <?php }?>
         </div>
-    
+     -->
 
   
 	<?php if (!Yii::$app->request->isAjax){ ?>

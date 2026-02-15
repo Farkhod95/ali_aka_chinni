@@ -63,11 +63,11 @@ $menuItems[] = [
 //     'visible' => $model && in_array($model->permission, [1,2,5,6]),
 // ];
 
-$menuItems[] = [
-    'label' => 'Mijoz umumiy buyurtmasi',
-    'url' => ['/order-account/index'],
-    'visible' => $model && in_array($model->permission, [1,2,5,6]),
-];
+// $menuItems[] = [
+//     'label' => 'Mijoz umumiy buyurtmasi',
+//     'url' => ['/order-account/index'],
+//     'visible' => $model && in_array($model->permission, [1,2,5,6]),
+// ];
 
 $menuItems[] = [
     'label' => 'Mahsulotlar',
@@ -81,17 +81,17 @@ $menuItems[] = [
     'visible' => $model && in_array($model->permission, [1,2,5,6]),
 ];
 
-$menuItems[] = [
-    'label' => 'Mening qarzlarim',
-    'url' => ['/my-total-debt/index'],
-    'visible' => $model && ($model->permission == 1),
-];
+// $menuItems[] = [
+//     'label' => 'Mening qarzlarim',
+//     'url' => ['/my-total-debt/index'],
+//     'visible' => $model && ($model->permission == 1),
+// ];
 
-$menuItems[] = [
-    'label' => 'Xarajatlar',
-    'url' => ['/expenses/index'],
-    'visible' => $model && ($model->permission == 1),
-];
+// $menuItems[] = [
+//     'label' => 'Xarajatlar',
+//     'url' => ['/expenses/index'],
+//     'visible' => $model && ($model->permission == 1),
+// ];
 
 // ====== TIZIM BOSHQARUVI (dropdown) ======
 $menuItems[] = [
@@ -172,10 +172,15 @@ $menuItems[] = [
             'url' => ['/client/index'],
             'visible' => $model && in_array($model->permission, [1,2,6]),
         ],
-           [
+        [
             'label' => 'Yuk jo\'natuvchilar', 
             'url' => ['/consignor/index'],
             'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
+        ],
+        [
+            'label' => 'Xarajatlar',
+            'url' => ['/expenses/index'],
+            'visible' => $model && ($model->permission == 1),
         ],
         // [
         //     'label' => 'Sotilgan tovarlar tarixi',
@@ -186,6 +191,11 @@ $menuItems[] = [
             'label' => 'To\'langan qarzlar',
             'url' => ['/debt-repayment/index'],
             'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
+        [
+            'label' => 'Mening qarzlarim',
+            'url' => ['/my-total-debt/index'],
+            'visible' => $model && ($model->permission == 1),
         ],
         // [
         //     'label' => 'Klientlar tarixi',
@@ -206,6 +216,11 @@ $menuItems[] = [
             'label' => 'Qarzdorlar ro\'yxati',
             'url' => ['/order-account/debtors'],
             'visible' => $model && in_array($model->permission, [1,2,6]),
+        ],
+        [
+            'label' => 'Mijoz umumiy buyurtmasi',
+            'url' => ['/order-account/index'],
+            'visible' => $model && in_array($model->permission, [1,2,5,6]),
         ],
         [
             'label' => 'Mijoz Buyurtma Karzinka',

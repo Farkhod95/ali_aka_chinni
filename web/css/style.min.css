@@ -52,7 +52,7 @@ html {
 
 body {
     background: #d9e0e7;
-    font-size: 12px;
+    font-size: 14px;
     font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #707478
 }
@@ -907,7 +907,7 @@ label {
     border: 1px solid #ccd0d4;
     -webkit-box-shadow: none;
     box-shadow: none;
-    font-size: 12px;
+    font-size: 14px;
     border-radius: 3px;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px
@@ -1076,7 +1076,7 @@ legend {
     border: none;
     -webkit-box-shadow: 0 2px 5px -1px rgba(0, 0, 0, .2);
     box-shadow: 0 2px 5px -1px rgba(0, 0, 0, .2);
-    font-size: 12px
+    font-size: 14px
 }
 
 .dropdown-menu>li>a {
@@ -1113,7 +1113,7 @@ legend {
 .dropdown-menu.media-list .dropdown-header {
     padding: 10px 20px !important;
     background: #fafafa;
-    font-size: 12px
+    font-size: 14px
 }
 
 .dropdown-menu.media-list .dropdown-header+.media {
@@ -1915,7 +1915,7 @@ legend {
 }
 
 .panel-title {
-    font-size: 12px
+    font-size: 14px
 }
 
 .panel-title .accordion-toggle {
@@ -3204,7 +3204,7 @@ code {
 }
 
 .f-s-12 {
-    font-size: 12px !important
+    font-size: 14px !important
 }
 
 .f-s-13 {
@@ -3864,7 +3864,7 @@ a.text-white:hover {
 }
 
 .gritter-title {
-    font-size: 12px !important;
+    font-size: 14px !important;
     line-height: 16px !important;
     padding-bottom: 2px !important;
     font-weight: 400 !important;
@@ -4096,7 +4096,7 @@ table.dataTable th.focus {
 
 .ui-widget {
     font-family: 'Open Sans';
-    font-size: 12px
+    font-size: 14px
 }
 
 .ui-autocomplete {
@@ -4133,7 +4133,7 @@ table.dataTable th.focus {
 .combobox-container input {
     border: 1px solid #edf0f5;
     background: #edf0f5;
-    font-size: 12px;
+    font-size: 14px;
     display: block;
     width: 100%;
     height: 34px;
@@ -4283,7 +4283,7 @@ ul.tagit.inverse li.tagit-choice .tagit-close:hover .ui-icon-close:before {
     list-style-type: none !important;
     margin: 0 !important;
     color: #e5603b;
-    font-size: 12px !important;
+    font-size: 14px !important;
     line-height: inherit !important
 }
 
@@ -4417,7 +4417,7 @@ ul.tagit.inverse li.tagit-choice .tagit-close:hover .ui-icon-close:before {
     border: none;
     color: #276e9c;
     padding: 10px 15px;
-    font-size: 12px;
+    font-size: 14px;
     margin-left: -15px;
     margin-right: -15px;
     border-top: 1px solid #D2D6DA;
@@ -4453,7 +4453,7 @@ body .fc button {
     box-shadow: none;
     padding: 5px 10px;
     height: inherit;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5
 }
 
@@ -4502,13 +4502,13 @@ body .fc button:active {
     top: 0;
     width: auto;
     height: auto;
-    font-size: 12px
+    font-size: 14px
 }
 
 .fc .fc-icon-left-single-arrow:after,
 .fc .fc-icon-right-single-arrow:after {
     content: '\f053';
-    font-size: 12px;
+    font-size: 14px;
     top: 0;
     margin: 0
 }
@@ -4721,7 +4721,7 @@ body .fc button:active {
 
 .result-list .result-price small {
     display: block;
-    font-size: 12px;
+    font-size: 14px;
     color: #999
 }
 
@@ -4761,7 +4761,7 @@ body .fc button:active {
 }
 
 .widget-stats .stats-info h4 {
-    font-size: 12px;
+    font-size: 14px;
     margin: 5px 0;
     color: #fff
 }
@@ -4815,7 +4815,7 @@ body .fc button:active {
 .widget-stats .stats-title {
     position: relative;
     line-height: 1.1;
-    font-size: 12px;
+    font-size: 14px;
     margin: 2px 0 7px
 }
 
@@ -5022,7 +5022,7 @@ body .fc button:active {
 }
 
 .invoice-price small {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     display: block
 }
@@ -5049,7 +5049,7 @@ body .fc button:active {
     position: absolute;
     top: 10px;
     left: 10px;
-    font-size: 12px
+    font-size: 14px
 }
 
 .invoice-footer {
@@ -5211,7 +5211,7 @@ body .fc button:active {
 
 .gallery .image-info .desc {
     line-height: 16px;
-    font-size: 12px;
+    font-size: 14px;
     height: 48px;
     overflow: hidden
 }
@@ -5339,7 +5339,7 @@ body .fc button:active {
 }
 
 .error-desc {
-    font-size: 12px;
+    font-size: 14px;
     color: #647788
 }
 
@@ -6056,7 +6056,7 @@ body .fc button:active {
 .widget-chart .chart-title small {
     display: block;
     margin-top: 5px;
-    font-size: 12px;
+    font-size: 14px;
     color: #616D72;
     color: rgba(255, 255, 255, .3)
 }
@@ -6083,7 +6083,7 @@ body .fc button:active {
 }
 
 .widget-chart-sidebar .chart-number small {
-    font-size: 12px;
+    font-size: 14px;
     color: #616D72;
     color: rgba(255, 255, 255, .3);
     display: block
@@ -6092,7 +6092,7 @@ body .fc button:active {
 .widget-chart-sidebar .chart-legend {
     margin: 0;
     padding: 0;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 300;
     position: absolute;
     bottom: 10px
@@ -6271,14 +6271,14 @@ body .fc button:active {
 
 .registered-users-list>li {
     width: 25%;
-    font-size: 12px;
+    font-size: 14px;
     float: left;
     padding: 7.5px;
     color: #333
 }
 
 .registered-users-list>li .username {
-    font-size: 12px;
+    font-size: 14px;
     color: #333;
     margin-bottom: 0
 }
@@ -6369,7 +6369,7 @@ body .fc button:active {
 .chats .message {
     border: 1px solid #ccd0d4;
     padding: 7px 12px;
-    font-size: 12px;
+    font-size: 14px;
     position: relative;
     background: #fff;
     -webkit-border-radius: 4px;
@@ -7362,7 +7362,7 @@ body.flat-black {
     top: 5px;
     display: block;
     line-height: 16px;
-    font-size: 12px;
+    font-size: 14px;
     font-style: initial;
     color: #276e9c
 }
@@ -7649,7 +7649,7 @@ body.flat-black {
 
 .profile-highlight h4 {
     margin: 0 0 7px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700
 }
 
@@ -7664,7 +7664,7 @@ body.flat-black {
 
 .table.table-profile>thead>tr>th h4 small {
     display: block;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
     margin-top: 5px
 }
@@ -8071,7 +8071,7 @@ body .bootstrap-datetimepicker-widget table td {
 
 .nvtooltip {
     font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif !important;
-    font-size: 12px !important;
+    font-size: 14px !important;
     background: #fff !important;
     -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, .25) !important;
     box-shadow: 0 0 4px rgba(0, 0, 0, .25) !important;
@@ -8097,7 +8097,7 @@ body .bootstrap-datetimepicker-widget table td {
 }
 
 .introjs-helperNumberLayer {
-    font-size: 12px;
+    font-size: 14px;
     background: #ff5b57 !important;
     font-family: 'Open Sans', sans-serif !important;
     border: none !important;
@@ -8233,7 +8233,7 @@ body .bootstrap-datetimepicker-widget table td {
 .sidebar .nav>li.nav-profile .info small {
     display: block;
     color: rgba(255, 255, 255, .75);
-    font-size: 12px;
+    font-size: 14px;
     margin-bottom: -5px
 }
 

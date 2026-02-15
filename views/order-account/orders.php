@@ -461,7 +461,7 @@ input:checked + .slider:before {
               <input class="form-control" name="dollar_kurs" value="<?= $exchangeRate->dollar ?>"/>
             </div> -->
           </div>
-          <hr/>
+          <!-- <hr/> -->
 
           <div class="form-group row m-b-15">
             <div class="col-sm-6">
@@ -521,7 +521,7 @@ input:checked + .slider:before {
           <div class="form-group row m-b-15">
             <div class="col-sm-12">
               <label class="col-sm-8 col-form-label"><h5><b>Izoh</b></h5></label>
-              <textarea class="form-control" name="comment" rows="4"></textarea>
+              <textarea class="form-control" name="comment" rows="1"></textarea>
             </div>
           </div> 
 
