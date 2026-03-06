@@ -5,98 +5,117 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 use app\models\Expenses;
 
-/**
- * ExpensesSearch represents the model behind the search form about `app\models\Expenses`.
- */
 class ExpensesSearch extends Expenses
 {
-    /**
-     * @inheritdoc
-     */
+    public $start_date;
+    public $end_date;
+
     public function rules()
     {
         return [
             [['id', 'type_id', 'loss_of_profit_id'], 'integer'],
-            [['nomi', 'date_cr'], 'safe'],
+            [['nomi', 'date_cr', 'start_date', 'end_date'], 'safe'],
             [['summa'], 'number'],
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
     public function scenarios()
     {
-        // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
-     */
     public function search($params)
     {
-        $query = Expenses::find();
+        $query = Expenses::find()->alias('e');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id' => SORT_DESC]],
+            'sort' => [
+                'defaultOrder' => ['id' => SORT_DESC]
+            ],
+            'pagination' => [
+                'pageSize' => 20,
+            ],
         ]);
 
         $this->load($params);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'summa' => $this->summa,
-            'date_cr' => $this->date_cr,
-            'type_id' => $this->type_id,
-            'loss_of_profit_id' => $this->loss_of_profit_id,
+            'e.id' => $this->id,
+            'e.type_id' => $this->type_id,
+            'e.loss_of_profit_id' => $this->loss_of_profit_id,
         ]);
 
-        $query->andFilterWhere(['like', 'nomi', $this->nomi]);
+        $query->andFilterWhere(['like', 'e.nomi', $this->nomi]);
+
+        if ($this->summa !== null && $this->summa !== '') {
+            $query->andWhere(['e.summa' => $this->summa]);
+        }
+
+        // Sana oralig'i filteri
+        if (!empty($this->start_date)) {
+            $start = date('Y-m-d', strtotime($this->start_date));
+            $query->andWhere(['>=', 'e.date_cr', $start]);
+        }
+
+        if (!empty($this->end_date)) {
+            $end = date('Y-m-d', strtotime($this->end_date));
+            $query->andWhere(['<=', 'e.date_cr', $end]);
+        }
+
+        // Grid filterdagi date_cr ishlashi uchun
+        if (!empty($this->date_cr)) {
+            $date = date('Y-m-d', strtotime($this->date_cr));
+            $query->andWhere(['e.date_cr' => $date]);
+        }
 
         return $dataProvider;
     }
 
-    public function search2($params, $start_date, $end_date)
+    public function getTotalSum($params)
     {
-        $query = Expenses::find()->where(['between', 'date_cr', $start_date, $end_date]);
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'sort'=> ['defaultOrder' => ['id' => SORT_DESC]],
-        ]);
+        $query = Expenses::find()->alias('e');
 
         $this->load($params);
 
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
+            return 0;
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'summa' => $this->summa,
-            'date_cr' => $this->date_cr,
-            'type_id' => $this->type_id,
-            'loss_of_profit_id' => $this->loss_of_profit_id,
+            'e.id' => $this->id,
+            'e.type_id' => $this->type_id,
+            'e.loss_of_profit_id' => $this->loss_of_profit_id,
         ]);
 
-        $query->andFilterWhere(['like', 'nomi', $this->nomi]);
+        $query->andFilterWhere(['like', 'e.nomi', $this->nomi]);
 
-        return $dataProvider;
+        if ($this->summa !== null && $this->summa !== '') {
+            $query->andWhere(['e.summa' => $this->summa]);
+        }
+
+        if (!empty($this->start_date)) {
+            $start = date('Y-m-d', strtotime($this->start_date));
+            $query->andWhere(['>=', 'e.date_cr', $start]);
+        }
+
+        if (!empty($this->end_date)) {
+            $end = date('Y-m-d', strtotime($this->end_date));
+            $query->andWhere(['<=', 'e.date_cr', $end]);
+        }
+
+        if (!empty($this->date_cr)) {
+            $date = date('Y-m-d', strtotime($this->date_cr));
+            $query->andWhere(['e.date_cr' => $date]);
+        }
+
+        return (float)$query->sum('e.summa');
     }
 }

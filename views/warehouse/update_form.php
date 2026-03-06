@@ -7,6 +7,7 @@ use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use app\models\ProductCategory;
 use app\models\BrandsSize;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Warehouse */
@@ -119,7 +120,17 @@ use app\models\BrandsSize;
         <div class="col-md-6">
             <?= $form->field($model, 'worker_price')->textInput() ?>
         </div>
-
+        <div class="col-md-12">
+                    <?= $form->field($model, 'cr_date')->widget(DatePicker::classname(), [
+                        'options' => ['placeholder' => Yii::t('app','Sanani tanlang...'), 'required'=>True],
+                        'removeButton' => false,
+                        'pluginOptions' => [
+                            'autoclose'=>true, 
+                            'format' => 'yyyy-mm-dd',
+                        ]
+                    ]);
+                    ?>
+                </div>
         <div class="col-md-12">
             <?= $form->field($model, 'comment')
                 ->textInput()

@@ -11,10 +11,7 @@ use kartik\date\DatePicker;
 
     <?php $form = ActiveForm::begin(); ?>
         <div class="row"> 
-            <div class="col-md-6 col-xs-6">
-                <?= $form->field($model, 'nomi')->textInput(['maxlength' => true]) ?>
-            </div>
-            <div class="col-md-6 col-xs-6">
+                 <div class="col-md-6 col-xs-6">
                 <?= $form->field($model, 'type_id')->label()->widget(\kartik\select2\Select2::classname(), [
                     'data' => $model->getTypes(),
                     'options' => [
@@ -24,6 +21,10 @@ use kartik\date\DatePicker;
                     ],
                 ]); ?> 
             </div>
+            <div class="col-md-6 col-xs-6">
+                <?= $form->field($model, 'nomi')->textInput(['maxlength' => true]) ?>
+            </div>
+       
             
         </div>
         <div class="row"> 

@@ -54,13 +54,15 @@ class ExpensesController extends Controller
      * @return mixed
      */
     public function actionIndex()
-    {    
+    {
         $searchModel = new ExpensesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $totalSum = $searchModel->getTotalSum(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
+            'totalSum'     => $totalSum,
         ]);
     }
 

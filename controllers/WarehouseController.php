@@ -535,15 +535,16 @@ class WarehouseController extends Controller
         $model = $this->findModel($id);   
         $modelOld = $this->findModel($id);    
 
-        if ($model->cr_date != null) {
-            $model->cr_date = \Yii::$app->formatter->asDate($model->cr_date, 'php:d.m.Y');
-        }
+        // if ($model->cr_date != null) {
+        //     $model->cr_date = \Yii::$app->formatter->asDate($model->cr_date, 'php:d.m.Y');
+        // }
 
         $updateData = Yii::$app->request->post('Warehouse');
         $updateReason = isset($updateData['comment']) ? $updateData['comment'] : null;
         $updateCount = isset($updateData['count']) ? $updateData['count'] : null;
         $updateworkerprice = isset($updateData['worker_price']) ? $updateData['worker_price'] : 0;
         $updateType = isset($updateData['type']) ? $updateData['type'] : null;
+        $updateCrDate= isset($updateData['cr_date']) ? $updateData['cr_date'] : null;
         $statusCount = isset($updateData['status_count']) ? $updateData['status_count'] : null;
 
         // YANGI QO‘SHILGANLAR: brand, category, size
@@ -587,6 +588,7 @@ class WarehouseController extends Controller
                 $model->count = $updateCount;
                 $model->worker_price = $updateworkerprice;
                 $model->status_count = $statusCount;
+                $model->cr_date = $updateCrDate;
                 $model->update_by = Yii::$app->user->identity->id;
                 $model->save(false);
 
