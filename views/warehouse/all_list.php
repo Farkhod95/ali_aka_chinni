@@ -348,7 +348,7 @@ $this->registerCss(<<<CSS
     position: sticky;
     top: var(--app-header-height);
     z-index: 1035;
-    background: #2d8c8c !important;
+    background: #276e9c !important;
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
@@ -390,7 +390,7 @@ $this->registerCss(<<<CSS
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
-    color: #2d8c8c;
+    color: #276e9c;
 }
 
 .warehouse-filter-btn .btn{
