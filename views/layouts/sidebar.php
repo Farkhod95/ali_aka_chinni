@@ -173,6 +173,11 @@ $menuItems[] = [
             'visible' => $model && in_array($model->permission, [1,2,6]),
         ],
         [
+            'label' => 'Mening qarzlarim', 
+            'url' => ['/my-total-debt/index'],
+            'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
+        ],
+        [
             'label' => 'Yuk jo\'natuvchilar', 
             'url' => ['/consignor/index'],
             'visible' => $model->permission == 1 || $model->permission == 2  ? true : false,
