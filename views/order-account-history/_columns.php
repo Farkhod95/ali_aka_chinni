@@ -628,7 +628,13 @@ return [
                 $today = date('Y-m-d');
 
                 // Tugmani ko'rsatish sharti
-            if (\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->id == $model->created_by) {
+                if (
+                    ($lastOrder && $lastOrder->id == $model->id) || // Agar bu buyurtma oxirgi buyurtma bo'lsa
+                    ($model->date == $today) || // Yoki bugungi sana bo'lsa 
+                    ($model->order_account_status == 0) || // order_account_status = 0 bo'lgan buyurtma
+                    ($model->update_status == 2)
+                ) {
+                    if (\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->id == $model->created_by) {
                         if (\Yii::$app->user->identity->permission == 1 || (\Yii::$app->user->identity->permission != 1 && $model->date === $today)) {
                         $url = Url::to(['/order-account-history/update', 'id' => $model->id, 'type' => 'index']);
                         return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
@@ -640,6 +646,7 @@ return [
                     }
                         
                     }
+                }
 
                 return ''; // Boshqa buyurtmalarda tugma ko'rinmaydi
             }
