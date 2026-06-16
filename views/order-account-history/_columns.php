@@ -616,62 +616,62 @@ return [
                 $url = Url::to(['/order-account-history/view' , 'id' => $model->id, 'type' => 'index']);
                 return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, [ 'role'=>'modal-remote', 'data-toggle'=>'tooltip', 'title'=>'Ko\'rish','class'=>'btn btn-info btn-xs']);
             },
-            // 'leadUpdate' => function ($url, $model) {
-            // // if($model->is_debt != 1){
-            //     // Mijozning oxirgi buyurtmasini topish
-            //     $lastOrder = \app\models\OrderAccountHistory::find()
-            //         ->where(['client_id' => $model->client_id])
-            //         ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC]) // Buyurtmalarni sanalar va ID bo'yicha teskari tartibda saralash
-            //         ->one();
-
-            //     // Bugungi sana
-            //     $today = date('Y-m-d');
-
-            //     // Tugmani ko'rsatish sharti
-            //    $url = Url::to(['/order-account-history/update', 'id' => $model->id, 'type' => 'index']);
-            //     return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
-            //         'data-pjax' => 0,
-            //         'data-toggle' => 'tooltip',
-            //         'title' => "O'zgartirish",
-            //         'class' => 'btn btn-success btn-xs'
-            //     ]);
-            // // }
-            // },
             'leadUpdate' => function ($url, $model) {
-                if($model->is_debt != 1){
-                    // Mijozning oxirgi buyurtmasini topish
-                    $lastOrder = \app\models\OrderAccountHistory::find()
-                        ->where(['client_id' => $model->client_id])
-                        ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC]) // Buyurtmalarni sanalar va ID bo'yicha teskari tartibda saralash
-                        ->one();
+            // if($model->is_debt != 1){
+                // Mijozning oxirgi buyurtmasini topish
+                $lastOrder = \app\models\OrderAccountHistory::find()
+                    ->where(['client_id' => $model->client_id])
+                    ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC]) // Buyurtmalarni sanalar va ID bo'yicha teskari tartibda saralash
+                    ->one();
 
-                    // Bugungi sana
-                    $today = date('Y-m-d');
+                // Bugungi sana
+                $today = date('Y-m-d');
 
-                    // Tugmani ko'rsatish sharti
-                    if (
-                        ($lastOrder && $lastOrder->id == $model->id) || // Agar bu buyurtma oxirgi buyurtma bo'lsa
-                        ($model->date == $today) || // Yoki bugungi sana bo'lsa 
-                        ($model->order_account_status == 0) || // order_account_status = 0 bo'lgan buyurtma
-                        ($model->update_status == 2)
-                    ) {
-                        if (\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->id == $model->created_by) {
-                            if (\Yii::$app->user->identity->permission == 1 || (\Yii::$app->user->identity->permission != 1 && $model->date === $today)) {
-                            $url = Url::to(['/order-account-history/update', 'id' => $model->id, 'type' => 'index']);
-                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
-                                'data-pjax' => 0,
-                                'data-toggle' => 'tooltip',
-                                'title' => "O'zgartirish",
-                                'class' => 'btn btn-success btn-xs'
-                            ]);
-                        }
-                            
-                        }
-                    }
-
-                    return ''; // Boshqa buyurtmalarda tugma ko'rinmaydi
-                }
+                // Tugmani ko'rsatish sharti
+               $url = Url::to(['/order-account-history/update', 'id' => $model->id, 'type' => 'index']);
+                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                    'data-pjax' => 0,
+                    'data-toggle' => 'tooltip',
+                    'title' => "O'zgartirish",
+                    'class' => 'btn btn-success btn-xs'
+                ]);
+            // }
             },
+            // 'leadUpdate' => function ($url, $model) {
+            //     if($model->is_debt != 1){
+            //         // Mijozning oxirgi buyurtmasini topish
+            //         $lastOrder = \app\models\OrderAccountHistory::find()
+            //             ->where(['client_id' => $model->client_id])
+            //             ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC]) // Buyurtmalarni sanalar va ID bo'yicha teskari tartibda saralash
+            //             ->one();
+
+            //         // Bugungi sana
+            //         $today = date('Y-m-d');
+
+            //         // Tugmani ko'rsatish sharti
+            //         if (
+            //             ($lastOrder && $lastOrder->id == $model->id) || // Agar bu buyurtma oxirgi buyurtma bo'lsa
+            //             ($model->date == $today) || // Yoki bugungi sana bo'lsa 
+            //             ($model->order_account_status == 0) || // order_account_status = 0 bo'lgan buyurtma
+            //             ($model->update_status == 2)
+            //         ) {
+            //             if (\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->id == $model->created_by) {
+            //                 if (\Yii::$app->user->identity->permission == 1 || (\Yii::$app->user->identity->permission != 1 && $model->date === $today)) {
+            //                 $url = Url::to(['/order-account-history/update', 'id' => $model->id, 'type' => 'index']);
+            //                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+            //                     'data-pjax' => 0,
+            //                     'data-toggle' => 'tooltip',
+            //                     'title' => "O'zgartirish",
+            //                     'class' => 'btn btn-success btn-xs'
+            //                 ]);
+            //             }
+                            
+            //             }
+            //         }
+
+            //         return ''; // Boshqa buyurtmalarda tugma ko'rinmaydi
+            //     }
+            // },
 
             // 'leadUpdate' => function ($url, $model) {
             //     if(\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->id == $model->created_by){
