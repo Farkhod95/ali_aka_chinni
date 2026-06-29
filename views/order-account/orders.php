@@ -258,6 +258,7 @@ input:checked + .slider:before {
 
           <div class="modal-body hidden" id="toggleContent">
             <form id="qarztul" action="<?= Url::toRoute(['order-account/qarztul'])?>" method="post">
+              <input type="hidden" name="debt_request_id" value="<?= Yii::$app->security->generateRandomString(32) ?>">
               <div class="row">
                 <div class="col-sm-4">
                   <label><h5><b>Sana</b></h5></label>
@@ -658,14 +659,17 @@ function toFloat(val) {
   return parseFloat(val);
 }
 
+let isDebtSubmitting = false;
 $("#qarztul").submit(function(event){
   event.preventDefault();
+  if (isDebtSubmitting) return false;
   var payButton = document.getElementById('payButton');
-  if (payButton){ payButton.disabled = true; payButton.innerHTML = 'Jarayonda…'; }
+  if (payButton){ payButton.disabled = true; payButton.innerHTML = 'Jarayonda...'; }
 
   let action = $(this).attr("action");
   let payload = {
     customer_name: $('select[name="customer_name"]').val(),
+    debt_request_id: $('input[name="debt_request_id"]').val(),
     qarz_client_summ: $("#qarz_client_summ").text(),
     qarz_tul_date: $('input[name="qarz_tul_date"]').val(),
     tul_qarz_sum_dollar: $('input[name="tul_qarz_sum_dollar"]').val(),
@@ -704,22 +708,25 @@ $("#qarztul").submit(function(event){
   // else { $(".error_tul_qarz_zdacha_sum").text(""); }
 
   if (hasError) {
+    isDebtSubmitting = false;
     if (payButton){ payButton.disabled = false; payButton.innerHTML = "Qarzni to'lash"; }
     return;
   }
 
+  isDebtSubmitting = true;
   $.ajax({ url: action, data: payload, method: "POST" })
     .done(function(data) {
-      alert(data);
-      if (payButton){ payButton.disabled = false; payButton.innerHTML = "Qarzni to'lash"; }
+      window.location.href = "<?= Url::toRoute(['/debt-repayment/index']) ?>";
     })
     .fail(function() {
-      if (payButton){ payButton.disabled = false; payButton.innerHTML = "Qarzni to'lash"; }
+      console.error("Debt payment request failed");
     });
 });
 
+let isBuySubmitting = false;
 $("#buy").submit(function(event){
   event.preventDefault();
+  if (isBuySubmitting) return false;
   let action = $(this).attr("action");
 
   let payload = {
@@ -771,6 +778,7 @@ $("#buy").submit(function(event){
     data: payload,
     method: "POST",
     beforeSend: function() {
+      isBuySubmitting = true;
       $("#sellSubmitButton").prop("disabled", true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Jarayonda...');
     }
   }).done(function(data) {
@@ -781,7 +789,6 @@ $("#buy").submit(function(event){
     console.error("Request failed: " + textStatus + ", " + errorThrown);
     $("#modal-dialog2").modal("hide");
   }).always(function() {
-    $("#sellSubmitButton").prop("disabled", false).html('Sotishni tasdiqlash');
     $("#modal-dialog2").modal("hide");
   });
 });

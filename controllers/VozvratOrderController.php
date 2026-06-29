@@ -177,19 +177,19 @@ class VozvratOrderController extends Controller
         
         $request = Yii::$app->request;
         $client_id = $request->post('customer_name');
-        $total_debts = $request->post('jami_qarzi');
+        $total_debts = (float)$request->post('jami_qarzi');
         $dates = $request->post('order_date');
-        $all_summ_dollar = $request->post('all_summ_dollar');
-        $summ_dollar = $request->post('summ_dollar');
-        $sum_soms = $request->post('summa_som');
-        $sum_carts = $request->post('summa_karta');
+        $all_summ_dollar = (float)$request->post('all_summ_dollar');
+        $summ_dollar = (float)$request->post('summ_dollar');
+        $sum_soms = (float)$request->post('summa_som');
+        $sum_carts = (float)$request->post('summa_karta');
         $comment = $request->post('comment');
         $tasdiq_check = $request->post('tasdiq_check');
         
         $count = $request->post('count');
-        $total_product_sum = $request->post('total_product_sum');
+        $total_product_sum = (float)$request->post('total_product_sum');
         $product_details = $request->post('product_details');
-        $contact = json_decode($product_details, true);
+        $contact = json_decode($product_details, true) ?: [];
         
         $client = Client::findOne((int)$client_id);
         if ($client === null) {
@@ -197,7 +197,7 @@ class VozvratOrderController extends Controller
             return $this->redirect(['index']);
         }
         $exchangeRate = ExchangeRate::find()->where(['id' => 1])->one();
-        $exchange_rates = $exchangeRate->dollar;
+        $exchange_rates = $exchangeRate ? $exchangeRate->dollar : 1;
 
         $orderAccount = OrderAccount::find()->where(['client_id' => $client_id])->one();
         if ($orderAccount === null) {
@@ -291,7 +291,7 @@ class VozvratOrderController extends Controller
                 $relative->profit                   = round($lineProfit, 2);
                 $relative->cr_date                  = date('Y-m-d', strtotime($dates));
                 $relative->is_debtor                = $hasLargePrice ? 1 : 0;
-                $relative->warehouse_id             = $warehouseValue->id;
+                $relative->warehouse_id             = $warehouseValue ? $warehouseValue->id : null;
                 $relative->save(false);
             } else {
                 $productAccount->count      = $productAccount->count + $count;
@@ -299,7 +299,7 @@ class VozvratOrderController extends Controller
                 $productAccount->real_price = $price_real;
                 $productAccount->is_debtor                = $hasLargePrice ? 1 : 0;
                 $productAccount->profit     = round($productAccount->profit + $lineProfit, 2);
-                $productAccount->warehouse_id             = $warehouseValue->id;
+                $productAccount->warehouse_id             = $warehouseValue ? $warehouseValue->id : null;
                 $productAccount->save(false);
             }
 
@@ -318,7 +318,7 @@ class VozvratOrderController extends Controller
             $relativeHistory->type_sklad_id            = $type_sklad_list->id;
             $relativeHistory->profit                   = round($lineProfit, 2);
             $relativeHistory->cr_date                  = date('Y-m-d', strtotime($dates));
-            $relativeHistory->warehouse_id             = $warehouseValue->id;
+            $relativeHistory->warehouse_id             = $warehouseValue ? $warehouseValue->id : null;
             $relativeHistory->save(false);
 
             // Ombor soni
@@ -332,25 +332,23 @@ class VozvratOrderController extends Controller
             $all_summ   += $lineAmount;
         }
 
+        $all_summ = round($all_summ, 2);
+        $discount_amount = $this->getVozvratDiscount($all_summ, $all_summ_dollar);
+        $new_total_debt = round($total_debts - ($tasdiq_check == 1 ? $discount_amount : 0), 2);
+
         $vozvratOrders = VozvratOrder::find()->where(['id' => $vozvratOrder_id])->one();
         $vozvratOrders->comment = $comment;
         $vozvratOrders->large_price = $hasLargePrice ? 1 : 0;
-        $vozvratOrders->save();
+        $vozvratOrders->product_summ_dollar = $all_summ;
+        $vozvratOrders->all_summ_dollar = $all_summ_dollar;
+        $vozvratOrders->discount_amount = $discount_amount;
+        $vozvratOrders->total_debt = $new_total_debt;
+        $vozvratOrders->save(false);
 
         if ($tasdiq_check == 1) {
-            if ($all_summ_dollar != $total_product_sum) {
-                $summ = $total_product_sum - $all_summ_dollar;
-                $orderAccount->total_debt_old = $total_debts;
-                $orderAccount->total_debt = round($total_debts - $summ, 2);
-                $orderAccount->save();
-            }
-           
-
-            $vozvratOrders = VozvratOrder::find()->where(['id' => $vozvratOrder_id])->one();
-            $vozvratOrders->total_debt = round($total_debts - $all_summ, 2);
-            $vozvratOrders->all_summ_dollar = $all_summ_dollar;
-            $vozvratOrders->save();
-            
+            $orderAccount->total_debt_old = $total_debts;
+            $orderAccount->total_debt = $new_total_debt;
+            $orderAccount->save(false);
         }
         return $this->redirect(['/vozvrat-order/index']);
     }
@@ -427,24 +425,25 @@ class VozvratOrderController extends Controller
     {
         $model = $this->findModel($id); 
         $orderAccount = OrderAccount::find()->where(['client_id' => $model->client_id])->one();
+        if ($orderAccount === null) {
+            $orderAccount = new OrderAccount();
+            $orderAccount->client_id = $model->client_id;
+            $orderAccount->last_order_date = $model->date;
+            $orderAccount->total_debt = 0;
+            $orderAccount->date = $model->date;
+            $orderAccount->exchange_rate = $model->exchange_rate ?: 1;
+            $orderAccount->cr_date_time = date('Y-m-d H:i:s');
+            $orderAccount->save(false);
+        }
         $client_total_debt = $orderAccount->total_debt;
 
         $client_id = $model->client_id;
-        $date_old = $model->date;
-
-        $exchange_rate_old = $model->exchange_rate;
         $sum_dollar_old = $model->all_summ_dollar;
-        $discount_amounts_old = $model->discount_amount;
-        
-        $total_debt_old = $model->old_total_debt;
-
         $all_product_sum_old = $model->product_summ_dollar;
-        $all_product_qolgan_sum_old = $all_product_sum_old;
-        $client = Client::find()->where(['id' => $client_id])->one();
+        $old_confirmation = (int)$model->confirmation;
 
         if ($model->load(Yii::$app->request->post())) {
             $updateReason = Yii::$app->request->post('VozvratOrder')['comments'];
-            $total_debts_new = Yii::$app->request->post('VozvratOrder')['old_total_debt']?? 0;
             $dates_new = Yii::$app->request->post('VozvratOrder')['date'];
             $exchange_rates_new = Yii::$app->request->post('VozvratOrder')['exchange_rate']?? 0;
             $sum_dollars_new = Yii::$app->request->post('VozvratOrder')['all_summ_dollar']?? 0;
@@ -455,11 +454,14 @@ class VozvratOrderController extends Controller
                 $warehouseValue = Warehouse::find()->where(['id' => $value->warehouse_id])->one();
                 if ($warehouseValue) {
                     if ($value->type_sklad_id == 1) {
-                        $warehouseValue->count += $value->count;
+                        $warehouseValue->count -= $value->count;
                         $warehouseValue->save(false);                          
                     }
                 }
                 ProductAccountHistory::find()->where(['id' => $value['id']])->one()->delete();
+            }
+            foreach (ProductAccount::find()->where(['vozvrat_order_id' => $id])->all() as $oldProductAccount) {
+                $oldProductAccount->delete();
             }
             
             $exchange_rates_new = is_numeric($exchange_rates_new) && $exchange_rates_new != 0 ? $exchange_rates_new : 1; // Avoid division by zero
@@ -499,7 +501,7 @@ class VozvratOrderController extends Controller
                     $type_sklad_list = TypeSklad::find()->where(['id' => $value['type_sklad_id']])->one();
 
                     $productAccount = ProductAccount::find()
-                        ->andWhere(['order_account_id' => $orderAccount->id])
+                        ->andWhere(['vozvrat_order_id' => $model->id])
                         ->andWhere(['brand_id' => (int)$brand_list->id])
                         ->andWhere(['product_category_id' => (int)$product_category_list->id])
                         ->andWhere(['type' => $value_type])
@@ -537,7 +539,6 @@ class VozvratOrderController extends Controller
                     // Yangi ProductAccount
                     if (!$productAccount) {
                         $relative = new ProductAccount();
-                        $relative->order_account_id         = $orderAccount->id;
                         $relative->vozvrat_order_id = $model->id;
                         $relative->brand_id                 = $brand_list->id;
                         $relative->product_category_id      = $product_category_list->id;
@@ -550,7 +551,7 @@ class VozvratOrderController extends Controller
                         $relative->is_debtor                = $hasLargePriceNew ? 1 : 0;
                         $relative->profit                   = round($lineProfit, 2);
                         $relative->cr_date                  = date('Y-m-d', strtotime($dates_new));
-                        $relative->warehouse_id             = $warehouseValue->id;
+                        $relative->warehouse_id             = $warehouseValue ? $warehouseValue->id : null;
                         $relative->save(false);
                     } else {
                         // Mavjud yozuvga yangi miqdor va foyda qo‘shamiz
@@ -564,7 +565,6 @@ class VozvratOrderController extends Controller
 
                     // History yozuvi
                     $relativeHistory = new ProductAccountHistory();
-                    $relativeHistory->order_account_id         = $orderAccount->id;
                     $relativeHistory->vozvrat_order_id = $model->id;
                     $relativeHistory->brand_id                 = $brand_list->id;
                     $relativeHistory->product_category_id      = $product_category_list->id;
@@ -578,11 +578,12 @@ class VozvratOrderController extends Controller
                     $relativeHistory->profit                   = round($lineProfit, 2);
                     $relativeHistory->is_debtor                = $hasLargePriceNew ? 1 : 0;
                     $relativeHistory->cr_date                  = date('Y-m-d', strtotime($dates_new));
+                    $relativeHistory->warehouse_id             = $warehouseValue ? $warehouseValue->id : null;
                     $relativeHistory->save(false);
 
-                    // Ombor sonini kamaytirish
+                    // Vozvratda mahsulot omborga qaytadi
                     if ($warehouseValue && $type_sklad_list->id == 1) {
-                        $warehouseValue->count = $warehouseValue->count - $value_count;
+                        $warehouseValue->count = $warehouseValue->count + $value_count;
                         $warehouseValue->save(false);
                     }
 
@@ -597,37 +598,35 @@ class VozvratOrderController extends Controller
             $model->large_price = $hasLargePriceNew ? 1 : 0;
 
             $model->save(false);
-            if ($model->confirmation == 1) {
-                 // Eski ma'lumotlarni tozalash
-                 if ($orderAccount->total_debt !=0) {
-                    $orderAccount->total_debt = $client_total_debt - ($all_product_sum_old - $all_pay_summ_old);
-                    $orderAccount->total_debt_old = $client_total_debt - ($all_product_sum_old - $all_pay_summ_old);
-                    $orderAccount->save(false);
-                 }
-                
-                // Yangi ma'lumotlarni qo'shish
+
+            $all_product_summ_new = round($all_product_summ_new, 2);
+            $old_discount_amount = $old_confirmation == 1
+                ? $this->getVozvratDiscount($all_product_sum_old, $sum_dollar_old)
+                : 0;
+            $new_discount_amount = $tasdiq_check_new == 1
+                ? $this->getVozvratDiscount($all_product_summ_new, $all_pay_summ_new)
+                : 0;
+            $new_total_debt = round($client_total_debt + $old_discount_amount - $new_discount_amount, 2);
+
+            if ($old_confirmation == 1 || $tasdiq_check_new == 1) {
                 $orderAccount->last_order_date = date('Y-m-d',strtotime($dates_new));
                 $orderAccount->exchange_rate = $exchange_rates_new;
-                $orderAccount->number_of_orders = $orderAccount->number_of_orders + 1;
-                $orderAccount->all_summ_dollar = round($orderAccount->all_summ_dollar + $all_pay_summ_new, 2);
-                $orderAccount->sum_dollar = $orderAccount->sum_dollar + (float)$sum_dollars_new;
-           
-                $orderAccount->all_product_sum = round($orderAccount->all_product_sum + $all_product_summ_new, 2);
-                $orderAccount->total_debt_old =$client_total_debt - ($all_product_sum_old - $all_pay_summ_old);
-                $orderAccount->total_debt = $orderAccount->total_debt + ($all_product_summ_new - $all_pay_summ_new );
+                $orderAccount->total_debt_old = $client_total_debt;
+                $orderAccount->total_debt = $new_total_debt;
                 $orderAccount->save(false);
-       
-                
-                $model->total_debt_today = round(($all_product_summ_new - $all_pay_summ_new ), 2);
-                $model->total_debt = $total_debt_old + ($all_product_summ_new - ($model->all_summ_dollar + $model->discount_amount));
-                $model->total_debt_old = $total_debt_old;
-                $model->all_product_sum = $all_product_summ_new;
-                $model->confirmation = $tasdiq_check_new;
-                $model->save(false);
+            }
 
+            $model->product_summ_dollar = $all_product_summ_new;
+            $model->discount_amount = $this->getVozvratDiscount($all_product_summ_new, $all_pay_summ_new);
+            $model->total_debt = $new_total_debt;
+            $model->old_total_debt = $client_total_debt;
+            $model->confirmation = $tasdiq_check_new;
+            $model->save(false);
+
+            if ($tasdiq_check_new == 1) {
                 $elegantHistoryUpdate = new ElegantHistoryUpdate();
                 $elegantHistoryUpdate->title = $model->client->fio . " ning ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanadagi buyurtmasi o'zgartirildi...";
-                $elegantHistoryUpdate->comment = $updateReason . ' <br><b style="color:#e97171">' . 'Ostatka: '. $model->total_debt_old .'$, '. 'Mahsulot summasi: '. ($all_product_summ_new).'$, '. 'Qaytarilgan summa : '. $model->all_summ_dollar .'$, '. 'Qolgan qarz: '. $model->total_debt.'$ </b>';
+                $elegantHistoryUpdate->comment = $updateReason . ' <br><b style="color:#e97171">' . 'Ostatka: '. $model->old_total_debt .'$, '. 'Mahsulot summasi: '. ($all_product_summ_new).'$, '. 'Qaytarilgan summa : '. $model->all_summ_dollar .'$, '. 'Qolgan qarz: '. $model->total_debt.'$ </b>';
                 $elegantHistoryUpdate->status = 1;
                 $elegantHistoryUpdate->type = 2;
                 $elegantHistoryUpdate->vozvrat_order_id = $model->id;
@@ -660,11 +659,13 @@ class VozvratOrderController extends Controller
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id); 
-        if ($model->all_summ_dollar != $model->product_summ_dollar) {
-            $summ = $model->product_summ_dollar - $model->all_summ_dollar;
+        if ($model->confirmation == 1) {
+            $summ = $this->getVozvratDiscount($model->product_summ_dollar, $model->all_summ_dollar);
             $orderAccount = OrderAccount::find()->where(['client_id' => $model->client_id])->one();
-            $orderAccount->total_debt = round($orderAccount->total_debt + $summ, 2);
-            $orderAccount->save();
+            if ($orderAccount) {
+                $orderAccount->total_debt = round($orderAccount->total_debt + $summ, 2);
+                $orderAccount->save(false);
+            }
         }
 
         $productAccountHistory = ProductAccountHistory::find()->where(['vozvrat_order_id' => $id])->all();
@@ -677,8 +678,10 @@ class VozvratOrderController extends Controller
             // print_r($value['count']);
             // echo "<pre>";
             $warehouseValue = Warehouse::find()->andWhere(['id' => (int)$value->warehouse_id])->one();
-            $warehouseValue->count = $warehouseValue->count - $value['count'];
-            $warehouseValue->save(false);
+            if ($warehouseValue && $value->type_sklad_id == 1) {
+                $warehouseValue->count = $warehouseValue->count - $value['count'];
+                $warehouseValue->save(false);
+            }
             ProductAccount::find()->where(['id' => $value['id']])->one()->delete();
         } 
 
@@ -718,6 +721,25 @@ class VozvratOrderController extends Controller
         $pks = explode(',', $request->post( 'pks' )); // Array or selected records primary keys
         foreach ( $pks as $pk ) {
             $model = $this->findModel($pk);
+            if ($model->confirmation == 1) {
+                $summ = $this->getVozvratDiscount($model->product_summ_dollar, $model->all_summ_dollar);
+                $orderAccount = OrderAccount::find()->where(['client_id' => $model->client_id])->one();
+                if ($orderAccount) {
+                    $orderAccount->total_debt = round($orderAccount->total_debt + $summ, 2);
+                    $orderAccount->save(false);
+                }
+            }
+            foreach (ProductAccountHistory::find()->where(['vozvrat_order_id' => $model->id])->all() as $history) {
+                $history->delete();
+            }
+            foreach (ProductAccount::find()->where(['vozvrat_order_id' => $model->id])->all() as $product) {
+                $warehouseValue = Warehouse::find()->andWhere(['id' => (int)$product->warehouse_id])->one();
+                if ($warehouseValue && $product->type_sklad_id == 1) {
+                    $warehouseValue->count = $warehouseValue->count - $product->count;
+                    $warehouseValue->save(false);
+                }
+                $product->delete();
+            }
             $model->delete();
         }
 
@@ -734,6 +756,11 @@ class VozvratOrderController extends Controller
             return $this->redirect(['index']);
         }
        
+    }
+
+    private function getVozvratDiscount($productSum, $returnedSum)
+    {
+        return round(max((float)$productSum - (float)$returnedSum, 0), 2);
     }
 
     /**

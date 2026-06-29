@@ -158,8 +158,8 @@ input:checked + .slider:before {
               <tbody id="showRes">
                 <?php foreach ($warehouse as $model) { $i = 1; $allCount = 0; ?>
                   <tr class="handle-header">
-                    <td colspan="5" style="background-color:#ccdefa;"><b style="color:red"><?= $model->brand->name ?></b></td>
-                    <td style="background-color:#ccdefa;"></td>
+                    <td colspan="5" style="background-color:#a0d9ea;"><b style="color:red"><?= $model->brand->name ?></b></td>
+                    <td style="background-color:#a0d9ea;"></td>
                   </tr>
 
                   <?php
@@ -366,33 +366,9 @@ input:checked + .slider:before {
               <span class="error_all_summ_dollar text-danger"></span>
             </div>
           </div>
-          <div class="form-group row m-b-15 align-items-center">
-            <label class="col-sm-6 col-form-label">
-              <h5 class="m-0"><b style="color:#151d83">Qaytarilgan summa ($)</b></h5>
-            </label>
-            <div class="col-sm-6">
-              <input type="number" class="form-control" name="sum_dollar"/>
-              <span class="error_sum_dollar text-danger"></span>
-            </div>
-          </div>
-           <div class="form-group row m-b-15 align-items-center">
-            <label class="col-sm-6 col-form-label">
-              <h5 class="m-0"><b style="color:#151d83">Qaytarilgan summa so'mda</b></h5>
-            </label>
-            <div class="col-sm-6">
-              <input type="number" class="form-control" name="summa_som"/>
-              <span class="error_summa_som text-danger"></span>
-            </div>
-          </div>
-          <div class="form-group row m-b-15 align-items-center">
-            <label class="col-sm-6 col-form-label">
-              <h5 class="m-0"><b style="color:#151d83">Qaytarilgan summa kartada</b></h5>
-            </label>
-            <div class="col-sm-6">
-              <input type="number" class="form-control" name="summa_karta"/>
-              <span class="error_summa_karta text-danger"></span>
-            </div>
-          </div>
+          <input type="hidden" name="sum_dollar" value="0"/>
+          <input type="hidden" name="summa_som" value="0"/>
+          <input type="hidden" name="summa_karta" value="0"/>
           <div class="form-group row m-b-15 align-items-center">
             <div class="col-sm-12">
               <label class="col-sm-8 col-form-label"><h5><b>Izoh</b></h5></label>
@@ -529,9 +505,9 @@ $("#buy").submit(function(event){
     jami_qarzi: $("#qarz_client_summ").text(),
     order_date: $('input[name="order_date"]').val(),
     all_summ_dollar: $('input[name="all_summ_dollar"]').val(),
-    summ_dollar: $('input[name="sum_dollar"]').val(),  
-    summa_som: $('input[name="summa_som"]').val(),
-    summa_karta: $('input[name="summa_karta"]').val(),
+    summ_dollar: 0,
+    summa_som: 0,
+    summa_karta: 0,
     comment: $('textarea[name="comment"]').val(),
     tasdiq_check: $('input[name="tasdiq_check"]').val(),
     total: $("#count_porduct").text(),
@@ -540,18 +516,18 @@ $("#buy").submit(function(event){
     product_details: $('input[name="product_details"]').val(),
   };
 
-    let hasError = false;
+  let hasError = false;
   let s1 = parseFloat($('input[name="all_summ_dollar"]').val());
-  if (isNaN(s1) || s1 < 0) { $(".error_all_summ_dollar").text("To'ldirish majburiy."); hasError = true; } else { $(".error_all_summ_dollar").text(""); }
-
-  let s2 = parseFloat($('input[name="sum_dollar"]').val());
-  if (isNaN(s2) || s2 < 0) { $(".error_sum_dollar").text("To'ldirish majburiy."); hasError = true; } else { $(".error_sum_dollar").text(""); }
-
-  let s3 = parseFloat($('input[name="summa_som"]').val());
-  if (isNaN(s3) || s3 < 0) { $(".error_summa_som").text("To'ldirish majburiy."); hasError = true; } else { $(".error_summa_som").text(""); }
-
-  let s4 = parseFloat($('input[name="summa_karta"]').val());
-  if (isNaN(s4) || s4 < 0) { $(".error_summa_karta").text("To'ldirish majburiy."); hasError = true; } else { $(".error_summa_karta").text(""); }
+  let totalProductSum = parseFloat($("#total_product_sum").text());
+  if (isNaN(s1) || s1 < 0) {
+    $(".error_all_summ_dollar").text("To'ldirish majburiy.");
+    hasError = true;
+  } else if (!isNaN(totalProductSum) && s1 > totalProductSum) {
+    $(".error_all_summ_dollar").text("Jami qaytarilgan summa umumiy narxdan katta bo'lmasligi kerak.");
+    hasError = true;
+  } else {
+    $(".error_all_summ_dollar").text("");
+  }
 
   if (hasError) return false;
 

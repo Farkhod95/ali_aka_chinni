@@ -76,37 +76,27 @@ CrudAsset::register($this);
                 <div class="table-responsive">
                     <h5>Hisobot</h5>
                     <?php if(Yii::$app->user->identity->permission == 1){?>
-                        <table class="table">   
+                        <table class="table">
                             <tr>
-                                <th nowrap style="text-align: left; width: 300px; color:#f59c1a">Dollar kursi:</th>
-                                <td ><b style="color:#f59c1a"><?= $vozvratOrder->exchange_rate ?></b></td>
-                                <td style="width: 10px;"></td>
-                                <th nowrap style="text-align: left; color:#474ba0">  </th>
-                                <td ><b style="color:#474ba0"> </b></td>
+                                <th nowrap style="text-align: left; width: 300px; color:green">Dollar kursi:</th>
+                                <td><b style="color:green"><?= $vozvratOrder->exchange_rate ?? 0 ?></b></td>
                             </tr>
                             <tr>
-                                <th nowrap style="text-align: left; width: 200px; color:#f59c1a">Jami mijozga qaytarilgan summa ($):</th>
-                                <td ><b style="color:#f59c1a"><?= Yii::$app->formatter->asDecimal($vozvratOrder->all_summ_dollar, 2) ?> $</b></td>
-                                <td style="width: 10px;"></td>
-                                <th nowrap style="text-align: left; color:#474ba0">Qaytarilgan summa dollarda ($):</th>
-                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($vozvratOrder->sum_dollar,2) ?>  $</b></td>
+                                <th nowrap style="text-align: left; width: 300px;color:red">Eski qarzi ($):</th>
+                                <td><b style="color:red"><?= Yii::$app->formatter->asDecimal($vozvratOrder->old_total_debt ?? 0, 2) ?> $</b></td>
                             </tr>
                             <tr>
-                                <th nowrap style="text-align: left; width: 200px;color:#f59c1a">Jami qaytarilgan summa ($):</th>
-                                <td ><b style="color:#f59c1a" ><?= Yii::$app->formatter->asDecimal($vozvratOrder->all_summ_dollar, 2) ?> $ </b></td>
-                                
-                                <td style="width: 10px;"></td>
-                                <th nowrap style="text-align: left;color:#474ba0">Qaytarilgan summa so'mda:</th>
-                                <td  ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($vozvratOrder->sum_som, 2) ?></b></td>
+                                <th nowrap style="text-align: left; width: 300px;color:#f59c1a">Jami qaytarilgan summa ($):</th>
+                                <td><b style="color:#f59c1a"><?= Yii::$app->formatter->asDecimal($vozvratOrder->all_summ_dollar ?? 0, 2) ?> $</b></td>
                             </tr>
                             <tr>
-                                <th nowrap style="text-align: left; width: 200px;color:#f59c1a">Qolgan qarz ($):</th>
-                                <td ><b style="color:#f59c1a"><?=  Yii::$app->formatter->asDecimal($orderAccount2->total_debt, 2) ?> $</b></td>
-                                <td style="width: 10px;"></td>
-                                <th nowrap style="text-align: left; color:#474ba0">Qaytarilgan summa kartada:</th>
-                                <td ><b style="color:#474ba0"><?= Yii::$app->formatter->asDecimal($vozvratOrder->sum_cart, 2)?></b></td>
+                                <th nowrap style="text-align: left; width: 300px;color:#f59c1a">Jami chegirma ($):</th>
+                                <td><b style="color:#f59c1a"><?= Yii::$app->formatter->asDecimal($vozvratOrder->getCalculatedDiscountAmount(), 2) ?> $</b></td>
                             </tr>
-                            <tr>                            
+                            <tr>
+                                <th nowrap style="text-align: left; width: 300px;color:red">Qolgan qarz ($):</th>
+                                <td><b style="color:red"><?=  Yii::$app->formatter->asDecimal($orderAccount2->total_debt ?? 0, 2) ?> $</b></td>
+                            </tr>
                         </table>
                     <?php }?>
                     <?php Pjax::begin([
@@ -147,7 +137,7 @@ CrudAsset::register($this);
                                 <?php  foreach ($warehouses = ProductAccountHistory::find()
                                                 ->andWhere(['brand_id' => $model->brand->id])
                                                 ->andWhere(['vozvrat_order_id' => $order_id])->all() as $model1) { 
-                                    $largePrice = $model1->price < $model1->real_price ?  '<i class="fa fa-exclamation-triangle" style="color: orange; font-size: 22px; cursor: pointer;" data-toggle="tooltip" title="Mahsulot narxi Asl narxidan kam"></i>':'';                
+                                    $largePrice = (float)($model1->price ?? 0) < (float)($model1->real_price ?? 0) ?  '<i class="fa fa-exclamation-triangle" style="color: orange; font-size: 22px; cursor: pointer;" data-toggle="tooltip" title="Mahsulot narxi Asl narxidan kam"></i>':'';
                                     ?>
                                     <tr >
                                         <?php if($model1->type_sklad_id ==1){ ?> 
@@ -175,9 +165,9 @@ CrudAsset::register($this);
                                         <?php }?>
 
                                         <?php if($model1->type_sklad_id ==1){ ?> 
-                                            <td > <b ><?= $model1->size ?></b></td>
+                                            <td > <b ><?= $model1->size ?? 0 ?></b></td>
                                         <?php }else{?>
-                                            <td> <b ><?= $model1->size ?></b></td>
+                                            <td> <b ><?= $model1->size ?? 0 ?></b></td>
                                         <?php }?>
 
                                         <?php if($model1->type_sklad_id ==1){ ?> 
@@ -187,9 +177,9 @@ CrudAsset::register($this);
                                         <?php }?>
                                         
                                         <?php if($model1->type_sklad_id ==1){ ?> 
-                                            <td > <b ><?= $model1->count ?></b></td>
+                                            <td > <b ><?= $model1->count ?? 0 ?></b></td>
                                         <?php }else{?>
-                                            <td> <b ><?= $model1->count ?></b></td>
+                                            <td> <b ><?= $model1->count ?? 0 ?></b></td>
                                         <?php }?>
                                         <!-- <?php if($model1->type_sklad_id ==1){ 
                                             if ($model1->count == $model1->given_count) {
@@ -237,13 +227,13 @@ CrudAsset::register($this);
                                         <?php }?> -->
                                         <?php if(Yii::$app->user->identity->permission == 1){?>
                                             <?php if($model1->type_sklad_id ==1){ ?> 
-                                            <td style="color:<?= ($model1->price < $model1->real_price) ? '#e70f0fff;font-size: 15px;' : ''?>"> <b > <?= $model1->price ?> <?= $largePrice ?></b></td>
-                                            <td > <b ><?= $model1->real_price ?></b></td>
-                                            <td > <b style="color:<?= ($model1->profit >0) ? 'green' :'red' ?>;font-size: 16px"><?= $model1->profit ?></b></td>
+                                            <td style="color:<?= ((float)($model1->price ?? 0) < (float)($model1->real_price ?? 0)) ? '#e70f0fff;font-size: 15px;' : ''?>"> <b > <?= $model1->price ?? 0 ?> <?= $largePrice ?></b></td>
+                                            <td > <b ><?= $model1->real_price ?? 0 ?></b></td>
+                                            <td > <b style="color:<?= ((float)($model1->profit ?? 0) > 0) ? 'green' :'red' ?>;font-size: 16px"><?= $model1->profit ?? 0 ?></b></td>
                                             <?php }else{?>
-                                                <td > <b style="color:<?= ($model1->price < $model1->real_price) ? '#e70f0fff;font-size: 15px' : ''?>">  <?= $model1->price ?> <?= $largePrice ?></b></td>
-                                                <td> <b ><?= $model1->real_price ?></b></td>
-                                                <td> <b style="color:<?= ($model1->profit >0) ? 'green' :'red' ?>;font-size: 16px"><?= $model1->profit ?></b></td>
+                                                <td > <b style="color:<?= ((float)($model1->price ?? 0) < (float)($model1->real_price ?? 0)) ? '#e70f0fff;font-size: 15px' : ''?>">  <?= $model1->price ?? 0 ?> <?= $largePrice ?></b></td>
+                                                <td> <b ><?= $model1->real_price ?? 0 ?></b></td>
+                                                <td> <b style="color:<?= ((float)($model1->profit ?? 0) > 0) ? 'green' :'red' ?>;font-size: 16px"><?= $model1->profit ?? 0 ?></b></td>
                                             <?php }?>
                                         <?php }?>
                                         

@@ -64,18 +64,21 @@ return [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'product_summ_dollar',
         'content'=> function($data){
-            if ($data->product_summ_dollar) {
-                return   '<b style="font-size: 14px">'.Yii::$app->formatter->asDecimal($data->product_summ_dollar, 2).' $</b>';
-            }
+            return '<b style="font-size: 14px">'.Yii::$app->formatter->asDecimal($data->product_summ_dollar ?? 0, 2).' $</b>';
         }
     ],
     [
         'class'=>'\kartik\grid\DataColumn',
         'attribute'=>'all_summ_dollar',
         'content'=> function($data){
-            if ($data->all_summ_dollar) {
-                return   '<b style="font-size: 14px">'.Yii::$app->formatter->asDecimal($data->all_summ_dollar, 2).' $</b>';
-            }
+            return '<b style="font-size: 14px">'.Yii::$app->formatter->asDecimal($data->all_summ_dollar ?? 0, 2).' $</b>';
+        }
+    ],
+    [
+        'class'=>'\kartik\grid\DataColumn',
+        'attribute'=>'discount_amount',
+        'content'=> function($data){
+            return '<b style="font-size: 14px">'.Yii::$app->formatter->asDecimal($data->getCalculatedDiscountAmount(), 2).' $</b>';
         }
     ],
     [
@@ -83,9 +86,7 @@ return [
         'attribute'=>'total_debt',
         'content'=> function($data){
             $orderAccount = OrderAccount::find()->where(['client_id' => $data->client_id])->one();
-            if ($orderAccount) {
-                return   '<b style="font-size: 14px;color:red">'.Yii::$app->formatter->asDecimal($orderAccount->total_debt??0, 2).' $</b>';
-            }
+            return '<b style="font-size: 14px;color:red">'.Yii::$app->formatter->asDecimal($orderAccount->total_debt ?? 0, 2).' $</b>';
         }
     ],
     [
@@ -224,4 +225,4 @@ return [
         ],
     ],
 
-];   
+];

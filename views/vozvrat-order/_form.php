@@ -282,42 +282,9 @@ $urlTypesBySz = Url::to(['order-account-history/types-by-size']);           // b
           ])->label("Jami summa dollarda ($)");
           ?>
         </div>
-
-        <div class="col-md-3">
-          <?php
-          $sumDollarVal = ($model->sum_dollar && $model->sum_dollar != 0) ? $model->sum_dollar : '';
-          echo $form->field($model, 'sum_dollar')->textInput([
-              'type' => 'number',
-              'id' => 'sum-dollar',
-              'value' => $sumDollarVal,
-              'required' => true,
-          ])->label("Summa dollarda ($)");
-          ?>
-        </div>
-
-        <div class="col-md-3">
-          <?php
-          $sumSomVal = ($model->sum_som && $model->sum_som != 0) ? $model->sum_som : '';
-          echo $form->field($model, 'sum_som')->textInput([
-              'type' => 'number',
-              'id' => 'sum-som',
-              'value' => $sumSomVal,
-              'required' => true,
-          ])->label("Summa so'mda");
-          ?>
-        </div>
-
-        <div class="col-md-3">
-          <?php
-          $sumCartVal = ($model->sum_cart && $model->sum_cart != 0) ? $model->sum_cart : '';
-          echo $form->field($model, 'sum_cart')->textInput([
-              'type' => 'number',
-              'id' => 'sum-cart',
-              'value' => $sumCartVal,
-              'required' => true,
-          ])->label("Summa kartada");
-          ?>
-        </div>
+        <?= $form->field($model, 'sum_dollar')->hiddenInput(['value' => 0])->label(false) ?>
+        <?= $form->field($model, 'sum_som')->hiddenInput(['value' => 0])->label(false) ?>
+        <?= $form->field($model, 'sum_cart')->hiddenInput(['value' => 0])->label(false) ?>
       </div>
 
       <div class="row align-items-center">

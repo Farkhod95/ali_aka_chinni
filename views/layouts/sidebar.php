@@ -68,6 +68,23 @@ $menuItems[] = [
 //     'url' => ['/order-account/index'],
 //     'visible' => $model && in_array($model->permission, [1,2,5,6]),
 // ];
+$menuItems[] = [
+    'label' => 'Vozvrat',
+    'url' => '#',
+    'items' => [
+         [
+            'label' => 'Vozvrat qilish',
+            'url' => ['/vozvrat-order/vozvrat'],
+            'visible' => $model && in_array($model->permission, [1,6]),
+        ],
+        [
+            'label' => 'Vozvrat buyurmalar tarixi',
+            'url' => ['/vozvrat-order/index'],
+            'visible' => $model && in_array($model->permission, [1,6]),
+        ],
+    ],
+    'visible' => $model && in_array($model->permission, [1,6]),
+];
 
 $menuItems[] = [
     'label' => 'Mahsulotlar',

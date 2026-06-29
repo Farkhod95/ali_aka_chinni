@@ -80,6 +80,15 @@ class VozvratOrder extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getCalculatedDiscountAmount()
+    {
+        if ($this->discount_amount !== null && $this->discount_amount !== '') {
+            return (float)$this->discount_amount;
+        }
+
+        return round(max((float)$this->product_summ_dollar - (float)$this->all_summ_dollar, 0), 2);
+    }
+
     public function beforeSave($insert)
     {   
         if ($this->isNewRecord){
@@ -175,10 +184,8 @@ class VozvratOrder extends \yii\db\ActiveRecord
         $table = '';
         $allCount = 0;
         $allSumm = 0;
-        $tulan_sum_som = $model->sum_som?'To\'langan summa so\'mda:': '';
-        $tulan_sum_karta = $model->sum_cart?'To\'langan summa kartada:': '';
-        $discount_amount_sum = $model->discount_amount?'Jami chegirma ($):': '';
-        $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
+        $discount_amount_sum = 'Jami chegirma ($):';
+        $discount_amount_sum_val = Yii::$app->formatter->asDecimal($model->getCalculatedDiscountAmount(), 2).' $,';
         $debtRepaymentall_sum = $debtRepaymentall != 0 ?'To\'langan qarz ($):': '';
         $debt_repayment_all = $debtRepaymentall != 0 ?$debtRepaymentall.' $,': '';
         if($sum>0){
@@ -206,10 +213,10 @@ class VozvratOrder extends \yii\db\ActiveRecord
                             <td style="height: 15px; border: 1px solid #000;"><b>&nbsp;'. $i . '</b></td>
                             <td style="height: 15px; border: 1px solid #000;"><b>&nbsp;'. $model1->brand->name . '</b></td>
                             <td style="height: 15px; border: 1px solid #000;"><b>&nbsp;'. $model1->productCategory->name.($model1->size!='0'?'&nbsp; (&nbsp;'. $model1->size.'&nbsp;)' : '') . '</b></td>
-                            <td style="height: 15px; text-align: center; border: 1px solid #000;"><b>'. $model1->count . '</b></td>
+                            <td style="height: 15px; text-align: center; border: 1px solid #000;"><b>'. ($model1->count ?? 0) . '</b></td>
                             <td style="height: 15px; text-align: center;  border: 1px solid #000;"><b>&nbsp;'. $model1->getTypeView($model1->type) . '</b></td>
-                            <td style="height: 15px; text-align: center;  border: 1px solid #000;"><b>'. $model1->price . '</b></td>
-                            <td style="height: 15px; text-align: left;  border: 1px solid #000;"><b> = '. round($model1->count * $model1->price,2) . '</b></td>
+                            <td style="height: 15px; text-align: center;  border: 1px solid #000;"><b>'. ($model1->price ?? 0) . '</b></td>
+                            <td style="height: 15px; text-align: left;  border: 1px solid #000;"><b> = '. round(($model1->count ?? 0) * ($model1->price ?? 0),2) . '</b></td>
                         </tr>';
                 $allCount = $allCount + $model1->count;
                 $allSumm = $allSumm + $model1->count * $model1->price;
@@ -249,8 +256,8 @@ class VozvratOrder extends \yii\db\ActiveRecord
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                 <td  ><b >{t_p},</b></td>
                 <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left;font-size:14px; color:green;">Dollar kursi:</th>
-                <td ><b style="text-align: left;font-size:14px; color:green;">{exchange_rate} so\'m</b></td>
+                <th nowrap style="text-align: left;font-size:14px; color:green;"></th>
+                <td ><b style="text-align: left;font-size:14px; color:green;"></b></td>
             </tr>
             <tr>
                 <th nowrap style="text-align: left;">Firma:</th>
@@ -269,53 +276,37 @@ class VozvratOrder extends \yii\db\ActiveRecord
            
         </table>
         '.$table.'<br>
-        <table style="width: 100%; text-align: right; font-size:12px;">   
+        <table style="width: 100%; text-align: right; font-size:12px;">
                 <tr>
-                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">Ostatka  ($):</th>
-                    <td ><b style="font-size:16px;color:#f59c1">{total_debt_old} $,</b></td>
-                    
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0">Qaytarilgan summa dollarda ($):</th>
-                    <td ><b style="color:#474ba0">{sum_dollar} $</b></td>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:green">Dollar kursi:</th>
+                    <td ><b style="font-size:16px;color:green">{exchange_rate} so\'m</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px; color:#f59c1">Vozvrat tavarlar summasi ($):</th>
-                    <td ><b style="color:#f59c1">{all_product_sum} $,</b></td>
-                    
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0">Qaytarilgan summa so\'mda:</th>
-                    <td ><b style="color:#474ba0">{sum_som} </b></td>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:red">Eski qarzi ($):</th>
+                    <td ><b style="font-size:16px;color:red">{total_debt_old} $,</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px;color:#f59c1">Jami qaytarilgan summa ($):</th>
-                    <td ><b style="color:#f59c1" >{all_summ_dollar} $,</b></td>
-        
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="text-align: left; color:#474ba0">Qaytarilgan summa kartada:</th>
-                    <td ><b style="color:#474ba0">{sum_cart} </b></td>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">Jami qaytarilgan summa ($):</th>
+                    <td ><b style="font-size:16px;color:#f59c1" >{all_summ_dollar} $,</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="text-align: left; width: 150px;color:#f59c1">'.$discount_amount_sum.'</th>
-                    <td ><b style="color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">'.$discount_amount_sum.'</th>
+                    <td ><b style="font-size:16px;color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
                 <tr>
-                    <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{all_total_debt} $,</b></td>
-                    
                 </tr>
-            </table> 
+            </table>
       ';
 
-        $text = str_replace ("{exchange_rate}", $model->exchange_rate , $text);
-        $text = str_replace ("{total_debt_old}", Yii::$app->formatter->asDecimal($model->old_total_debt, 2), $text);
-        $text = str_replace ("{all_total_debt}", Yii::$app->formatter->asDecimal($orderAccount2->total_debt,2), $text);
-        $text = str_replace ("{total_debt}", Yii::$app->formatter->asDecimal($model->total_debt,2) , $text);
-        $text = str_replace ("{discount_amount}", $model->discount_amount?$model->discount_amount:'' , $text);
-        $text = str_replace ("{sum_dollar}", $model->sum_dollar?Yii::$app->formatter->asDecimal($model->sum_dollar,2):'0' , $text);
-        $text = str_replace ("{all_summ_dollar}", Yii::$app->formatter->asDecimal($model->all_summ_dollar,2) , $text);
-        $text = str_replace ("{sum_som}", $model->sum_som?Yii::$app->formatter->asDecimal($model->sum_som,2):' ' , $text);
-        $text = str_replace ("{sum_cart}", $model->sum_cart?Yii::$app->formatter->asDecimal($model->sum_cart, 2):'0' , $text);
-        $text = str_replace ("{all_product_sum}", $model->product_summ_dollar?Yii::$app->formatter->asDecimal($model->product_summ_dollar, 2):'0' , $text);
+        $text = str_replace ("{exchange_rate}", $model->exchange_rate ?? 0 , $text);
+        $text = str_replace ("{total_debt_old}", Yii::$app->formatter->asDecimal($model->old_total_debt ?? 0, 2), $text);
+        $text = str_replace ("{all_total_debt}", Yii::$app->formatter->asDecimal($orderAccount2->total_debt ?? 0,2), $text);
+        $text = str_replace ("{total_debt}", Yii::$app->formatter->asDecimal($model->total_debt ?? 0,2) , $text);
+        $text = str_replace ("{discount_amount}", $model->getCalculatedDiscountAmount() , $text);
+        $text = str_replace ("{all_summ_dollar}", Yii::$app->formatter->asDecimal($model->all_summ_dollar ?? 0,2) , $text);
+        $text = str_replace ("{all_product_sum}", Yii::$app->formatter->asDecimal($model->product_summ_dollar ?? 0, 2) , $text);
         $text = str_replace ("{date}", $model->date , $text);
         $text = str_replace ("{debt_repayment_all}", Yii::$app->formatter->asDecimal($debtRepaymentall, 2), $text);
         $text = str_replace ("{cr_date_time}", date('d.m.Y', strtotime($model->cr_date_time)) , $text);
@@ -359,10 +350,8 @@ class VozvratOrder extends \yii\db\ActiveRecord
         $table = '';
         $allCount = 0;
         $allSumm = 0;
-        $tulan_sum_som = $model->sum_som?'To\'langan summa so\'mda:': '';
-        $tulan_sum_karta = $model->sum_cart?'To\'langan summa kartada:': '';
-        $discount_amount_sum = $model->discount_amount?'Jami chegirma ($):': '';
-        $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
+        $discount_amount_sum = 'Jami chegirma ($):';
+        $discount_amount_sum_val = Yii::$app->formatter->asDecimal($model->getCalculatedDiscountAmount(), 2).' $,';
         $debtRepaymentall_sum = $debtRepaymentall != 0 ?'To\'langan qarz ($):': '';
         $debt_repayment_all = $debtRepaymentall != 0 ?$debtRepaymentall.' $,': '';
         if($sum>0){
@@ -390,10 +379,10 @@ class VozvratOrder extends \yii\db\ActiveRecord
                             <td style="height: 15px; border: 1px solid #000;"><b>&nbsp;'. $i . '</b></td>
                             <td style="height: 15px; border: 1px solid #000;"><b>&nbsp;'. $model1->brand->name . '</b></td>
                             <td style="height: 15px; border: 1px solid #000;"><b>&nbsp;'. $model1->productCategory->name.($model1->size!='0'?'&nbsp; (&nbsp;'. $model1->size.'&nbsp;)' : '') . '</b></td>
-                            <td style="height: 15px; text-align: center; border: 1px solid #000;"><b>'. $model1->count . '</b></td>
+                            <td style="height: 15px; text-align: center; border: 1px solid #000;"><b>'. ($model1->count ?? 0) . '</b></td>
                             <td style="height: 15px; text-align: center;  border: 1px solid #000;"><b>&nbsp;'. $model1->getTypeView($model1->type) . '</b></td>
-                            <td style="height: 15px; text-align: center;  border: 1px solid #000;"><b>'. $model1->price . '</b></td>
-                            <td style="height: 15px; text-align: left;  border: 1px solid #000;"><b> = '. round($model1->count * $model1->price,2) . '</b></td>
+                            <td style="height: 15px; text-align: center;  border: 1px solid #000;"><b>'. ($model1->price ?? 0) . '</b></td>
+                            <td style="height: 15px; text-align: left;  border: 1px solid #000;"><b> = '. round(($model1->count ?? 0) * ($model1->price ?? 0),2) . '</b></td>
                         </tr>';
                 $allCount = $allCount + $model1->count;
                 $allSumm = $allSumm + $model1->count * $model1->price;
@@ -433,8 +422,8 @@ class VozvratOrder extends \yii\db\ActiveRecord
                 <th nowrap style="text-align: left; width: 200px;">Do\'kon:</th>
                 <td  ><b >{t_p},</b></td>
                 <td style="width: 10px;"></td>
-                <th nowrap style="text-align: left;font-size:14px; color:green;">Dollar kursi:</th>
-                <td ><b style="text-align: left;font-size:14px; color:green;">{exchange_rate} so\'m</b></td>
+                <th nowrap style="text-align: left;font-size:14px; color:green;"></th>
+                <td ><b style="text-align: left;font-size:14px; color:green;"></b></td>
             </tr>
             <tr>
                 <th nowrap style="text-align: left;">Firma:</th>
@@ -453,28 +442,37 @@ class VozvratOrder extends \yii\db\ActiveRecord
            
         </table>
         '.$table.'<br>
-        <table style="width: 100%; text-align: right; font-size:12px;">   
+        <table style="width: 100%; text-align: right; font-size:12px;">
                 <tr>
-                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">Ostatka  ($):</th>
-                    <td ><b style="font-size:16px;color:#f59c1">{total_debt_old} $,</b></td>
-                    
-                    <td style="width: 10px;"></td>
-                    <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:green">Dollar kursi:</th>
+                    <td ><b style="font-size:16px;color:green">{exchange_rate} so\'m</b></td>
+                </tr>
+                <tr>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:red">Eski qarzi ($):</th>
+                    <td ><b style="font-size:16px;color:red">{total_debt_old} $,</b></td>
+                </tr>
+                <tr>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">Jami qaytarilgan summa ($):</th>
+                    <td ><b style="font-size:16px;color:#f59c1" >{all_summ_dollar} $,</b></td>
+                </tr>
+                <tr>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:#f59c1">'.$discount_amount_sum.'</th>
+                    <td ><b style="font-size:16px;color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
+                </tr>
+                <tr>
+                    <th nowrap style="font-size:16px;text-align: left; width: 250px;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{all_total_debt} $,</b></td>
                 </tr>
-            </table> 
+            </table>
       ';
 
-        $text = str_replace ("{exchange_rate}", $model->exchange_rate , $text);
-        $text = str_replace ("{total_debt_old}", Yii::$app->formatter->asDecimal($model->old_total_debt, 2), $text);
-        $text = str_replace ("{all_total_debt}", Yii::$app->formatter->asDecimal($orderAccount2->total_debt,2), $text);
-        $text = str_replace ("{total_debt}", Yii::$app->formatter->asDecimal($model->total_debt,2) , $text);
-        $text = str_replace ("{discount_amount}", $model->discount_amount?$model->discount_amount:'' , $text);
-        $text = str_replace ("{sum_dollar}", $model->sum_dollar?Yii::$app->formatter->asDecimal($model->sum_dollar,2):'0' , $text);
-        $text = str_replace ("{all_summ_dollar}", Yii::$app->formatter->asDecimal($model->all_summ_dollar,2) , $text);
-        $text = str_replace ("{sum_som}", $model->sum_som?Yii::$app->formatter->asDecimal($model->sum_som,2):' ' , $text);
-        $text = str_replace ("{sum_cart}", $model->sum_cart?Yii::$app->formatter->asDecimal($model->sum_cart, 2):'0' , $text);
-        $text = str_replace ("{all_product_sum}", $model->product_summ_dollar?Yii::$app->formatter->asDecimal($model->product_summ_dollar, 2):'0' , $text);
+        $text = str_replace ("{exchange_rate}", $model->exchange_rate ?? 0 , $text);
+        $text = str_replace ("{total_debt_old}", Yii::$app->formatter->asDecimal($model->old_total_debt ?? 0, 2), $text);
+        $text = str_replace ("{all_total_debt}", Yii::$app->formatter->asDecimal($orderAccount2->total_debt ?? 0,2), $text);
+        $text = str_replace ("{total_debt}", Yii::$app->formatter->asDecimal($model->total_debt ?? 0,2) , $text);
+        $text = str_replace ("{discount_amount}", $model->getCalculatedDiscountAmount() , $text);
+        $text = str_replace ("{all_summ_dollar}", Yii::$app->formatter->asDecimal($model->all_summ_dollar ?? 0,2) , $text);
+        $text = str_replace ("{all_product_sum}", Yii::$app->formatter->asDecimal($model->product_summ_dollar ?? 0, 2) , $text);
         $text = str_replace ("{date}", $model->date , $text);
         $text = str_replace ("{debt_repayment_all}", Yii::$app->formatter->asDecimal($debtRepaymentall, 2), $text);
         $text = str_replace ("{cr_date_time}", date('d.m.Y', strtotime($model->cr_date_time)) , $text);

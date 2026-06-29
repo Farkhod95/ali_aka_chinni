@@ -111,18 +111,96 @@ class OrderAccountController extends Controller
         return $qarz_sum;
     }
 
+    private function assertWarehouseCountsAvailable($rows, $typeIsName = false)
+    {
+        if (!is_array($rows) || empty($rows)) {
+            throw new \yii\web\BadRequestHttpException("Mahsulot qatorlari bo'sh bo'lishi mumkin emas.");
+        }
+
+        $required = [];
+        foreach ($rows as $row) {
+            $brandId = isset($row['brand_id']) ? (int)$row['brand_id'] : 0;
+            $categoryId = isset($row['product_category_id']) ? (int)$row['product_category_id'] : 0;
+            $size = isset($row['size']) ? (float)$row['size'] : null;
+            $type = $typeIsName ? $this->getProductTypeIdByName($row['tip'] ?? null) : (isset($row['type']) ? (int)$row['type'] : 0);
+            $count = isset($row['count']) ? (int)$row['count'] : 0;
+
+            if (!$brandId || !$categoryId || $size === null || !$type || $count < 1) {
+                throw new \yii\web\BadRequestHttpException("Mahsulot ma'lumotlari to'liq emas.");
+            }
+
+            $key = $brandId . '|' . $categoryId . '|' . $size . '|' . $type;
+            if (!isset($required[$key])) {
+                $required[$key] = [
+                    'brand_id' => $brandId,
+                    'product_category_id' => $categoryId,
+                    'size' => $size,
+                    'type' => $type,
+                    'count' => 0,
+                ];
+            }
+            $required[$key]['count'] += $count;
+        }
+
+        foreach ($required as $item) {
+            $warehouseValue = Warehouse::find()
+                ->andWhere(['product_category_id' => $item['product_category_id']])
+                ->andWhere(['brand_id' => $item['brand_id']])
+                ->andWhere(['size' => $item['size']])
+                ->andWhere(['type' => $item['type']])
+                ->one();
+
+            $brand = Brands::findOne($item['brand_id']);
+            $category = ProductCategory::findOne($item['product_category_id']);
+            $productName = ($brand ? $brand->name : $item['brand_id']) . ' / ' .
+                ($category ? $category->name : $item['product_category_id']) . ' / ' .
+                $item['size'] . ' / ' . ProductCategory::getTypeView($item['type']);
+
+            if (!$warehouseValue) {
+                throw new \yii\web\BadRequestHttpException($productName . ' skladda topilmadi.');
+            }
+            if ((float)$warehouseValue->count < (int)$item['count']) {
+                throw new \yii\web\BadRequestHttpException($productName . ' skladda yetarli emas. Mavjud: ' . $warehouseValue->count . ", so'ralgan: " . $item['count'] . '.');
+            }
+        }
+    }
+
+    private function getProductTypeIdByName($name)
+    {
+        if ($name == 'Dona') return 1;
+        if ($name == 'Karobka') return 2;
+        if ($name == 'Komplekt') return 3;
+        if ($name == 'Pochka') return 4;
+        return null;
+    }
+
     public function actionQarztul(){
         // Requestni chop etish
         
         $request = Yii::$app->request;
         $clients_id = $request->post('customer_name');
-        $qarz_client_summ = $request->post('qarz_client_summ');
+        $debt_request_id = trim((string)$request->post('debt_request_id'));
+        if ($debt_request_id === '') {
+            throw new \yii\web\BadRequestHttpException("Qarz to'lash so'rovi noto'g'ri yuborildi.");
+        }
+
+        $session = Yii::$app->session;
+        $processedDebtRequests = $session->get('processed_debt_requests', []);
+        if (isset($processedDebtRequests[$debt_request_id])) {
+            return $this->redirect(['/debt-repayment/index']);
+        }
+
+        $toFloat = function ($value) {
+            return (float)str_replace(',', '.', trim((string)$value));
+        };
+
+        $qarz_client_summ = $toFloat($request->post('qarz_client_summ'));
         $qarz_tul_date = $request->post('qarz_tul_date');
         // $dollar_kurs = $request->post('tul_qarz_dollar_kurs');
         $dollar_kurs = 0;
 
-        $tul_qarz_sikidka = $request->post('tul_qarz_sikidka');
-        $tul_qarz_sum_dollar = $request->post('tul_qarz_sum_dollar');
+        $tul_qarz_sikidka = $toFloat($request->post('tul_qarz_sikidka'));
+        $tul_qarz_sum_dollar = $toFloat($request->post('tul_qarz_sum_dollar'));
         // $tul_qarz_sum_som = $request->post('tul_qarz_sum_som');
         $tul_qarz_sum_som = 0;
         // $tul_qarz_summ_cart = $request->post('tul_qarz_summ_cart');
@@ -134,61 +212,92 @@ class OrderAccountController extends Controller
         // $tul_qarz_zdacha_sum = $request->post('tul_qarz_zdacha_sum');
         $tul_qarz_zdacha_sum = 0;
 
+        if (!$clients_id || !$qarz_tul_date || $tul_qarz_sum_dollar < 0 || $tul_qarz_sikidka < 0) {
+            throw new \yii\web\BadRequestHttpException("Qarz to'lash ma'lumotlari to'liq yoki to'g'ri emas.");
+        }
+
         $all_tulangan_summa_dollar = round($tul_qarz_sum_dollar + $tul_qarz_sikidka,2);
+        if ($all_tulangan_summa_dollar <= 0) {
+            throw new \yii\web\BadRequestHttpException("Qarz to'lash summasi 0 dan katta bo'lishi kerak.");
+        }
         // echo '<pre>';
         // print_r($all_tulangan_summa_dollar);
         // echo '</pre>';
         $client = Client::find()->where(['id' => $clients_id])->one();
+        if (!$client) {
+            throw new \yii\web\BadRequestHttpException("Mijoz topilmadi.");
+        }
+
         $exchangeRate = ExchangeRate::find()->where(['id' => 1])->one();
+        if (!$exchangeRate) {
+            throw new \yii\web\BadRequestHttpException("Dollar kursi topilmadi.");
+        }
         $dollar_kurs =  $exchangeRate->dollar;
       
-        // $orderAccountHistory = OrderAccountHistory::find()->where(['client_id' => $clients_id])->all();
-        $orderAccountHistory = OrderAccountHistory::find()
-            ->where(['client_id' => $clients_id])
-            ->andWhere(['or',
-                ['!=', 'is_worker', 1],
-                ['is', 'is_worker', null]
-            ])
-            ->all();
-
-        foreach ($orderAccountHistory as $value) {
-            $value->is_debt = 1;
-            $value->save(false);
-        }
         $orderAccount = OrderAccount::find()->where(['client_id' => $clients_id])->one();
-        
-        $model = new DebtRepayment();  
-        $model->client_id = $clients_id;
-        $model->order_account_id = $orderAccount->id;
-        $model->date = $qarz_tul_date;
-        $model->total_debt_old = $qarz_client_summ;
-        $model->exchange_rate = $dollar_kurs;
+        if (!$orderAccount) {
+            throw new \yii\web\BadRequestHttpException("Mijoz qarz hisobi topilmadi.");
+        }
 
-        $model->discount_amount = $tul_qarz_sikidka;
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // $orderAccountHistory = OrderAccountHistory::find()->where(['client_id' => $clients_id])->all();
+            $orderAccountHistory = OrderAccountHistory::find()
+                ->where(['client_id' => $clients_id])
+                ->andWhere(['or',
+                    ['!=', 'is_worker', 1],
+                    ['is', 'is_worker', null]
+                ])
+                ->all();
 
-        $model->summ_dollar = $tul_qarz_sum_dollar;
-        $model->sum_som = $tul_qarz_sum_som;
-        $model->summ_cart = $tul_qarz_summ_cart;
-        $model->sum_transfers = $tul_qarz_sum_transfer;
-        $model->zdacha_dollar = $tul_qarz_zdacha_dollar;
-        $model->zdacha_sum = $tul_qarz_zdacha_sum;
+            foreach ($orderAccountHistory as $value) {
+                $value->is_debt = 1;
+                $value->save(false);
+            }
 
-        $model->all_summ_dollar = $all_tulangan_summa_dollar;
+            $model = new DebtRepayment();  
+            $model->client_id = $clients_id;
+            $model->order_account_id = $orderAccount->id;
+            $model->date = $qarz_tul_date;
+            $model->total_debt_old = $qarz_client_summ;
+            $model->exchange_rate = $dollar_kurs;
 
-        $orderAccount->total_debt = $orderAccount->total_debt - $all_tulangan_summa_dollar;
-        $orderAccount->date_last_debt_payment = $qarz_tul_date;
-        $orderAccount->save();
+            $model->discount_amount = $tul_qarz_sikidka;
 
-        $tul_qarz_sikidkatext = $tul_qarz_sikidka !=0? (", ".$tul_qarz_sikidka." $ chegirma qilib berildi"): "";
-        $elegantHistoryUpdate = new ElegantHistoryUpdate();
-        $elegantHistoryUpdate->title = $client->fio . " ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada qarz to'ladi...";
-        $elegantHistoryUpdate->comment = $all_tulangan_summa_dollar. " $ qarz to'ladi". $tul_qarz_sikidkatext;
-        $elegantHistoryUpdate->status = 3;
-        $elegantHistoryUpdate->type = 2;
-        $elegantHistoryUpdate->save(false);
+            $model->summ_dollar = $tul_qarz_sum_dollar;
+            $model->sum_som = $tul_qarz_sum_som;
+            $model->summ_cart = $tul_qarz_summ_cart;
+            $model->sum_transfers = $tul_qarz_sum_transfer;
+            $model->zdacha_dollar = $tul_qarz_zdacha_dollar;
+            $model->zdacha_sum = $tul_qarz_zdacha_sum;
 
-        $model->total_debt = $orderAccount->total_debt;
-        $model->save(false);
+            $model->all_summ_dollar = $all_tulangan_summa_dollar;
+
+            $orderAccount->total_debt = $orderAccount->total_debt - $all_tulangan_summa_dollar;
+            $orderAccount->date_last_debt_payment = $qarz_tul_date;
+            $orderAccount->save(false);
+
+            $tul_qarz_sikidkatext = $tul_qarz_sikidka !=0? (", ".$tul_qarz_sikidka." $ chegirma qilib berildi"): "";
+            $elegantHistoryUpdate = new ElegantHistoryUpdate();
+            $elegantHistoryUpdate->title = $client->fio . " ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada qarz to'ladi...";
+            $elegantHistoryUpdate->comment = $all_tulangan_summa_dollar. " $ qarz to'ladi". $tul_qarz_sikidkatext;
+            $elegantHistoryUpdate->status = 3;
+            $elegantHistoryUpdate->type = 2;
+            $elegantHistoryUpdate->save(false);
+
+            $model->total_debt = $orderAccount->total_debt;
+            $model->save(false);
+
+            $processedDebtRequests[$debt_request_id] = true;
+            if (count($processedDebtRequests) > 50) {
+                $processedDebtRequests = array_slice($processedDebtRequests, -50, null, true);
+            }
+            $session->set('processed_debt_requests', $processedDebtRequests);
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
         
         return $this->redirect(['/debt-repayment/index']);
     }
@@ -232,6 +341,7 @@ class OrderAccountController extends Controller
         $all_sum = $request->post('all_sum');
         $product_details = $request->post('product_details');
         $contact = json_decode($product_details, true);
+        $this->assertWarehouseCountsAvailable($contact, true);
 
         $all_pay_summ = round($sum_dollars, 2);
         // $contact = $post['OrderAccount']['allValue'];
@@ -439,7 +549,7 @@ class OrderAccountController extends Controller
             $relativeHistory->save(false);
 
             // Ombor soni
-            if ($warehouseValue && $type_sklad_list->id == 1) {
+            if ($warehouseValue) {
                 $warehouseValue->count = $warehouseValue->count - $count;
                 $warehouseValue->save(false);
             }
@@ -661,6 +771,7 @@ class OrderAccountController extends Controller
             // echo '</pre>';
             $all_pay_summ = round($sum_dollars, 2);
             $allValues = $post['OrderAccount']['allValue'];
+            $this->assertWarehouseCountsAvailable($allValues);
             
             $client = Client::find()->where(['id' => $clients_id])->one();
             if (!isset($client)){                    
@@ -867,10 +978,8 @@ class OrderAccountController extends Controller
                         $all_summ = round($all_summ + $value['price'] * $value['count'], 2);
                     }
                     if ($warehouseValue) {
-                        if ($type_sklad_list->id == 1) {
-                            $warehouseValue->count = $warehouseValue->count - $value['count'];
-                            $warehouseValue->save(false);
-                        }
+                        $warehouseValue->count = $warehouseValue->count - $value['count'];
+                        $warehouseValue->save(false);
                     }
                         
                 }
