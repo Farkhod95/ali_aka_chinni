@@ -4,21 +4,22 @@ use yii\widgets\ActiveForm;
 use unclead\multipleinput\MultipleInput;
 use app\models\BrandsSize;
 
-$brandsSize = BrandsSize::find()->where(['product_category_id' => $model->id])->all();
-
-$data = [];
-foreach ($brandsSize as $value) {
-    $data[] = [
-        'size' => $value->size,
-        'type' => $value->type,
-    ];
+$data = is_array($model->allValue) && !empty($model->allValue) ? $model->allValue : [];
+if (empty($data)) {
+    $brandsSize = BrandsSize::find()->where(['product_category_id' => $model->id])->all();
+    foreach ($brandsSize as $value) {
+        $data[] = [
+            'size' => $value->size,
+            'type' => $value->type,
+        ];
+    }
 }
 
 ?>
 
 <div class="product-category-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'product-category-form']); ?>
 		<div class="row">
 			<div class="col-md-12">
                     <?= $form->field($model, 'brand_id')->label()->widget(\kartik\select2\Select2::classname(), [
@@ -54,7 +55,7 @@ foreach ($brandsSize as $value) {
                                 'title' => 'O\'lchami <b style="color:red">(Misol: 9.99 )</b>',
                                 'enableError' => true,
                                 'options' => [
-                                    'class' => 'input-priority',
+                                    'class' => 'input-priority js-size',
                                     'required' => true,
                                 ],
                                 'headerOptions' => ['style' => 'width: 180px;']
@@ -67,12 +68,12 @@ foreach ($brandsSize as $value) {
                                     'data'  => $model->getType(),
                                     'options' => [
                                         'placeholder' => 'Tanlang...',
+                                        'class' => 'input-priority js-type',
                                         'required' => true
                                     ],   
                                     'pluginOptions' => [
                                         'allowClear' => true,
-                                    ],     
-                                    'class' => 'input-priority',
+                                    ],
                                     ],
                                     'headerOptions' => [
                                         'style' => 'width: 180px;',
@@ -96,6 +97,12 @@ foreach ($brandsSize as $value) {
 <?php
 // ... sizning form kodingiz o‘zgarmaydi ...
 
+$this->registerCss("
+.pc-invalid { border-color:#dc3545 !important; }
+.select2-selection.pc-invalid { border-color:#dc3545 !important; }
+.pc-row-error { margin-top:4px; }
+");
+
 $adviceUrl = \yii\helpers\Url::to(['product-category/sorting-advice']);
 $js = <<<JS
 (function(){
@@ -103,8 +110,21 @@ $js = <<<JS
   var \$sorting = $('#productcategory-sorting');
   var \$field = $('.field-productcategory-sorting');
   var \$hint = $('<div class="help-block text-info small" id="sorting-hint"></div>');
+  var lastSuggested = null;
   if (\$field.find('#sorting-hint').length === 0) {
       \$field.append(\$hint);
+  }
+
+  function fillSortingFromAdvice(data) {
+      if (!data || !data.next_free) {
+          return;
+      }
+      var next = String(data.next_free);
+      var current = $.trim(\$sorting.val() || '');
+      if (current === '' || current === String(lastSuggested)) {
+          \$sorting.val(next);
+          lastSuggested = next;
+      }
   }
 
   function renderHint(data, currentVal) {
@@ -128,9 +148,8 @@ $js = <<<JS
       var b = \$brand.val();
       if (!b) { \$hint.text('Avval brandni tanlang'); return; }
       $.getJSON('$adviceUrl', { brand_id: b, value: \$sorting.val() }, function(resp){
+          fillSortingFromAdvice(resp);
           renderHint(resp, \$sorting.val());
-          // Agar sorting bo'sh bo'lsa, avtomatik next_free bilan to'ldirib beramiz (ixtiyoriy)
-         
       });
   }
 
@@ -143,6 +162,63 @@ $js = <<<JS
 
   // Form ochilganda bir marta
   refreshHint();
+})();
+
+(function(){
+  function clearErrors() {
+    $('.pc-row-error').remove();
+    $('.pc-invalid').removeClass('pc-invalid');
+    $('.select2-selection').removeClass('pc-invalid');
+  }
+
+  function markInput(\$input, message) {
+    \$input.addClass('pc-invalid');
+    if (\$input.next('.pc-row-error').length === 0) {
+      \$input.after('<div class="pc-row-error text-danger small">'+message+'</div>');
+    }
+  }
+
+  function markSelect(\$select, message) {
+    var \$selection = \$select.next('.select2').find('.select2-selection');
+    \$selection.addClass('pc-invalid');
+    if (\$selection.parent().next('.pc-row-error').length === 0) {
+      \$selection.parent().after('<div class="pc-row-error text-danger small">'+message+'</div>');
+    }
+  }
+
+  $(document).on('input change', '#my_id .js-size, #my_id .js-type', function(){
+    clearErrors();
+  });
+
+  $('#product-category-form').on('submit', function(e){
+    clearErrors();
+    var hasError = false;
+
+    $('#my_id').find('tr.multiple-input-list__item').each(function(){
+      var \$row = $(this);
+      var \$size = \$row.find('.js-size');
+      var \$type = \$row.find('.js-type');
+      var sizeVal = $.trim(\$size.val() || '').replace(',', '.');
+
+      if (!sizeVal || isNaN(parseFloat(sizeVal))) {
+        hasError = true;
+        markInput(\$size, "O'lcham kiritilishi shart");
+      }
+
+      if (!\$type.val()) {
+        hasError = true;
+        markSelect(\$type, 'Tip tanlanishi shart');
+      }
+    });
+
+    if (hasError) {
+      e.preventDefault();
+      var \$first = $('.pc-row-error').first();
+      if (\$first.length) {
+        $('html,body').animate({scrollTop: \$first.offset().top - 150}, 250);
+      }
+    }
+  });
 })();
 JS;
 

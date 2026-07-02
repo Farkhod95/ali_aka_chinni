@@ -229,26 +229,7 @@ class ProductCategoryController extends Controller
                 $model->sup_status = 1;
                 $model->save(false);
 
-                // MultipleInput dan kelgan qiymatlar
-                $allValues = Yii::$app->request->post('ProductCategory')['allValue'] ?? [];
-             
-                if (!empty($allValues)) {
-                    foreach ($allValues as $row) {
-                        $sizeVal = (float)$row['size'];
-                        // "9,99" kabilarni ham qabul qilish uchun
-                        $sizeVal = str_replace(',', '.', trim((string)$sizeVal));
-                        if (!is_numeric($sizeVal)) {
-                            continue; // yoki xatoga tashlang
-                        }
-                        $bs = new BrandsSize();
-                        $bs->size = (float)$sizeVal;
-                        $bs->type = (float)$row['type'];
-                        $bs->brand_id = $model->brand_id;
-                        $bs->product_category_id = $model->id;
-                        $bs->save();
-                       
-                    }
-                }
+                $this->saveBrandSizes($model, Yii::$app->request->post('ProductCategory')['allValue'] ?? []);
                 
                 // Modalni yopamiz va jadvalni yangilaymiz
                 return [
@@ -270,6 +251,7 @@ class ProductCategoryController extends Controller
         if ($model->load($request->post()) && $model->save()) {
             $model->sup_status = 1;
             $model->save(false);
+            $this->saveBrandSizes($model, Yii::$app->request->post('ProductCategory')['allValue'] ?? []);
             return $this->redirect(['view','id'=>$model->id]);
         }
         return $this->render('create', ['model'=>$model]);
@@ -305,23 +287,7 @@ class ProductCategoryController extends Controller
             }else if($model->load($request->post()) && $model->save()){
                 $model->sup_status = 1;
                 $model->save(false);
-                $allValues_new = Yii::$app->request->post('ProductCategory')['allValue'];
-                // echo "<pre>";
-                // print_r($allValues_new);
-                // echo "<pre>";
-                if ($allValues_new) {
-                    BrandsSize::deleteAll(['product_category_id' => (int)$model->id]);
-                    foreach ($allValues_new as $row) {
-                        $bs = new BrandsSize();
-                        $bs->size = (float)$row['size'];
-                        $bs->type = (float)$row['type'];
-                        $bs->brand_id = $model->brand_id;
-                        $bs->product_category_id = $model->id;
-                        if (!$bs->save()) {
-                            throw new \Exception('BrandsSize xatolik: '.json_encode($bs->errors));
-                        }
-                    }
-                }
+                $this->saveBrandSizes($model, Yii::$app->request->post('ProductCategory')['allValue'] ?? []);
                         
 
                 return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];   
@@ -340,6 +306,7 @@ class ProductCategoryController extends Controller
             *   Process for non-ajax request
             */
             if ($model->load($request->post()) && $model->save()) {
+                $this->saveBrandSizes($model, Yii::$app->request->post('ProductCategory')['allValue'] ?? []);
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
                 return $this->render('update', [
@@ -415,6 +382,55 @@ class ProductCategoryController extends Controller
             return $this->redirect(['index']);
         }
        
+    }
+
+    protected function saveBrandSizes(ProductCategory $model, $rows)
+    {
+        $normalizedRows = $this->normalizeBrandSizeRows($rows);
+        BrandsSize::deleteAll(['product_category_id' => (int)$model->id]);
+
+        foreach ($normalizedRows as $row) {
+            $bs = new BrandsSize();
+            $bs->size = $row['size'];
+            $bs->type = $row['type'];
+            $bs->brand_id = $model->brand_id;
+            $bs->product_category_id = $model->id;
+            if (!$bs->save()) {
+                throw new \Exception('BrandsSize xatolik: '.json_encode($bs->errors));
+            }
+        }
+    }
+
+    protected function normalizeBrandSizeRows($rows)
+    {
+        if (!is_array($rows) || empty($rows)) {
+            throw new \yii\web\BadRequestHttpException('Kamida bitta o\'lcham va tip kiriting.');
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            $size = isset($row['size']) ? str_replace(',', '.', trim((string)$row['size'])) : '';
+            $type = isset($row['type']) ? trim((string)$row['type']) : '';
+
+            if ($size === '' && $type === '') {
+                continue;
+            }
+
+            if ($size === '' || !is_numeric($size) || $type === '' || !is_numeric($type)) {
+                throw new \yii\web\BadRequestHttpException('Har bir qator uchun o\'lcham va tip kiritilishi shart.');
+            }
+
+            $result[] = [
+                'size' => (float)$size,
+                'type' => (int)$type,
+            ];
+        }
+
+        if (empty($result)) {
+            throw new \yii\web\BadRequestHttpException('Kamida bitta o\'lcham va tip kiriting.');
+        }
+
+        return $result;
     }
 
     /**

@@ -274,157 +274,85 @@ class SkladController extends Controller
         
         if ($sklad->load(Yii::$app->request->post()) ) {
             $post = Yii::$app->request->post();
-            
-            $importProducts = $post['Sklad']['allValue'];
+            $data = isset($post['Sklad']) ? $post['Sklad'] : [];
+            $importProducts = $this->normalizeProductRows(isset($data['allValue']) ? $data['allValue'] : []);
+            $consignor_id = isset($data['consignor_id']) ? (int)$data['consignor_id'] : 0;
+            $dates = isset($data['dates']) ? $data['dates'] : null;
+            $exchange_rates = isset($data['exchange_rates']) ? (int)$data['exchange_rates'] : 0;
+            $sum_dollars = isset($data['sum_dollars']) ? (float)$data['sum_dollars'] : 0;
+            $discount_amounts = isset($data['discount_amounts']) ? (float)$data['discount_amounts'] : 0;
+            $comments = isset($data['comments']) ? $data['comments'] : '';
 
-            $my_total_debts = $post['Sklad']['my_total_debts'];
-            $consignor_id = $post['Sklad']['consignor_id'];
-            $dates = $post['Sklad']['dates'];
-            $exchange_rates = $post['Sklad']['exchange_rates'];
-            $given_sum_dollars = $post['Sklad']['given_sum_dollars'];
-            // $given_sum_dollars = 0;
-            $sum_dollars = $post['Sklad']['sum_dollars'];
-            // $sum_dollars = 0;
-            $discount_amounts = $post['Sklad']['discount_amounts'];
-            // $discount_amounts = 0;
-            $comments = $post['Sklad']['comments'];
-            
-            $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $consignor_id])->one();
-        
-            $my_total_debts = 0;
-            if ($myTotalDebt) {
-                $my_total_debts = $myTotalDebt->total_debt;
+            $consignor = Consignor::findOne($consignor_id);
+            if (!$consignor) {
+                throw new \yii\web\BadRequestHttpException('Yuk jo\'natuvchi topilmadi.');
+            }
+            if (!$dates || strtotime($dates) === false) {
+                throw new \yii\web\BadRequestHttpException('Sana noto\'g\'ri kiritilgan.');
+            }
+            if (trim($comments) === '') {
+                throw new \yii\web\BadRequestHttpException('Izoh kiritilishi shart.');
+            }
+            if ($sum_dollars < 0 || $discount_amounts < 0) {
+                throw new \yii\web\BadRequestHttpException('Summa va chegirma manfiy bo\'lmasligi kerak.');
             }
 
-            // $order_account_statuses = $post['Sklad']['order_account_statuses'];
-            
-            $consignor = Consignor::find()->where(['id' => $consignor_id])->one();
-            
-            // $sklad = new Sklad();
-            $sklad->created_by = Yii::$app->user->identity->id;
-            $sklad->comment = $comments;
-            $sklad->given_sum_dollar = 0;
-            $sklad->sum_dollar = $sum_dollars;
-            $sklad->exchange_rate = $exchange_rates;
-            $sklad->discount_amount = $discount_amounts;
-            $sklad->my_total_debt = 0;
-            $sklad->old_my_total_debt = $my_total_debts;
-            $sklad->cr_date_time = date('Y-m-d H:i:s');
-            $sklad->cr_date = date('Y-m-d',strtotime($dates));
-            $sklad->consignor_id = $consignor->id;
-            $sklad->status = 1;
-            $sklad->actived = 0;
-            $sklad->save(false);
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $myTotalDebt = $this->findOrCreateMyTotalDebt($consignor->id);
+                $oldDebt = (float)$myTotalDebt->total_debt;
+                $given_sum_dollars = $this->calculateProductsTotal($importProducts);
+                $debtDelta = $given_sum_dollars - $sum_dollars - $discount_amounts;
 
-            
+                $sklad->created_by = Yii::$app->user->identity->id;
+                $sklad->comment = $comments;
+                $sklad->given_sum_dollar = $given_sum_dollars;
+                $sklad->sum_dollar = $sum_dollars;
+                $sklad->exchange_rate = $exchange_rates;
+                $sklad->discount_amount = $discount_amounts;
+                $sklad->my_total_debt = $debtDelta;
+                $sklad->old_my_total_debt = $oldDebt;
+                $sklad->cr_date_time = date('Y-m-d H:i:s');
+                $sklad->cr_date = date('Y-m-d', strtotime($dates));
+                $sklad->consignor_id = $consignor->id;
+                $sklad->status = 1;
+                $sklad->actived = 0;
+                $sklad->save(false);
 
-            $sum_all_product = 0;
-            $given_sum_dollars = 0;
-            foreach ($importProducts as $value) {
-                // echo '<pre>';
-                // print_r("value['brand_id'] ". $value['brand_id'] . "<br/>");
-                // print_r("value['product_category_id'] ". $value['product_category_id']."<br/>");
-                // print_r("value['type'] ". $value['type']."<br/>");
-                // print_r("value['size'] ". $value['size']."<br/>");
-                // echo '</pre>';
-
-                $warehouse = Warehouse::find()
-                                ->andWhere(['brand_id' => (int)$value['brand_id']])
-                                ->andWhere(['product_category_id' => (int)$value['product_category_id']])
-                                ->andWhere(['type' => $value['type']])
-                                ->andWhere(['size' => (float)$value['size']])->one();
-
-                if (!$warehouse) {
-                    $relative = new Warehouse();
-                    $relative->brand_id = $value['brand_id'];
-                    $relative->product_category_id = $value['product_category_id'];
-                    $relative->size = $value['size'];
-                    $relative->count = $value['count'];
-                    $relative->price = $value['price'];
-                    $relative->type = $value['type'];
-
-                    $relative->all_my_total_debt = 0;
-                    $relative->all_sum_dollar = 0;
-                    $relative->all_discount_amount = 0;
-                    // $relative->order_account_statuse = $value['order_account_statuses'];
-
-                    $relative->cr_date = date('Y-m-d',strtotime($dates));
-                    $relative->save(false);
-                    $given_sum_dollars = $given_sum_dollars + (float)$value['price'] * 0;
-
-                    $relativeHistory = new WarehouseHistory();
-                    $relativeHistory->sklad_id = $sklad->id;
-                    $relativeHistory->brand_id = $value['brand_id'];
-                    $relativeHistory->product_category_id = $value['product_category_id'];
-                    $relativeHistory->size = $value['size'];
-                    $relativeHistory->type = $value['type'];
-                    $relativeHistory->price = $value['price'];
-                    $relativeHistory->count = $value['count'];
-                    $relativeHistory->cr_date = date('Y-m-d H:i:s');
-                    $relativeHistory->cr_date_time = date('Y-m-d H:i:s');
-                    $relativeHistory->save(false);
-                    $error = $relativeHistory->errors;
-
-                    $modelPrices = new Prices();  
-                    $modelPrices->warehouse_id = $relative->id;
-                    $modelPrices->price = $value['price'];
-                    $modelPrices->save();
-
-                }else {
-                    
-                    $warehouse->all_my_total_debt = 0;
-                    $warehouse->all_sum_dollar =0;
-                    $warehouse->all_discount_amount = 0;
-                    $warehouse->count = $warehouse->count + (float)$value['count'];
-                    $warehouse->save(false);
-                    $given_sum_dollars = $given_sum_dollars + (float)$value['price'] * (float)$value['count'];
-
-                    $relativeHistory = new WarehouseHistory();
-                    $relativeHistory->sklad_id = $sklad->id;
-                    $relativeHistory->brand_id = $value['brand_id'];
-                    $relativeHistory->product_category_id = $value['product_category_id'];
-                    $relativeHistory->size = $value['size'];
-                    $relativeHistory->count = $value['count'];
-                    $relativeHistory->type = $value['type'];
-                    $relativeHistory->price = $value['price'];
-                    $relativeHistory->cr_date = date('Y-m-d H:i:s');
-                    $relativeHistory->save(false);
-                    $error = $relativeHistory->errors;
-                    
-                    $price = Prices::find()->where(['warehouse_id' => $warehouse->id])->one();
-                    if ($price) {
-                        $price->warehouse_id = $warehouse->id;
-                        $price->price = $value['price'];
-                        $price->save(false);
-                    }else {
-                        $modelPrices = new Prices();  
-                        $modelPrices->warehouse_id = $warehouse->id;
-                        $modelPrices->price = $value['price'];
-                        $modelPrices->save();
+                foreach ($importProducts as $value) {
+                    $warehouse = $this->findWarehouseByProductRow($value);
+                    if (!$warehouse) {
+                        $warehouse = new Warehouse();
+                        $warehouse->brand_id = $value['brand_id'];
+                        $warehouse->product_category_id = $value['product_category_id'];
+                        $warehouse->size = $value['size'];
+                        $warehouse->type = $value['type'];
+                        $warehouse->count = 0;
                     }
-                    
-                }
-                    
-            }
-            $sklad->given_sum_dollar = $given_sum_dollars;
-            $sklad->my_total_debt = $given_sum_dollars -  ($sum_dollars -  $discount_amounts);
-            $sklad->save(false);
 
-            $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $consignor->id])->one();
-            if ($myTotalDebt) {
-                $myTotalDebt->total_debt = $my_total_debts + ($given_sum_dollars -  $sum_dollars - $discount_amounts);
+                    $warehouse->price = $value['price'];
+                    $warehouse->all_my_total_debt = 0;
+                    $warehouse->all_sum_dollar = 0;
+                    $warehouse->all_discount_amount = 0;
+                    $warehouse->count = (float)$warehouse->count + (float)$value['count'];
+                    $warehouse->cr_date = date('Y-m-d', strtotime($dates));
+                    $warehouse->save(false);
+
+                    $this->saveWarehouseHistory($sklad->id, $value);
+                    $this->savePrice($warehouse->id, $value['price']);
+                }
+
+                $myTotalDebt->total_debt = $oldDebt + $debtDelta;
                 $myTotalDebt->update_by = Yii::$app->user->identity->id;
                 $myTotalDebt->cr_date = date('Y-m-d H:i:s');
                 $myTotalDebt->save(false);
-            }else{
-                $myTotalDebt = new MyTotalDebt();
-                $myTotalDebt->consignor_id = $consignor->id;
-                $myTotalDebt->total_debt = $my_total_debts + ($given_sum_dollars -  $sum_dollars - $discount_amounts);
-                $myTotalDebt->update_by = Yii::$app->user->identity->id;
-                $myTotalDebt->cr_date = date('Y-m-d H:i:s');
-                $myTotalDebt->save(false);
+
+                $transaction->commit();
+                return $this->redirect(['warehouse/index']);
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
             }
-            return $this->redirect(['warehouse/index']);
         }
 
         return $this->render('create', [
@@ -573,127 +501,105 @@ class SkladController extends Controller
         $sum_dollar_old = $model->sum_dollar;
         $discount_amount_old = $model->discount_amount;
 
-        $consignor = Consignor::find()->where(['id' => $consignor_id])->one();
-        $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $consignor->id])->one();
+        $consignor = Consignor::findOne($consignor_id);
+        if (!$consignor) {
+            throw new NotFoundHttpException('Yuk jo\'natuvchi topilmadi.');
+        }
+        $myTotalDebt = $this->findOrCreateMyTotalDebt($consignor->id);
         
 
         if ($model->load(Yii::$app->request->post())) {
-            $my_total_debt_new = Yii::$app->request->post('Sklad')['my_total_debt'];
-            $datees_new = Yii::$app->request->post('Sklad')['date'];
-            $exchange_rate_new = Yii::$app->request->post('Sklad')['exchange_rate'];
+            $post = Yii::$app->request->post();
+            $data = isset($post['Sklad']) ? $post['Sklad'] : [];
+            $datees_new = isset($data['cr_date']) ? $data['cr_date'] : null;
+            $exchange_rate_new = isset($data['exchange_rate']) ? (int)$data['exchange_rate'] : 0;
+            $sum_dollar_new = isset($data['sum_dollar']) ? (float)$data['sum_dollar'] : 0;
+            $discount_amount_new = isset($data['discount_amount']) ? (float)$data['discount_amount'] : 0;
+            $updateReason = isset($data['comments']) ? $data['comments'] : '';
+            $allValues_new = $this->normalizeProductRows(isset($data['allValue']) ? $data['allValue'] : []);
+            $given_sum_dollar_new = $this->calculateProductsTotal($allValues_new);
+            $newDebtDelta = $given_sum_dollar_new - $sum_dollar_new - $discount_amount_new;
+            $oldDebtDelta = (float)$model->my_total_debt;
+            $oldDebtTotal = (float)$myTotalDebt->total_debt;
 
-            $given_sum_dollar_new = Yii::$app->request->post('Sklad')['given_sum_dollar'];
-            $sum_dollar_new = Yii::$app->request->post('Sklad')['sum_dollar'];
-            $discount_amount_new = Yii::$app->request->post('Sklad')['discount_amount'];
-
-            // echo '<pre>';
-            // print_r("given_sum_dollar_new: ". $given_sum_dollar_new . "<br/>");
-            // echo '</pre>';
-
-            $updateReason = Yii::$app->request->post('Sklad')['comments'];
-            $allValues_new = Yii::$app->request->post('Sklad')['allValue'];
-            $warehouseHistories = WarehouseHistory::find()->where(['sklad_id' => $id])->all();
-            foreach ($warehouseHistories as $value) {
-                $warehouse = Warehouse::find()->andWhere(['brand_id' => $value->brand_id])
-                                    ->andWhere(['product_category_id' => $value->product_category_id])
-                                    ->andWhere(['type' => $value->type])
-                                    ->andWhere(['size' => $value->size])->one();
-
-                $warehouse->all_my_total_debt = $my_total_debt_new - ($given_sum_dollar_old -  ($sum_dollar_old - $discount_amount_old));
-                $warehouse->all_sum_dollar =$warehouse->all_sum_dollar - $sum_dollar_old;
-                $warehouse->all_discount_amount = $warehouse->all_discount_amount - $discount_amount_old;
-                $warehouse->count = $warehouse->count - $value->count;
-                $warehouse->save(false);
-                $value->delete();
-                if ($myTotalDebt) {
-                    $myTotalDebt->total_debt = $my_total_debt_new - ($given_sum_dollar_old -  ($sum_dollar_old - $discount_amount_old));
-                    $myTotalDebt->update_by = Yii::$app->user->identity->id;
-                    $myTotalDebt->cr_date = date('Y-m-d H:i:s');
-                    $myTotalDebt->save(false);
-                }
-                
+            if (!$datees_new || strtotime($datees_new) === false) {
+                throw new \yii\web\BadRequestHttpException('Sana noto\'g\'ri kiritilgan.');
             }
-            // WarehouseHistory::deleteAll(['sklad_id' => $id]);
-            if ($allValues_new) {
-                foreach ($allValues_new as $value) {
-                    $warehouse = Warehouse::find()
-                                ->andWhere(['brand_id' => (int)$value['brand_id']])
-                                ->andWhere(['product_category_id' => (int)$value['product_category_id']])
-                                ->andWhere(['type' => $value['type']])
-                                ->andWhere(['size' => (float)$value['size']])->one();
-                    // echo '<pre>';
-                    // print_r("warehouse ". $warehouse->id. "<br/>");
-                    // echo '</pre>';
-                    if (!$warehouse) {
-                        $relative = new Warehouse();
-                        $relative->brand_id = $value['brand_id'];
-                        $relative->product_category_id = $value['product_category_id'];
-                        $relative->size = $value['size'];
-                        $relative->count = $value['count'];
-                        $relative->price = $value['price'];
-                        $relative->type = $value['type'];
-                        $relative->all_my_total_debt = $my_total_debt_new + ($given_sum_dollar_new -  ($sum_dollar_new - $discount_amount_new));
-                        $relative->all_sum_dollar = $sum_dollar_new;
-                        $relative->all_discount_amount = $discount_amount_new;
-                        $relative->cr_date = date('Y-m-d',strtotime($datees_new));
-                        $relative->save(false);
-    
-                        $relativeHistory = new WarehouseHistory();
-                        $relativeHistory->sklad_id = $id;
-                        $relativeHistory->brand_id = $value['brand_id'];
-                        $relativeHistory->product_category_id = $value['product_category_id'];
-                        $relativeHistory->size = $value['size'];
-                        $relativeHistory->type = $value['type'];
-                        $relativeHistory->price = $value['price'];
-                        $relativeHistory->count = $value['count'];
-                        $relativeHistory->cr_date = date('Y-m-d H:i:s');
-                        $relativeHistory->cr_date_time = date('Y-m-d H:i:s');
-                        $relativeHistory->save(false);    
-                    }else {
-                        $warehouse->all_my_total_debt = $warehouse->all_my_total_debt + ($given_sum_dollar_new -  ($sum_dollar_new - $discount_amount_new));
-                        $warehouse->all_sum_dollar =$warehouse->all_sum_dollar + $sum_dollar_new;
-                        $warehouse->all_discount_amount = $warehouse->all_discount_amount + $discount_amount_new;
-                        $warehouse->count = $warehouse->count + $value['count'];
+            if (trim($updateReason) === '') {
+                throw new \yii\web\BadRequestHttpException('Izoh kiritilishi shart.');
+            }
+            if ($sum_dollar_new < 0 || $discount_amount_new < 0) {
+                throw new \yii\web\BadRequestHttpException('Summa va chegirma manfiy bo\'lmasligi kerak.');
+            }
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $warehouseHistories = WarehouseHistory::find()->where(['sklad_id' => $id])->all();
+                foreach ($warehouseHistories as $value) {
+                    $warehouse = Warehouse::find()->andWhere(['brand_id' => $value->brand_id])
+                                        ->andWhere(['product_category_id' => $value->product_category_id])
+                                        ->andWhere(['type' => $value->type])
+                                        ->andWhere(['size' => $value->size])->one();
+                    if ($warehouse) {
+                        $warehouse->count = (float)$warehouse->count - (float)$value->count;
                         $warehouse->save(false);
-                        $relativeHistory = new WarehouseHistory();
-                        $relativeHistory->sklad_id = $id;
-                        $relativeHistory->brand_id = $value['brand_id'];
-                        $relativeHistory->product_category_id = $value['product_category_id'];
-                        $relativeHistory->size = $value['size'];
-                        $relativeHistory->count = $value['count'];
-                        $relativeHistory->type = $value['type'];
-                        $relativeHistory->price = $value['price'];
-                        $relativeHistory->cr_date = date('Y-m-d H:i:s');
-                        $relativeHistory->save(false);
                     }
+                    $value->delete();
                 }
-            }
-            if ($myTotalDebt) {
-                $myTotalDebt->total_debt = $myTotalDebt->total_debt + ($given_sum_dollar_new -  ($sum_dollar_new - $discount_amount_new));
+
+                foreach ($allValues_new as $value) {
+                    $warehouse = $this->findWarehouseByProductRow($value);
+                    if (!$warehouse) {
+                        $warehouse = new Warehouse();
+                        $warehouse->brand_id = $value['brand_id'];
+                        $warehouse->product_category_id = $value['product_category_id'];
+                        $warehouse->size = $value['size'];
+                        $warehouse->type = $value['type'];
+                        $warehouse->count = 0;
+                    }
+
+                    $warehouse->price = $value['price'];
+                    $warehouse->all_my_total_debt = $oldDebtTotal - $oldDebtDelta + $newDebtDelta;
+                    $warehouse->all_sum_dollar = $sum_dollar_new;
+                    $warehouse->all_discount_amount = $discount_amount_new;
+                    $warehouse->count = (float)$warehouse->count + (float)$value['count'];
+                    $warehouse->cr_date = date('Y-m-d', strtotime($datees_new));
+                    $warehouse->save(false);
+
+                    $this->saveWarehouseHistory($id, $value);
+                    $this->savePrice($warehouse->id, $value['price']);
+                }
+
+                $myTotalDebt->total_debt = $oldDebtTotal - $oldDebtDelta + $newDebtDelta;
                 $myTotalDebt->update_by = Yii::$app->user->identity->id;
                 $myTotalDebt->cr_date = date('Y-m-d H:i:s');
                 $myTotalDebt->save(false);
-            }   
-            $elegantHistoryUpdate = new ElegantHistoryUpdate();
-            $elegantHistoryUpdate->title = $consignor->name . " dan olingan mahsulotlar ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada o'zgartirildi...";
-            $elegantHistoryUpdate->comment = $updateReason;
-            $elegantHistoryUpdate->status = 1;
-            $elegantHistoryUpdate->type = 1;
-            $elegantHistoryUpdate->save(false);
 
-            // $model->comment = $updateReason;
-            $model->given_sum_dollar = $given_sum_dollar_new;
-            $model->sum_dollar = $sum_dollar_new;
-            $model->exchange_rate = $exchange_rate_new;
-            $model->discount_amount = $discount_amount_new;
-            $model->my_total_debt = $given_sum_dollar_new -  ($sum_dollar_new -  $discount_amount_new);
-            $model->old_my_total_debt = $my_total_debt_new - ($given_sum_dollar_old -  ($sum_dollar_old - $discount_amount_old));
-            $model->cr_date_time = date('Y-m-d H:i:s');
-            $model->cr_date = date('Y-m-d',strtotime($datees_new));
-            $model->consignor_id = $consignor->id;
-            $model->status = 1;
-            $model->save(false);
-            return $this->redirect(['index']);
+                $elegantHistoryUpdate = new ElegantHistoryUpdate();
+                $elegantHistoryUpdate->title = $consignor->name . " dan olingan mahsulotlar ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada o'zgartirildi...";
+                $elegantHistoryUpdate->comment = $updateReason;
+                $elegantHistoryUpdate->status = 1;
+                $elegantHistoryUpdate->type = 1;
+                $elegantHistoryUpdate->save(false);
+
+                $model->given_sum_dollar = $given_sum_dollar_new;
+                $model->sum_dollar = $sum_dollar_new;
+                $model->exchange_rate = $exchange_rate_new;
+                $model->discount_amount = $discount_amount_new;
+                $model->my_total_debt = $newDebtDelta;
+                $model->old_my_total_debt = $oldDebtTotal - $oldDebtDelta;
+                $model->cr_date_time = date('Y-m-d H:i:s');
+                $model->cr_date = date('Y-m-d', strtotime($datees_new));
+                $model->consignor_id = $consignor->id;
+                $model->status = 1;
+                $model->save(false);
+
+                $transaction->commit();
+                return $this->redirect(['index']);
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
         }
         return $this->render('update', ['model' => $model, 'my_total_debt' => $myTotalDebt->total_debt]);
         
@@ -780,6 +686,102 @@ class SkladController extends Controller
             return $this->redirect(['index']);
         }
        
+    }
+
+    protected function normalizeProductRows($rows)
+    {
+        if (!is_array($rows) || empty($rows)) {
+            throw new \yii\web\BadRequestHttpException('Kamida bitta mahsulot qatori kiritilishi kerak.');
+        }
+
+        $normalized = [];
+        foreach ($rows as $row) {
+            $brandId = isset($row['brand_id']) ? (int)$row['brand_id'] : 0;
+            $categoryId = isset($row['product_category_id']) ? (int)$row['product_category_id'] : 0;
+            $size = isset($row['size']) ? (float)$row['size'] : null;
+            $type = isset($row['type']) ? (int)$row['type'] : 0;
+            $count = isset($row['count']) ? (float)$row['count'] : 0;
+            $price = isset($row['price']) ? (float)$row['price'] : 0;
+
+            if (!$brandId && !$categoryId && !$type && !$count && !$price) {
+                continue;
+            }
+
+            if (!$brandId || !$categoryId || $size === null || !$type || $count <= 0 || $price < 0) {
+                throw new \yii\web\BadRequestHttpException('Mahsulot qatorlarida model, nomi, o\'lcham, tip, soni va narxi to\'liq kiritilishi kerak.');
+            }
+
+            $normalized[] = [
+                'brand_id' => $brandId,
+                'product_category_id' => $categoryId,
+                'size' => $size,
+                'type' => $type,
+                'count' => $count,
+                'price' => $price,
+            ];
+        }
+
+        if (empty($normalized)) {
+            throw new \yii\web\BadRequestHttpException('Kamida bitta mahsulot qatori kiritilishi kerak.');
+        }
+
+        return $normalized;
+    }
+
+    protected function calculateProductsTotal($rows)
+    {
+        $total = 0;
+        foreach ($rows as $row) {
+            $total += (float)$row['price'] * (float)$row['count'];
+        }
+        return $total;
+    }
+
+    protected function findWarehouseByProductRow($row)
+    {
+        return Warehouse::find()
+            ->andWhere(['brand_id' => (int)$row['brand_id']])
+            ->andWhere(['product_category_id' => (int)$row['product_category_id']])
+            ->andWhere(['type' => (int)$row['type']])
+            ->andWhere(['size' => (float)$row['size']])
+            ->one();
+    }
+
+    protected function saveWarehouseHistory($skladId, $row)
+    {
+        $relativeHistory = new WarehouseHistory();
+        $relativeHistory->sklad_id = $skladId;
+        $relativeHistory->brand_id = $row['brand_id'];
+        $relativeHistory->product_category_id = $row['product_category_id'];
+        $relativeHistory->size = $row['size'];
+        $relativeHistory->type = $row['type'];
+        $relativeHistory->price = $row['price'];
+        $relativeHistory->count = $row['count'];
+        $relativeHistory->cr_date = date('Y-m-d H:i:s');
+        $relativeHistory->cr_date_time = date('Y-m-d H:i:s');
+        $relativeHistory->save(false);
+    }
+
+    protected function savePrice($warehouseId, $price)
+    {
+        $modelPrices = Prices::find()->where(['warehouse_id' => $warehouseId])->one();
+        if (!$modelPrices) {
+            $modelPrices = new Prices();
+            $modelPrices->warehouse_id = $warehouseId;
+        }
+        $modelPrices->price = $price;
+        $modelPrices->save(false);
+    }
+
+    protected function findOrCreateMyTotalDebt($consignorId)
+    {
+        $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $consignorId])->one();
+        if (!$myTotalDebt) {
+            $myTotalDebt = new MyTotalDebt();
+            $myTotalDebt->consignor_id = $consignorId;
+            $myTotalDebt->total_debt = 0;
+        }
+        return $myTotalDebt;
     }
 
     /**

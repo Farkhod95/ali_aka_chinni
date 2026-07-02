@@ -7,6 +7,9 @@ use yii\widgets\ActiveForm;
 
 $freeSorting = $freeSorting ?? \app\models\Brands::getFreeSorting(8);
 $suggested   = $freeSorting[0] ?? 1;
+if (empty($model->sorting)) {
+    $model->sorting = $suggested;
+}
 ?>
 
 <div class="brands-form">
@@ -24,7 +27,6 @@ $suggested   = $freeSorting[0] ?? 1;
         ->input('number', [
             'min'  => 1,
             'list' => 'free-sorting-options',
-            'placeholder' => $suggested,
         ])
         ->hint('Bo‘sh tartib raqamlari: <b>' . implode(', ', $freeSorting) . '</b>. Tavsiya: <a href="#" id="fill-sorting">'.$suggested.'</a>'); ?>
 

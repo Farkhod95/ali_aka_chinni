@@ -175,9 +175,9 @@ input:checked + .slider:before {
                     ->select(["p.*", "pc.sorting"])
                     ->leftJoin("product_category pc", "p.product_category_id = pc.id")
                     ->leftJoin("brands b", "p.brand_id = b.id")
-                    ->andWhere(['b.sup_status' => 1])
+                    ->andWhere(['b.sup_status' => 1, 'pc.sup_status' => 1])
                     ->andWhere(['p.brand_id' => $model->brand->id])
-                    ->orderBy(['pc.sorting' => SORT_ASC])
+                    ->orderBy(['b.sorting' => SORT_ASC, 'pc.sorting' => SORT_ASC])
                     ->all();
 
                   foreach ($warehouses as $model1) {
@@ -442,6 +442,7 @@ input:checked + .slider:before {
           </div>
           <hr/>
           <input type="hidden" class="form-control" name="product_details"/>
+          <input type="hidden" name="order_request_id" value="<?= Yii::$app->security->generateRandomString(32) ?>">
 
           <div class="form-group row m-b-15">
             <div class="col-sm-12">
@@ -473,6 +474,7 @@ input:checked + .slider:before {
             <div class="col-sm-6">
               <label class="col-sm-8 col-form-label"><h5><b>Chegirma ($)</b></h5></label>
               <input type="number" class="form-control" name="chegirma_summa" value="0"/>
+              <span class="error_chegirma_summa text-danger"></span>
             </div>
           </div>
 
@@ -683,7 +685,7 @@ $("#qarztul").submit(function(event){
   };
 
   let hasError = false;
-  let v1 = parseFloat($('input[name="tul_qarz_sum_dollar"]').val());
+  let v1 = toFloat($('input[name="tul_qarz_sum_dollar"]').val());
   if (isNaN(v1) || v1 < 0) { $(".error_tul_qarz_sum_dollar").text("Jami Summa ($) ni kiriting."); hasError = true; }
   else { $(".error_tul_qarz_sum_dollar").text(""); }
 
@@ -748,13 +750,16 @@ $("#buy").submit(function(event){
     count: $("#total_product").text(),
     all_sum: $("#total_product_sum").text(),
     product_details: $('input[name="product_details"]').val(),
+    order_request_id: $('input[name="order_request_id"]').val(),
     tasdiq_check: $('input[name="tasdiq_check"]').val(),
     fast_order: $('#fastOrderCheckbox').is(':checked') ? 1 : 0,
   };
 
   let hasError = false;
-  let s1 = parseFloat($('input[name="summa_dollor"]').val());
+  let s1 = toFloat($('input[name="summa_dollor"]').val());
   if (isNaN(s1) || s1 < 0) { $(".error_summa_dollor").text("Jami to'langan summa ($) ni kiriting."); hasError = true; } else { $(".error_summa_dollor").text(""); }
+  let discount = toFloat($('input[name="chegirma_summa"]').val());
+  if (isNaN(discount) || discount < 0) { $(".error_chegirma_summa").text("Chegirma ($) ni kiriting."); hasError = true; } else { $(".error_chegirma_summa").text(""); }
 
   // let s2 = parseFloat($('input[name="summa_transfer"]').val());
   // if (isNaN(s2) || s2 < 0) { $(".error_summa_transfer").text("To'langan summa ($) ni kiriting."); hasError = true; } else { $(".error_summa_transfer").text(""); }
@@ -782,14 +787,9 @@ $("#buy").submit(function(event){
       $("#sellSubmitButton").prop("disabled", true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Jarayonda...');
     }
   }).done(function(data) {
-    alert(data);
-    $("#modal-dialog2").modal("hide");
-    $(this).addClass("done");
+    window.location.href = "<?= Url::toRoute(['/order-account-history/index']) ?>";
   }).fail(function(jqXHR, textStatus, errorThrown) {
     console.error("Request failed: " + textStatus + ", " + errorThrown);
-    $("#modal-dialog2").modal("hide");
-  }).always(function() {
-    $("#modal-dialog2").modal("hide");
   });
 });
 
@@ -894,8 +894,8 @@ $(".submit").on("click", function(event){
 
   let count_old = parseInt($("#" + key).children().eq(4).text() || '0', 10);
 
-  if(count_product === 0){
-    $(".error_message").text("0 ta buyurtma berib bo'lmaydi");
+  if(count_product < 1){
+    $(".error_message").text("Mahsulot soni 1 tadan kam bo'lmasligi kerak");
     return false;
   }
   if (!String(price || '').length) {

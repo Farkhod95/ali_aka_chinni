@@ -302,12 +302,12 @@ return [
                 }
             },
             'leadUpdate' => function ($url, $model) {
-                if ($model->actived == 1) {
-                    if(\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->permission == 5|| $model->created_by == \Yii::$app->user->identity->id){
-                        $url = Url::to(['/sklad/update', 'id' => $model->id]);
-                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [ 'data-pjax' => 0, 'data-toggle'=>'tooltip', 'title'=>'Chop qilish','class'=>'btn btn-warning btn-xs']);
-                    }
+                // if ($model->actived == 1) {
+                if(\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->permission == 5|| $model->created_by == \Yii::$app->user->identity->id){
+                    $url = Url::to(['/sklad/update', 'id' => $model->id]);
+                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [ 'data-pjax' => 0, 'data-toggle'=>'tooltip', 'title'=>'Chop qilish','class'=>'btn btn-warning btn-xs']);
                 }
+                // }
                 
             },
             'leadPrint' => function ($url, $model) {

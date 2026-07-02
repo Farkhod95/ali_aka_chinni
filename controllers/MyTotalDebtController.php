@@ -164,17 +164,14 @@ class MyTotalDebtController extends Controller
     {
         $request = Yii::$app->request;
         $model = $this->findModel($id);       
-        $total_debt_old = $model->total_debt;
-
-        $updateData = Yii::$app->request->post('MyTotalDebt');
-        $valueReason = isset($updateData['total_debts']) ? $updateData['total_debts'] : null;
-        $chegirma = isset($updateData['chegirma']) ? $updateData['chegirma'] : 0;
         if($request->isAjax){
             /*
             *   Process for ajax request
             */
             Yii::$app->response->format = Response::FORMAT_JSON;
             if($request->isGet){
+                $model->total_debts = 0;
+                $model->chegirma = 0;
                 return [
                     'title'=> 'Hozirgi qarzingiz <b style="font-size:16px;color:red">'. $model->total_debt. ' $</b>',
                     'content'=>$this->renderAjax('update', [
@@ -183,34 +180,87 @@ class MyTotalDebtController extends Controller
                     'footer'=> Html::button('Bekor qilish',['class'=>'btn btn-default pull-left','data-dismiss'=>"modal"]).
                                 Html::button('To\'lash',['class'=>'btn btn-primary','type'=>"submit"])
                 ];         
-            }else if($model->load($request->post()) && $model->save()){
-                $myTotalDebtHistory = new MyTotalDebtHistory();
-                $myTotalDebtHistory->all_summ_dollar = $valueReason;
-                $myTotalDebtHistory->total_debt = $total_debt_old;
-                $myTotalDebtHistory->cr_date = $model->cr_date;
-                $myTotalDebtHistory->discount_amount = $chegirma;
-                $myTotalDebtHistory->my_total_debt_id = $model->id;
-                $myTotalDebtHistory->exchange_rate = $total_debt_old - ($valueReason + $chegirma);
-                $myTotalDebtHistory->save(false);
+            }else if($model->load($request->post())){
+                $requestId = trim((string)$request->post('debt_request_id'));
+                $session = Yii::$app->session;
+                $processedDebtRequests = $session->get('processed_my_total_debt_requests', []);
 
-                $model->total_debt = $total_debt_old - ($valueReason + $chegirma);
-                $model->save(false);
+                if ($requestId === '') {
+                    $model->addError('total_debts', "Qarz to'lash so'rovi noto'g'ri yuborildi.");
+                } elseif (isset($processedDebtRequests[$requestId])) {
+                    return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];
+                }
 
-                return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];   
+                if (trim((string)$model->total_debts) === '') {
+                    $model->total_debts = 0;
+                }
+                if (trim((string)$model->chegirma) === '') {
+                    $model->chegirma = 0;
+                }
+
+                if (!$this->isMoneyValue($model->total_debts)) {
+                    $model->addError('total_debts', "To'lanadigan summa faqat son bo'lishi kerak.");
+                }
+                if (!$this->isMoneyValue($model->chegirma)) {
+                    $model->addError('chegirma', "Chegirma faqat son bo'lishi kerak.");
+                }
+
+                $valueReason = $model->hasErrors('total_debts') ? 0 : $this->toFloat($model->total_debts);
+                $chegirma = $model->hasErrors('chegirma') ? 0 : $this->toFloat($model->chegirma);
+                $totalPaid = round($valueReason + $chegirma, 2);
+                $totalDebtOld = round((float)$model->total_debt, 2);
+
+                if (!$model->cr_date) {
+                    $model->addError('cr_date', 'Sana kiritilishi shart.');
+                }
+                if ($valueReason < 0 || $chegirma < 0) {
+                    $model->addError('total_debts', "To'lov va chegirma manfiy bo'lmasligi kerak.");
+                }
+                if ($totalPaid <= 0) {
+                    $model->addError('total_debts', "To'lov yoki chegirma 0 dan katta bo'lishi kerak.");
+                }
+                if ($totalPaid > $totalDebtOld) {
+                    $model->addError('total_debts', "To'lov va chegirma jami hozirgi qarzdan oshmasligi kerak.");
+                }
+
+                if ($model->hasErrors()) {
+                    return $this->renderDebtPaymentForm($model, "Qarz to'lash");
+                }
+
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    $model->total_debt = round($totalDebtOld - $totalPaid, 2);
+                    $model->update_by = Yii::$app->user->identity->id;
+
+                    $myTotalDebtHistory = new MyTotalDebtHistory();
+                    $myTotalDebtHistory->all_summ_dollar = $valueReason;
+                    $myTotalDebtHistory->total_debt = $totalDebtOld;
+                    $myTotalDebtHistory->cr_date = $model->cr_date;
+                    $myTotalDebtHistory->discount_amount = $chegirma;
+                    $myTotalDebtHistory->my_total_debt_id = $model->id;
+                    $myTotalDebtHistory->exchange_rate = $model->total_debt;
+
+                    if (!$model->save(false) || !$myTotalDebtHistory->save(false)) {
+                        throw new \RuntimeException("Qarz to'lovini saqlab bo'lmadi.");
+                    }
+
+                    $transaction->commit();
+                    $processedDebtRequests[$requestId] = time();
+                    $session->set('processed_my_total_debt_requests', $processedDebtRequests);
+
+                    return ['forceClose'=>true,'forceReload'=>'#crud-datatable-pjax'];   
+                } catch (\Throwable $e) {
+                    $transaction->rollBack();
+                    $model->addError('total_debts', $e->getMessage());
+                    return $this->renderDebtPaymentForm($model, "Qarz to'lash");
+                }
             }else{
-                 return [
-                    'title'=> "Update MyTotalDebt #".$id,
-                    'content'=>$this->renderAjax('update', [
-                        'model' => $model,
-                    ]),
-                    'footer'=> Html::button('Close',['class'=>'btn btn-default pull-left','data-dismiss'=>"modal"]).
-                                Html::button('Save',['class'=>'btn btn-primary','type'=>"submit"])
-                ];        
+                return $this->renderDebtPaymentForm($model, "Qarz to'lash");
             }
         }else{
             /*
-            *   Process for non-ajax request
-            */
+             *   Process for non-ajax request
+             */
             if ($model->load($request->post()) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
@@ -219,6 +269,29 @@ class MyTotalDebtController extends Controller
                 ]);
             }
         }
+    }
+
+    protected function toFloat($value)
+    {
+        return round((float)str_replace(',', '.', (string)$value), 2);
+    }
+
+    protected function isMoneyValue($value)
+    {
+        $value = str_replace(',', '.', trim((string)$value));
+        return $value !== '' && is_numeric($value);
+    }
+
+    protected function renderDebtPaymentForm(MyTotalDebt $model, $title)
+    {
+        return [
+            'title'=> $title,
+            'content'=>$this->renderAjax('update', [
+                'model' => $model,
+            ]),
+            'footer'=> Html::button('Bekor qilish',['class'=>'btn btn-default pull-left','data-dismiss'=>"modal"]).
+                        Html::button('To\'lash',['class'=>'btn btn-primary','type'=>"submit"])
+        ];
     }
 
     /**

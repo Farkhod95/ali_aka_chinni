@@ -40,7 +40,7 @@ class MyTotalDebt extends \yii\db\ActiveRecord
     {
         return [
             [['cr_date'], 'safe'],
-            [['total_debt'], 'number'],
+            [['total_debt', 'total_debts', 'chegirma'], 'number', 'min' => 0],
             [['consignor_id', 'created_by', 'update_by'], 'integer'],
             [['consignor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Consignor::className(), 'targetAttribute' => ['consignor_id' => 'id']],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['created_by' => 'id']],

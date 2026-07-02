@@ -265,7 +265,10 @@ function clearInputInvalid($inp){
   $inp.removeClass('is-invalid');
   $inp.next('.mi-row-error').remove();
 }
-$(document).on('input', '#all-sum-dollar, #sum-dollar, #sum-som, #sum-cart, #id-comment', function(){
+function fieldByName(name){
+  return $('[name="'+name+'"]');
+}
+$(document).on('input change', '[name="Sklad[dates]"], [name="Sklad[comments]"], [name="Sklad[sum_dollars]"], .target, .mi-price', function(){
   clearInputInvalid($(this));
 });
 
@@ -318,6 +321,18 @@ $('#order-form').on('submit', function(e){
   $('.mi-row-error').remove();
   $('.select2-selection').removeClass('is-invalid');
 
+  ['Sklad[consignor_id]', 'Sklad[dates]', 'Sklad[comments]', 'Sklad[sum_dollars]'].forEach(function(name){
+    const $i=fieldByName(name);
+    if($i.length && ($.trim($i.val())==='')){
+      hasError=true;
+      if ($i.is('select')) {
+        markSelect2Invalid($i,'Majburiy maydon');
+      } else {
+        markInputInvalid($i,'Bu maydon to\'ldirilishi shart');
+      }
+    }
+  });
+
   // Pastki majburiylar: jami $, summa $, so'mda, kartada, izoh
   ['#all-sum-dollar','#sum-dollar','#sum-som','#sum-cart','#id-comment'].forEach(function(id){
     const $i=$(id);
@@ -332,6 +347,7 @@ $('#order-form').on('submit', function(e){
     const $sk=$r.find('select.mi-sklad'); const $br=$r.find('select.mi-brand');
     const $ct=$r.find('select.mi-category'); const $sz=$r.find('select.mi-size'); const $tp=$r.find('select.mi-type');
     const $prc=$r.find('input[name*="[price]"]');
+    const $cnt=$r.find('input[name*="[count]"]');
 
     if($sk.length&&!$sk.val()){markSelect2Invalid($sk,'Majburiy maydon');hasError=true;}
     if($br.length&&!$br.val()){markSelect2Invalid($br,'Majburiy maydon');hasError=true;}
@@ -339,6 +355,9 @@ $('#order-form').on('submit', function(e){
     if($sz.length&&!$sz.val()){markSelect2Invalid($sz,'Majburiy maydon');hasError=true;}
     if($tp.length&&!$tp.val()){markSelect2Invalid($tp,'Majburiy maydon');hasError=true;}
 
+
+    const cs=($cnt.val()||'').trim(); const cnt=parseFloat(cs.replace(',','.'));
+    if(cs===''||isNaN(cnt)||cnt<=0){hasError=true; markInputInvalid($cnt,'Soni 0 dan katta bo\'lishi kerak');}
 
     const ps=($prc.val()||'').trim(); const prc=parseFloat(ps.replace(',','.'));
     if(ps===''||isNaN(prc)||prc<0){hasError=true; markInputInvalid($prc,'Qiymat kiriting');}
@@ -350,6 +369,8 @@ $('#order-form').on('submit', function(e){
     if($first.length){$('html,body').animate({scrollTop:$first.offset().top-150},250);}
     return;
   }
+
+  $(this).find(':submit').prop('disabled', true);
 });
 
 // --- Edit holatda selectlarni tiklash ---
@@ -378,6 +399,28 @@ $(document).on('afterAddRow','#my_id',function(e,row){
 $(document).ready(initDependentSelects);
 
 
+function copyToClipboard(element) {
+    element.select();
+    document.execCommand("copy");
+
+    const message = document.createElement("span");
+    message.innerText = "Nusxalandi";
+    message.style.position = "absolute";
+    message.style.bottom = "50%";
+    message.style.left = "150px";
+    message.style.transform = "translateY(-50%)";
+    message.style.backgroundColor = "#83a16ed9";
+    message.style.color = "white";
+    message.style.padding = "5px 10px";
+    message.style.borderRadius = "4px";
+    message.style.fontSize = "12px";
+
+    element.parentNode.appendChild(message);
+
+    setTimeout(() => {
+        message.remove();
+    }, 2000);
+}
 
 document.getElementById("sum_all_pro").onclick = function() {
     copyToClipboard(this); // Input ustiga bosilganda nusxalaymiz
@@ -396,6 +439,10 @@ $(document).on("change", ".input-priority", function() {
         // console.log('product_details:', product_details);
         
         // Umumiy qiymatni hisoblash
+        const total_sum = Object.values(product_details).reduce((a, b) => a + b, 0);
+        $("input[name='Sklad[sum_all_pro]']").val(total_sum);
+    } else {
+        delete product_details[id];
         const total_sum = Object.values(product_details).reduce((a, b) => a + b, 0);
         $("input[name='Sklad[sum_all_pro]']").val(total_sum);
     }

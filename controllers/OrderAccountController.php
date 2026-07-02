@@ -117,7 +117,6 @@ class OrderAccountController extends Controller
             throw new \yii\web\BadRequestHttpException("Mahsulot qatorlari bo'sh bo'lishi mumkin emas.");
         }
 
-        $required = [];
         foreach ($rows as $row) {
             $brandId = isset($row['brand_id']) ? (int)$row['brand_id'] : 0;
             $categoryId = isset($row['product_category_id']) ? (int)$row['product_category_id'] : 0;
@@ -128,41 +127,9 @@ class OrderAccountController extends Controller
             if (!$brandId || !$categoryId || $size === null || !$type || $count < 1) {
                 throw new \yii\web\BadRequestHttpException("Mahsulot ma'lumotlari to'liq emas.");
             }
-
-            $key = $brandId . '|' . $categoryId . '|' . $size . '|' . $type;
-            if (!isset($required[$key])) {
-                $required[$key] = [
-                    'brand_id' => $brandId,
-                    'product_category_id' => $categoryId,
-                    'size' => $size,
-                    'type' => $type,
-                    'count' => 0,
-                ];
-            }
-            $required[$key]['count'] += $count;
         }
 
-        foreach ($required as $item) {
-            $warehouseValue = Warehouse::find()
-                ->andWhere(['product_category_id' => $item['product_category_id']])
-                ->andWhere(['brand_id' => $item['brand_id']])
-                ->andWhere(['size' => $item['size']])
-                ->andWhere(['type' => $item['type']])
-                ->one();
-
-            $brand = Brands::findOne($item['brand_id']);
-            $category = ProductCategory::findOne($item['product_category_id']);
-            $productName = ($brand ? $brand->name : $item['brand_id']) . ' / ' .
-                ($category ? $category->name : $item['product_category_id']) . ' / ' .
-                $item['size'] . ' / ' . ProductCategory::getTypeView($item['type']);
-
-            if (!$warehouseValue) {
-                throw new \yii\web\BadRequestHttpException($productName . ' skladda topilmadi.');
-            }
-            if ((float)$warehouseValue->count < (int)$item['count']) {
-                throw new \yii\web\BadRequestHttpException($productName . ' skladda yetarli emas. Mavjud: ' . $warehouseValue->count . ", so'ralgan: " . $item['count'] . '.');
-            }
-        }
+        // Omborda yetarli qoldiq bo'lmasa ham sotishga ruxsat beriladi.
     }
 
     private function getProductTypeIdByName($name)
@@ -307,14 +274,18 @@ class OrderAccountController extends Controller
         // Requestni chop etish
         
         $request = Yii::$app->request;
+        $toFloat = function ($value) {
+            return (float)str_replace(',', '.', trim((string)$value));
+        };
+
         $clients_id = $request->post('customer_name');
-        $total_debts = $request->post('jami_qarzi');
+        $total_debts = $toFloat($request->post('jami_qarzi'));
         $dates = $request->post('order_date');
         // $exchange_rates = $request->post('dollar_kurs');
         $exchange_rates = 0;
 
-        $discount_amounts = $request->post('chegirma_summa');
-        $sum_dollars = $request->post('summa_dollor');
+        $discount_amounts = $toFloat($request->post('chegirma_summa'));
+        $sum_dollars = $toFloat($request->post('summa_dollor'));
         // $dollar_sumda = $request->post('dollar_sumda');
         $dollar_sumda = 0;
         // $sum_soms = $request->post('summa_som');
@@ -342,15 +313,32 @@ class OrderAccountController extends Controller
         $product_details = $request->post('product_details');
         $contact = json_decode($product_details, true);
         $this->assertWarehouseCountsAvailable($contact, true);
+        if (!$clients_id || !$dates || $sum_dollars < 0 || $discount_amounts < 0) {
+            throw new \yii\web\BadRequestHttpException("Sotish ma'lumotlari to'liq yoki to'g'ri emas.");
+        }
+        $order_request_id = trim((string)$request->post('order_request_id'));
+        if ($order_request_id === '') {
+            throw new \yii\web\BadRequestHttpException("Sotish so'rovi noto'g'ri yuborildi.");
+        }
+
+        $session = Yii::$app->session;
+        $processedOrderRequests = $session->get('processed_order_requests', []);
+        if (isset($processedOrderRequests[$order_request_id])) {
+            return $this->redirect(['/order-account-history/index']);
+        }
 
         $all_pay_summ = round($sum_dollars, 2);
         // $contact = $post['OrderAccount']['allValue'];
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
         
         $client = Client::find()->where(['id' => $clients_id])->one();
         if (!isset($client)){                    
             $client_cr = new Client();
             $client_cr->fio = $clients_id;
             $client_cr->save();
+            $client = $client_cr;
             $client_id = $client_cr->id;                        
         }else{
             $client_id = $client->id;   
@@ -419,6 +407,7 @@ class OrderAccountController extends Controller
             $orderAccountCr->cr_date_time = date('Y-m-d H:i:s',strtotime($dates.' '.date('H:i:s')));
             $orderAccountCr->save(false);
             $orderAccount_id = $orderAccountCr->id;
+            $orderAccount = $orderAccountCr;
 
             $orderAccountCrHistory = new OrderAccountHistory();
             $orderAccountCrHistory->client_id = $client_id;
@@ -456,6 +445,9 @@ class OrderAccountController extends Controller
             $brand_list = Brands::find()->where(['id' => $value['brand_id']])->one();
             $product_category_list = ProductCategory::find()->where(['id' => $value['product_category_id']])->one();
             $type_sklad_list = TypeSklad::find()->where(['name' => $value['joy']])->one();
+            if (!$brand_list || !$product_category_list || !$type_sklad_list) {
+                throw new \yii\web\BadRequestHttpException("Mahsulot ma'lumotlari topilmadi.");
+            }
 
             // if ($value['joy'] == "Ombor") {
             //     $status_order_sklad = 1;
@@ -601,8 +593,8 @@ class OrderAccountController extends Controller
             $orderAccountProfHistory->all_product_sum = $all_summ;
             $orderAccountProfHistory->save();
 
-            $keshbekClient = Client::find()->where(['id' => $clients_id])->one();
-            if ($keshbekClient->keshbek) {
+            $keshbekClient = $client;
+            if ($keshbekClient && $keshbekClient->keshbek) {
                 $keshbekHistory = new KeshbekHistory();
                 $keshbekHistory->order_account_history_id = $orderAccountHistory_id;
                 $keshbekHistory->client_id = $keshbekClient->id;
@@ -612,6 +604,16 @@ class OrderAccountController extends Controller
                 $keshbekHistory->save();
             }
             
+        }
+            $processedOrderRequests[$order_request_id] = true;
+            if (count($processedOrderRequests) > 50) {
+                $processedOrderRequests = array_slice($processedOrderRequests, -50, null, true);
+            }
+            $session->set('processed_order_requests', $processedOrderRequests);
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
         }
         return $this->redirect(['/order-account-history/index']);
     }
@@ -640,12 +642,14 @@ class OrderAccountController extends Controller
         // $warehouse = Warehouse::find()->select(['brand_id'])->groupBy(['brand_id'])->orderBy(['product_category.sorting' => SORT_ASC])->all();
             
         $warehouse = Warehouse::find()
-        ->alias('p')
-        ->select(["p.*", "pc.sorting"])
-        ->leftJoin("brands pc", "p.brand_id = pc.id")
-        ->where(['pc.sup_status' => 1])
-        ->orderBy(['pc.sorting' => SORT_ASC])
-        ->groupBy(['p.brand_id'])->all();
+            ->alias('p')
+            ->with(['brand', 'productCategory'])
+            ->leftJoin('brands b', 'p.brand_id = b.id')
+            ->leftJoin('product_category pc', 'p.product_category_id = pc.id')
+            ->where(['b.sup_status' => 1, 'pc.sup_status' => 1])
+            ->orderBy(['b.sorting' => SORT_ASC, 'pc.sorting' => SORT_ASC])
+            ->groupBy(['p.brand_id'])
+            ->all();
         // echo "<pre>";
         // print_r($warehouse);
         // echo "<pre>";

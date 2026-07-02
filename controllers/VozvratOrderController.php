@@ -157,12 +157,14 @@ class VozvratOrderController extends Controller
         // $warehouse = Warehouse::find()->select(['brand_id'])->groupBy(['brand_id'])->orderBy(['product_category.sorting' => SORT_ASC])->all();
             
         $warehouse = Warehouse::find()
-        ->alias('p')
-        ->select(["p.*", "pc.sorting"])
-        ->leftJoin("brands pc", "p.brand_id = pc.id")
-        ->where(['pc.sup_status' => 1])
-        ->orderBy(['pc.sorting' => SORT_ASC])
-        ->groupBy(['p.brand_id'])->all();
+            ->alias('p')
+            ->with(['brand', 'productCategory'])
+            ->leftJoin('brands b', 'p.brand_id = b.id')
+            ->leftJoin('product_category pc', 'p.product_category_id = pc.id')
+            ->where(['b.sup_status' => 1, 'pc.sup_status' => 1])
+            ->orderBy(['b.sorting' => SORT_ASC, 'pc.sorting' => SORT_ASC])
+            ->groupBy(['p.brand_id'])
+            ->all();
         // echo "<pre>";
         // print_r($warehouse);
         // echo "<pre>";

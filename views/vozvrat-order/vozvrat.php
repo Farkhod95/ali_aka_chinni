@@ -168,9 +168,9 @@ input:checked + .slider:before {
                     ->select(["p.*", "pc.sorting"])
                     ->leftJoin("product_category pc", "p.product_category_id = pc.id")
                     ->leftJoin("brands b", "p.brand_id = b.id")
-                    ->andWhere(['b.sup_status' => 1])
+                    ->andWhere(['b.sup_status' => 1, 'pc.sup_status' => 1])
                     ->andWhere(['p.brand_id' => $model->brand->id])
-                    ->orderBy(['pc.sorting' => SORT_ASC])
+                    ->orderBy(['b.sorting' => SORT_ASC, 'pc.sorting' => SORT_ASC])
                     ->all();
 
                   foreach ($warehouses as $model1) {

@@ -49,6 +49,7 @@ use kartik\date\DatePicker;
                 'options' => [
                     'placeholder' => 'Modelni tanlang...',
                     'id' => 'warehouse-brand_id',
+                    'disabled' => true, 
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,
@@ -64,6 +65,7 @@ use kartik\date\DatePicker;
                 'options' => [
                     'placeholder' => $model->brand_id ? 'Nomini tanlang...' : 'Avval modelni tanlang...',
                     'id' => 'warehouse-product_category_id',
+                    'disabled' => true, 
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,
@@ -80,6 +82,7 @@ use kartik\date\DatePicker;
                 'options' => [
                     'placeholder' => 'Avval model va nomini tanlang...',
                     'id' => 'warehouse-size',
+                    'disabled' => true, 
                 ],
                 'pluginOptions' => [
                     'allowClear' => true,

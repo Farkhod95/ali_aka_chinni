@@ -5,11 +5,12 @@ use unclead\multipleinput\MultipleInput;
 /* @var $this yii\web\View */
 /* @var $model app\models\ProductCategory */
 /* @var $form yii\widgets\ActiveForm */
+$data = is_array($model->allValue) && !empty($model->allValue) ? $model->allValue : [];
 ?>
 
 <div class="product-category-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'product-category-form']); ?>
 		<div class="row">
 			<div class="col-md-12">
                     <?= $form->field($model, 'brand_id')->label()->widget(\kartik\select2\Select2::classname(), [
@@ -35,16 +36,17 @@ use unclead\multipleinput\MultipleInput;
              <div class="col-md-12">
                     <?php echo $form->field($model, 'allValue')->widget(MultipleInput::className(), [
                         'id' => 'my_id',
-                        'allowEmptyList' => true,
+                        'data' => $data,
+                        'allowEmptyList' => false,
+                        'min' => 1,
                         'enableGuessTitle' => true,
                         'columns' => [
                             [
                                 'name'  => 'size',
                                 'title' => 'O\'lchami <b style="color:red">(Misol: 9.99 )</b>',
                                 'enableError' => true,
-                                'defaultValue' => 0,
                                 'options' => [
-                                    'class' => 'input-priority',
+                                    'class' => 'input-priority js-size',
                                     // 'type' =>'number',
                                     'required' => true,
                                 ],
@@ -61,12 +63,12 @@ use unclead\multipleinput\MultipleInput;
                                     'data'  => $model->getType(),
                                     'options' => [
                                         'placeholder' => 'Tanlang...',
+                                        'class' => 'input-priority js-type',
                                         'required' => true
                                     ],   
                                     'pluginOptions' => [
                                         'allowClear' => true,
-                                    ],     
-                                    'class' => 'input-priority',
+                                    ],
                                     ],
                                     'headerOptions' => [
                                         'style' => 'width: 180px;',
@@ -90,6 +92,12 @@ use unclead\multipleinput\MultipleInput;
 <?php
 // ... sizning form kodingiz o‘zgarmaydi ...
 
+$this->registerCss("
+.pc-invalid { border-color:#dc3545 !important; }
+.select2-selection.pc-invalid { border-color:#dc3545 !important; }
+.pc-row-error { margin-top:4px; }
+");
+
 $adviceUrl = \yii\helpers\Url::to(['product-category/sorting-advice']);
 $js = <<<JS
 (function(){
@@ -97,8 +105,21 @@ $js = <<<JS
   var \$sorting = $('#productcategory-sorting');
   var \$field = $('.field-productcategory-sorting');
   var \$hint = $('<div class="help-block text-info small" id="sorting-hint"></div>');
+  var lastSuggested = null;
   if (\$field.find('#sorting-hint').length === 0) {
       \$field.append(\$hint);
+  }
+
+  function fillSortingFromAdvice(data) {
+      if (!data || !data.next_free) {
+          return;
+      }
+      var next = String(data.next_free);
+      var current = $.trim(\$sorting.val() || '');
+      if (current === '' || current === String(lastSuggested)) {
+          \$sorting.val(next);
+          lastSuggested = next;
+      }
   }
 
   function renderHint(data, currentVal) {
@@ -122,9 +143,8 @@ $js = <<<JS
       var b = \$brand.val();
       if (!b) { \$hint.text('Avval brandni tanlang'); return; }
       $.getJSON('$adviceUrl', { brand_id: b, value: \$sorting.val() }, function(resp){
+          fillSortingFromAdvice(resp);
           renderHint(resp, \$sorting.val());
-          // Agar sorting bo'sh bo'lsa, avtomatik next_free bilan to'ldirib beramiz (ixtiyoriy)
-         
       });
   }
 
@@ -137,6 +157,63 @@ $js = <<<JS
 
   // Form ochilganda bir marta
   refreshHint();
+})();
+
+(function(){
+  function clearErrors() {
+    $('.pc-row-error').remove();
+    $('.pc-invalid').removeClass('pc-invalid');
+    $('.select2-selection').removeClass('pc-invalid');
+  }
+
+  function markInput(\$input, message) {
+    \$input.addClass('pc-invalid');
+    if (\$input.next('.pc-row-error').length === 0) {
+      \$input.after('<div class="pc-row-error text-danger small">'+message+'</div>');
+    }
+  }
+
+  function markSelect(\$select, message) {
+    var \$selection = \$select.next('.select2').find('.select2-selection');
+    \$selection.addClass('pc-invalid');
+    if (\$selection.parent().next('.pc-row-error').length === 0) {
+      \$selection.parent().after('<div class="pc-row-error text-danger small">'+message+'</div>');
+    }
+  }
+
+  $(document).on('input change', '#my_id .js-size, #my_id .js-type', function(){
+    clearErrors();
+  });
+
+  $('#product-category-form').on('submit', function(e){
+    clearErrors();
+    var hasError = false;
+
+    $('#my_id').find('tr.multiple-input-list__item').each(function(){
+      var \$row = $(this);
+      var \$size = \$row.find('.js-size');
+      var \$type = \$row.find('.js-type');
+      var sizeVal = $.trim(\$size.val() || '').replace(',', '.');
+
+      if (!sizeVal || isNaN(parseFloat(sizeVal))) {
+        hasError = true;
+        markInput(\$size, "O'lcham kiritilishi shart");
+      }
+
+      if (!\$type.val()) {
+        hasError = true;
+        markSelect(\$type, 'Tip tanlanishi shart');
+      }
+    });
+
+    if (hasError) {
+      e.preventDefault();
+      var \$first = $('.pc-row-error').first();
+      if (\$first.length) {
+        $('html,body').animate({scrollTop: \$first.offset().top - 150}, 250);
+      }
+    }
+  });
 })();
 JS;
 
