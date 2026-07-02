@@ -93,7 +93,7 @@ $menuItems[] = [
 ];
 
 $menuItems[] = [
-    'label' => 'Sklad hisobi',
+    'label' => 'Import tarixi',
     'url' => ['/sklad/index'],
     'visible' => $model && in_array($model->permission, [1,2,5,6]),
 ];
