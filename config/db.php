@@ -2,7 +2,7 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=127.0.0.1;port=3308;dbname=host1836067_aliakadb',
+    'dsn' => 'mysql:host=127.0.0.1;port=3308;dbname=host1836067_aliakabdnew',
     'username' => 'host1836067_user',
     'password' => 'elegant@q12we3',
     'charset' => 'utf8',
