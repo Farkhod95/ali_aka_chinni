@@ -226,6 +226,61 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         return $this->hasMany(ProductAccount::className(), ['order_account_history_id' => 'id']);
     }
 
+    private function getHistoryCalcTime($model, $endOfDay = false)
+    {
+        if (!empty($model->cr_date_time)) {
+            return date('Y-m-d H:i:s', strtotime($model->cr_date_time));
+        }
+
+        $date = !empty($model->date) ? $model->date : $model->cr_date;
+        return date('Y-m-d', strtotime($date)) . ($endOfDay ? ' 23:59:59' : ' 00:00:00');
+    }
+
+    private function getDebtRepaymentBeforeOrder($model)
+    {
+        $currentTime = $this->getHistoryCalcTime($model, true);
+        $previousOrder = self::find()
+            ->where(['client_id' => $model->client_id])
+            ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
+            ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
+            ->andWhere([
+                'or',
+                ['<', 'date', $model->date],
+                ['and', ['date' => $model->date], ['<', 'id', $model->id]]
+            ])
+            ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC])
+            ->one();
+
+        if (!$previousOrder) {
+            return 0;
+        }
+
+        $previousTime = $this->getHistoryCalcTime($previousOrder, true);
+        $timeExpression = "COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59'))";
+
+        return (float)DebtRepayment::find()
+            ->where(['client_id' => $model->client_id])
+            ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
+            ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
+            ->andWhere($timeExpression . ' > :previousTime', [':previousTime' => $previousTime])
+            ->andWhere($timeExpression . ' <= :currentTime', [':currentTime' => $currentTime])
+            ->select(new \yii\db\Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
+            ->scalar();
+    }
+
+    private function getDebtRepaymentInvoiceRow($model)
+    {
+        $debtRepayment = $this->getDebtRepaymentBeforeOrder($model);
+        if ($debtRepayment <= 0) {
+            return '';
+        }
+
+        return '<tr>
+                    <th nowrap style="text-align: left; width: 150px;color:#f59c1a">To\'langan qarz ($):</th>
+                    <td ><b style="color:#f59c1a" >' . Yii::$app->formatter->asDecimal($debtRepayment, 2) . ' $,</b></td>
+                </tr>';
+    }
+
     public function getInvoiceHtmlTextSklad($model, $id)
     {
         $warehouse = ProductAccountHistory::find()->where(['order_account_history_id' => $id])->select(['brand_id'])->groupBy(['brand_id'])->all();
@@ -358,6 +413,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         $tulan_sum_transfer = $model->sum_transfers?'To\'langan summa transferda:': '';
         $discount_amount_sum = $model->discount_amount?'Jami chegirma ($):': '';
         $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
+        $debtRepaymentRow = $this->getDebtRepaymentInvoiceRow($model);
         $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;font-size:12px">
                     <tr style="">
                         <td style="height: 20px;text-align: center; width: 10px; border: 1px solid #000;"><b>№</b></td>
@@ -465,6 +521,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                     <th nowrap style="text-align: left; width: 150px;color:#f59c1">'.$discount_amount_sum.'</th>
                     <td ><b style="color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
+                '.$debtRepaymentRow.'
                 <tr>
                     <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{all_total_debt} $,</b></td>
@@ -517,6 +574,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         $tulan_sum_transfer = $model->sum_transfers?'To\'langan summa transferda:': '';
         $discount_amount_sum = $model->discount_amount?'Jami chegirma ($):': '';
         $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
+        $debtRepaymentRow = $this->getDebtRepaymentInvoiceRow($model);
         $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;font-size:12px">
                     <tr style="">
                         <td style="height: 20px;text-align: center; width: 10px; border: 1px solid #000;"><b>№</b></td>
@@ -624,6 +682,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                     <th nowrap style="text-align: left; width: 150px;color:#f59c1">'.$discount_amount_sum.'</th>
                     <td ><b style="color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
+                '.$debtRepaymentRow.'
                 <tr>
                     <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{all_total_debt} $,</b></td>
@@ -693,6 +752,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
         $debtRepaymentall_sum = $debtRepaymentall != 0 ?'To\'langan qarz ($):': '';
         $debt_repayment_all = $debtRepaymentall != 0 ?$debtRepaymentall.' $,': '';
+        $debtRepaymentRow = $this->getDebtRepaymentInvoiceRow($model);
         // if($sum>0){
         //     $keshbek_tr = '
         //     <br/><br/><br/>
@@ -790,6 +850,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                     <th nowrap style="text-align: left; width: 150px;">'.$discount_amount_sum.'</th>
                     <td ><b style="" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
+                '.$debtRepaymentRow.'
                 <tr>
                     <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{all_total_debt} $,</b></td>
@@ -969,6 +1030,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
         $discount_amount_sum_val = $model->discount_amount?$model->discount_amount.' $,': '';
         $debtRepaymentall_sum = $debtRepaymentall != 0 ?'To\'langan qarz ($):': '';
         $debt_repayment_all = $debtRepaymentall != 0 ?$debtRepaymentall.' $,': '';
+        $debtRepaymentRow = $this->getDebtRepaymentInvoiceRow($model);
 
         $table .= '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;font-size:12px">
                     <tr style="">
@@ -1088,6 +1150,7 @@ class OrderAccountHistory extends \yii\db\ActiveRecord
                     <th nowrap style="text-align: left; width: 150px;color:#f59c1">'.$discount_amount_sum.'</th>
                     <td ><b style="color:#f59c1" >'.$discount_amount_sum_val.'</b></td>
                 </tr>
+                '.$debtRepaymentRow.'
                 <tr>
                     <th nowrap style="font-size:16px;text-align: left; width: 150px;color:red">Qolgan qarz ($): </th>
                     <td ><b style="font-size:16px;color:red" >{all_total_debt} $,</b></td>

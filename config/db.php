@@ -14,7 +14,7 @@ return [
     // 'charset' => 'utf8',
 
     // 'class' => 'yii\db\Connection',
-    // 'dsn' => 'mysql:host=localhost;dbname=ali_aka_chinni_db',
+    // 'dsn' => 'mysql:host=localhost;dbname=ali_aka_chinni_db_08_07',
     // 'username' => 'root',
     // 'password' => 'root',
     // 'charset' => 'utf8',
