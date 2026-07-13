@@ -165,6 +165,13 @@ $js = <<<JS
 })();
 
 (function(){
+  function applyRequiredAttributes() {
+    $('#my_id').find('.js-size, .js-type').attr({
+      required: true,
+      'aria-required': 'true'
+    });
+  }
+
   function clearErrors() {
     $('.pc-row-error').remove();
     $('.pc-invalid').removeClass('pc-invalid');
@@ -190,11 +197,18 @@ $js = <<<JS
     clearErrors();
   });
 
+  $('#my_id').on('afterAddRow', function(){
+    applyRequiredAttributes();
+  });
+
+  applyRequiredAttributes();
+
   $('#product-category-form').on('submit', function(e){
+    applyRequiredAttributes();
     clearErrors();
     var hasError = false;
 
-    $('#my_id').find('tr.multiple-input-list__item').each(function(){
+    $('#my_id').find('.multiple-input-list__item').each(function(){
       var \$row = $(this);
       var \$size = \$row.find('.js-size');
       var \$type = \$row.find('.js-type');

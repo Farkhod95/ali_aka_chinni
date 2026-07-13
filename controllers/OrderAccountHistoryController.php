@@ -2075,12 +2075,20 @@ class OrderAccountHistoryController extends Controller
                         ->andWhere(['size' => $value->size])
                         ->andWhere(['type' => $value->type])
                         ->one();
-                    if ($warehouseValue) {
-                        $warehouseValue->count = (float)$warehouseValue->count + (float)$value->count;
-                        $warehouseValue->save(false);
+                    if (!$warehouseValue) {
+                        throw new \RuntimeException(
+                            'Mahsulot skladdan topilmadi. Brand ID: ' . $value->brand_id .
+                            ', kategoriya ID: ' . $value->product_category_id .
+                            ', o\'lcham: ' . $value->size .
+                            ', tip: ' . ProductCategory::getTypeView($value->type) . '.'
+                        );
                     }
 
+                    $warehouseValue->count = (float)$warehouseValue->count + (float)$value->count;
+                    $warehouseValue->save(false);
+
                     $productAccount = ProductAccount::find()
+                        ->andWhere(['order_account_history_id' => $id])
                         ->andWhere(['order_account_id' => $orderAccount->id])
                         ->andWhere(['brand_id' => $value->brand_id])
                         ->andWhere(['product_category_id' => $value->product_category_id])
@@ -2088,17 +2096,46 @@ class OrderAccountHistoryController extends Controller
                         ->andWhere(['type_sklad_id' => $value->type_sklad_id])
                         ->andWhere(['size' => $value->size])
                         ->one();
+                    if (!$productAccount) {
+                        $productAccount = ProductAccount::find()
+                            ->andWhere(['order_account_id' => $orderAccount->id])
+                            ->andWhere(['brand_id' => $value->brand_id])
+                            ->andWhere(['product_category_id' => $value->product_category_id])
+                            ->andWhere(['type' => $value->type])
+                            ->andWhere(['type_sklad_id' => $value->type_sklad_id])
+                            ->andWhere(['size' => $value->size])
+                            ->one();
+                    }
                     if ($productAccount) {
                         $productAccount->count = (int)$productAccount->count - (int)$value->count;
                         $productAccount->profit = round((float)$productAccount->profit - (float)$value->profit, 2);
                         if ($productAccount->count <= 0) {
                             $productAccount->delete();
                         } else {
+                            if ((int)$productAccount->order_account_history_id === (int)$id) {
+                                $productAccount->order_account_history_id = null;
+                            }
                             $productAccount->save(false);
                         }
+                    } else {
+                        throw new \RuntimeException(
+                            'ProductAccount topilmadi. Brand ID: ' . $value->brand_id .
+                            ', kategoriya ID: ' . $value->product_category_id .
+                            ', o\'lcham: ' . $value->size .
+                            ', tip: ' . ProductCategory::getTypeView($value->type) . '.'
+                        );
                     }
 
                     $value->delete();
+                }
+
+                $leftProductAccounts = ProductAccount::find()->where(['order_account_history_id' => $id])->all();
+                if (!empty($leftProductAccounts)) {
+                    $ids = [];
+                    foreach ($leftProductAccounts as $leftProductAccount) {
+                        $ids[] = $leftProductAccount->id;
+                    }
+                    throw new \RuntimeException('Order historyga bog\'langan ProductAccount qatorlari qoldi: ' . implode(', ', $ids));
                 }
 
                 $nextOrders = OrderAccountHistory::find()
@@ -2115,12 +2152,15 @@ class OrderAccountHistoryController extends Controller
 
                 foreach ($nextOrders as $nextOrder) {
                     $nextOrderTime = $nextOrder->cr_date_time ?: ($nextOrder->date . ' 23:59:59');
+                    $repaymentTimeExpression = "COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59'))";
                     $summaDebt = (float) DebtRepayment::find()
                         ->where(['client_id' => $orderAccountHistory->client_id])
                         ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
-                        ->andWhere(['>', 'cr_date_time', $previousDebtTime])
-                        ->andWhere(['<=', 'cr_date_time', $nextOrderTime])
-                        ->sum('all_summ_dollar');
+                        ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
+                        ->andWhere($repaymentTimeExpression . ' > :previousDebtTime', [':previousDebtTime' => $previousDebtTime])
+                        ->andWhere($repaymentTimeExpression . ' <= :nextOrderTime', [':nextOrderTime' => $nextOrderTime])
+                        ->select(new Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
+                        ->scalar();
                     $summaDebt = $summaDebt ?: 0.0;
 
                     $nextOrder->total_debt_old = $previousDebt;
@@ -2136,6 +2176,16 @@ class OrderAccountHistoryController extends Controller
                     $previousDebtTime = $nextOrderTime;
                     $nextOrder->save(false);
                 }
+
+                $afterLastRepayment = (float) DebtRepayment::find()
+                    ->where(['client_id' => $orderAccountHistory->client_id])
+                    ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
+                    ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
+                    ->andWhere("COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59')) > :previousDebtTime", [':previousDebtTime' => $previousDebtTime])
+                    ->select(new Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
+                    ->scalar();
+                $orderAccount->total_debt = round($previousDebt - ($afterLastRepayment ?: 0.0), 2);
+                $orderAccount->save(false);
 
                 $elegantHistoryUpdates = ElegantHistoryUpdate::find()->where(['order_account_history_id' => $id])->all();
                 foreach ($elegantHistoryUpdates as $update) {
