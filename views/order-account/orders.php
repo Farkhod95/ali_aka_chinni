@@ -263,7 +263,7 @@ input:checked + .slider:before {
                 <div class="col-sm-4">
                   <label><h5><b>Sana</b></h5></label>
                   <input class="form-control" required type="date" name="qarz_tul_date"
-                        value="<?= date('Y-m-d') ?>" <?= $isRole1 ? '' : 'disabled' ?>>
+                        value="<?= date('Y-m-d') ?>" disabled>
                   <span class="text-danger err-space"></span>
                 </div>
 
@@ -455,7 +455,7 @@ input:checked + .slider:before {
                   type="date"
                   name="order_date"
                   value="<?= date('Y-m-d') ?>"
-                  <?= $isRole1 ? '' : 'disabled' ?>
+                  disabled
               >
             </div>
             <!-- <div class="col-sm-6">
