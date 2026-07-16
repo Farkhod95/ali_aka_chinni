@@ -455,7 +455,6 @@ input:checked + .slider:before {
                   type="date"
                   name="order_date"
                   value="<?= date('Y-m-d') ?>"
-                  disabled
               >
             </div>
             <!-- <div class="col-sm-6">
