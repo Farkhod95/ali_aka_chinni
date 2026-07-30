@@ -31,7 +31,7 @@ return [
         'content' => function ($data) {
             if ($data->consignor_id) {
                 if ($data->status == 1) {
-                    return '<b style="font-size: 14px;color:#b76060" >'. $data->consignor0->name.'</b>';
+                    return '<b style="font-size: 14px;" >'. $data->consignor0->name.'</b>';
                 }elseif($data->status == 2){
                     return '<b style="font-size: 14px;" >'. $data->consignor0->name .'</b>';
                 }elseif($data->status == 3){
@@ -63,7 +63,7 @@ return [
         'content' => function ($data) {
             if ($data->created_by) {
                 if ($data->status == 1) {
-                    return '<b style="font-size: 14px;color:#b76060" >'. $data->createdBy->surname.' '.$data->createdBy->name.'</b>';
+                    return '<b style="font-size: 14px;" >'. $data->createdBy->surname.' '.$data->createdBy->name.'</b>';
                 }elseif($data->status == 2){
                     return '<b style="font-size: 14px;" >'. $data->createdBy->surname.' '.$data->createdBy->name .'</b>';
                 }elseif($data->status == 3){
@@ -85,7 +85,7 @@ return [
             //     return   '<b style="font-size: 14px;color:red">'.Yii::$app->formatter->asDecimal($orderAccount->total_debt, 2).' $</b>';
             // }
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. Yii::$app->formatter->asDecimal($data->given_sum_dollar?: 0, 2).' $</b>';
+                return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->given_sum_dollar?: 0, 2).' $</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->given_sum_dollar?: 0, 2) .' $</b>';
             }elseif($data->status == 3){
@@ -106,7 +106,7 @@ return [
             //     return   '<b style="font-size: 14px;color:red">'.Yii::$app->formatter->asDecimal($orderAccount->total_debt, 2).' $</b>';
             // }
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. Yii::$app->formatter->asDecimal($data->sum_dollar?: 0, 2).' $</b>';
+                return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->sum_dollar?: 0, 2).' $</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->sum_dollar?: 0, 2) .' $</b>';
             }elseif($data->status == 3){
@@ -127,7 +127,7 @@ return [
             //     return   '<b style="font-size: 14px;color:red">'.Yii::$app->formatter->asDecimal($orderAccount->total_debt, 2).' $</b>';
             // }
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. Yii::$app->formatter->asDecimal($data->discount_amount?: 0, 2).' $</b>';
+                return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->discount_amount?: 0, 2).' $</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->discount_amount?: 0, 2) .' $</b>';
             }elseif($data->status == 3){
@@ -150,7 +150,7 @@ return [
             if ($myTotalDebt) {
                 $qarz_sum = $myTotalDebt->total_debt;
             }
-            return '<b style="font-size: 14px;color:#b76060" >'. Yii::$app->formatter->asDecimal($qarz_sum, 2).' $</b>';
+            return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($qarz_sum, 2).' $</b>';
         }
     ],
     
@@ -173,7 +173,7 @@ return [
             //     $commitColor = '<b style="font-size: 14px;color:red">'.$commitShort.'...</b>';
             // }
             if ($data->status == 1) {
-                $commitColor =  '<b style="font-size: 14px;color:#b76060" >'. $commitShort.' $</b>';
+                $commitColor =  '<b style="font-size: 14px;" >'. $commitShort.' $</b>';
             }elseif($data->status == 2){
                 $commitColor =  '<b style="font-size: 14px;" >'. $commitShort .' $</b>';
             }elseif($data->status == 3){
@@ -218,7 +218,7 @@ return [
             //     return   '<b style="font-size: 14px;color:red">'.Yii::$app->formatter->asDecimal($orderAccount->total_debt, 2).' $</b>';
             // }
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. Yii::$app->formatter->asDecimal($data->exchange_rate?: 0, 2).' $</b>';
+                return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->exchange_rate?: 0, 2).' $</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;" >'. Yii::$app->formatter->asDecimal($data->exchange_rate?: 0, 2) .' $</b>';
             }elseif($data->status == 3){
@@ -234,7 +234,7 @@ return [
         'attribute'=>'cr_date',
         'content' => function ($data) {
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. \Yii::$app->formatter->asDate($data->cr_date, 'php:d.m.Y') .'</b>';
+                return '<b style="font-size: 14px;" >'. \Yii::$app->formatter->asDate($data->cr_date, 'php:d.m.Y') .'</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;" >'. \Yii::$app->formatter->asDate($data->cr_date, 'php:d.m.Y') .'</b>';
             }elseif($data->status == 3){
@@ -250,7 +250,7 @@ return [
         'attribute'=>'cr_date_time',
         'content' => function ($data) {
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. date("H:i:s", strtotime($data->cr_date_time)).'</b>';
+                return '<b style="font-size: 14px;" >'. date("H:i:s", strtotime($data->cr_date_time)).'</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;" >'. date("H:i:s", strtotime($data->cr_date_time)) .'</b>';
             }elseif($data->status == 3){
@@ -267,7 +267,7 @@ return [
         'filter' => Sklad::getStatus(),
         'content' => function($data){
             if ($data->status == 1) {
-                return '<b style="font-size: 14px;color:#b76060" >'. $data->getStatusView($data->status) .'</b>';
+                return '<b style="font-size: 14px;" >'. $data->getStatusView($data->status) .'</b>';
             }elseif($data->status == 2){
                 return '<b style="font-size: 14px;color:green" >'. $data->getStatusView($data->status) .'</b>';
             }elseif($data->status == 3){
@@ -285,7 +285,7 @@ return [
         'dropdown' => false,
         'header' => 'Harakatlar',
         'width' => '180px',
-        'template' => '{leadOrderStatus} {leadUpdate} {leadView} {leadDelete}',
+        'template' => ' {leadUpdate} {leadView} {leadDelete}',
         'urlCreator' => function($action, $model, $key, $index) {
             return Url::to([$action,'id'=>$key]);
         },
@@ -324,43 +324,16 @@ return [
             // },
             'leadDelete' => function ($url, $model) {
                 if(\Yii::$app->user->identity->permission == 1 || \Yii::$app->user->identity->permission == 5|| $model->created_by == \Yii::$app->user->identity->id){
-                    $consignor_name = "";
-                    if ($model->consignor_id) {
-                        $consignor_name = $model->consignor0->name;
-                    }
-                    
-                    // Create the button to trigger the modal
-                    return Html::a('<span style="font-size: 12px;" class="glyphicon glyphicon-trash"></span>', '#', [
-                        'data-toggle' => 'modal',
-                        'data-target' => '#deleteModal-'.$model->id, // Unique modal ID
-                        'title' => 'O\'chirish',
-                        'class' => 'btn btn-danger btn-xs',
-                    ]) .
-                    // Modal HTML
-                    '<div class="modal fade" id="deleteModal-'.$model->id.'" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel-'.$model->id.'" >
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="deleteModalLabel-'.$model->id.'"><b style="font-size:16px;color:red">'.$consignor_name.'</b> dan olingan mahsulotlarni oʻchirib tashlamoqchimisiz?</h5>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Mahsulotlarni o\'chirishdan oldin izoh kiriting:'.'</p>
-                                    '.Html::beginForm(['sklad/delete', 'id' => $model->id], 'post').'
-                                    <div class="form-group">
-                                        '.Html::input('text', 'delete_reason', '', ['class' => 'form-control', 'placeholder' => 'Sababini kiriting...', 'required' => true]).'
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Bekor qilish</button>
-                                    '.Html::submitButton('O\'chirish', ['class' => 'btn btn-danger']).'
-                                    '.Html::endForm().'
-                                </div>
-                            </div>
-                        </div>
-                    </div>';
+                    $url = Url::to(['/sklad/delete', 'id' => $model->id]);
+                    return Html::beginForm($url, 'post', ['style' => 'display:inline;'])
+                        . Html::submitButton('<span style="font-size: 12px;" class="glyphicon glyphicon-trash"></span>', [
+                            'title' => 'O\'chirish',
+                            'class' => 'btn btn-danger btn-xs',
+                        ])
+                        . Html::endForm();
                 }
             },
         ],
     ],
 
-];   
+];

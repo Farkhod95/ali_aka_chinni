@@ -300,7 +300,12 @@ class SkladController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $myTotalDebt = $this->findOrCreateMyTotalDebt($consignor->id);
-                $oldDebt = (float)$myTotalDebt->total_debt;
+                if ($myTotalDebt->isNewRecord) {
+                    $this->saveOrFail($myTotalDebt, 'Umumiy qarz yaratilmadi.');
+                }
+                $this->lockMyTotalDebtForUpdate($myTotalDebt->id);
+                $myTotalDebt = MyTotalDebt::findOne($myTotalDebt->id);
+                $oldDebt = $this->calculateConsignorTotalDebt($consignor->id, $myTotalDebt->id);
                 $given_sum_dollars = $this->calculateProductsTotal($importProducts);
                 $debtDelta = $given_sum_dollars - $sum_dollars - $discount_amounts;
 
@@ -317,7 +322,8 @@ class SkladController extends Controller
                 $sklad->consignor_id = $consignor->id;
                 $sklad->status = 1;
                 $sklad->actived = 0;
-                $sklad->save(false);
+                $this->saveOrFail($sklad, 'Kirim hujjati saqlanmadi.');
+                $this->refreshConsignorDebtSnapshots($consignor->id, $myTotalDebt->id);
 
                 foreach ($importProducts as $value) {
                     $warehouse = $this->findWarehouseByProductRow($value);
@@ -342,10 +348,10 @@ class SkladController extends Controller
                     $this->savePrice($warehouse->id, $value['price']);
                 }
 
-                $myTotalDebt->total_debt = $oldDebt + $debtDelta;
+                $myTotalDebt->total_debt = $this->calculateConsignorTotalDebt($consignor->id, $myTotalDebt->id);
                 $myTotalDebt->update_by = Yii::$app->user->identity->id;
                 $myTotalDebt->cr_date = date('Y-m-d H:i:s');
-                $myTotalDebt->save(false);
+                $this->saveOrFail($myTotalDebt, 'Umumiy qarz yangilanmadi.');
 
                 $transaction->commit();
                 return $this->redirect(['warehouse/index']);
@@ -519,8 +525,6 @@ class SkladController extends Controller
             $allValues_new = $this->normalizeProductRows(isset($data['allValue']) ? $data['allValue'] : []);
             $given_sum_dollar_new = $this->calculateProductsTotal($allValues_new);
             $newDebtDelta = $given_sum_dollar_new - $sum_dollar_new - $discount_amount_new;
-            $oldDebtDelta = (float)$model->my_total_debt;
-            $oldDebtTotal = (float)$myTotalDebt->total_debt;
 
             if (!$datees_new || strtotime($datees_new) === false) {
                 throw new \yii\web\BadRequestHttpException('Sana noto\'g\'ri kiritilgan.');
@@ -534,6 +538,20 @@ class SkladController extends Controller
 
             $transaction = Yii::$app->db->beginTransaction();
             try {
+                // Lock the edited document and the consignor total before reading old values.
+                $this->lockSkladForUpdate($id);
+                $lockedSklad = $this->findModel($id);
+                $oldDebtDelta = (float)$lockedSklad->my_total_debt;
+
+                $myTotalDebt = $this->findOrCreateMyTotalDebt($consignor->id);
+                if ($myTotalDebt->isNewRecord) {
+                    $this->saveOrFail($myTotalDebt, 'Umumiy qarz yaratilmadi.');
+                }
+                $this->lockMyTotalDebtForUpdate($myTotalDebt->id);
+                $myTotalDebt = MyTotalDebt::findOne($myTotalDebt->id);
+                $oldDebtTotal = $this->calculateConsignorTotalDebt($consignor->id, $myTotalDebt->id);
+                $newDebtTotal = $oldDebtTotal - $oldDebtDelta + $newDebtDelta;
+
                 $warehouseHistories = WarehouseHistory::find()->where(['sklad_id' => $id])->all();
                 foreach ($warehouseHistories as $value) {
                     $warehouse = Warehouse::find()->andWhere(['brand_id' => $value->brand_id])
@@ -542,9 +560,14 @@ class SkladController extends Controller
                                         ->andWhere(['size' => $value->size])->one();
                     if ($warehouse) {
                         $warehouse->count = (float)$warehouse->count - (float)$value->count;
-                        $warehouse->save(false);
+                        if ($warehouse->count < 0) {
+                            throw new \yii\web\BadRequestHttpException('Ombor qoldig\'i manfiy bo\'lib qolishi mumkin emas.');
+                        }
+                        $this->saveOrFail($warehouse, 'Ombordan eski mahsulot miqdori ayirilmadi.');
                     }
-                    $value->delete();
+                    if ($value->delete() === false) {
+                        throw new \RuntimeException('Mahsulot tarixi o\'chirilmadi.');
+                    }
                 }
 
                 foreach ($allValues_new as $value) {
@@ -559,28 +582,23 @@ class SkladController extends Controller
                     }
 
                     $warehouse->price = $value['price'];
-                    $warehouse->all_my_total_debt = $oldDebtTotal - $oldDebtDelta + $newDebtDelta;
+                    $warehouse->all_my_total_debt = $newDebtTotal;
                     $warehouse->all_sum_dollar = $sum_dollar_new;
                     $warehouse->all_discount_amount = $discount_amount_new;
                     $warehouse->count = (float)$warehouse->count + (float)$value['count'];
                     $warehouse->cr_date = date('Y-m-d', strtotime($datees_new));
-                    $warehouse->save(false);
+                    $this->saveOrFail($warehouse, 'Ombor qoldig\'i yangilanmadi.');
 
                     $this->saveWarehouseHistory($id, $value);
                     $this->savePrice($warehouse->id, $value['price']);
                 }
-
-                $myTotalDebt->total_debt = $oldDebtTotal - $oldDebtDelta + $newDebtDelta;
-                $myTotalDebt->update_by = Yii::$app->user->identity->id;
-                $myTotalDebt->cr_date = date('Y-m-d H:i:s');
-                $myTotalDebt->save(false);
 
                 $elegantHistoryUpdate = new ElegantHistoryUpdate();
                 $elegantHistoryUpdate->title = $consignor->name . " dan olingan mahsulotlar ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada o'zgartirildi...";
                 $elegantHistoryUpdate->comment = $updateReason;
                 $elegantHistoryUpdate->status = 1;
                 $elegantHistoryUpdate->type = 1;
-                $elegantHistoryUpdate->save(false);
+                $this->saveOrFail($elegantHistoryUpdate, 'O\'zgarish tarixi saqlanmadi.');
 
                 $model->given_sum_dollar = $given_sum_dollar_new;
                 $model->sum_dollar = $sum_dollar_new;
@@ -592,7 +610,13 @@ class SkladController extends Controller
                 $model->cr_date = date('Y-m-d', strtotime($datees_new));
                 $model->consignor_id = $consignor->id;
                 $model->status = 1;
-                $model->save(false);
+                $this->saveOrFail($model, 'Kirim hujjati yangilanmadi.');
+                $this->refreshConsignorDebtSnapshots($consignor->id, $myTotalDebt->id);
+
+                $myTotalDebt->total_debt = $this->calculateConsignorTotalDebt($consignor->id, $myTotalDebt->id);
+                $myTotalDebt->update_by = Yii::$app->user->identity->id;
+                $myTotalDebt->cr_date = date('Y-m-d H:i:s');
+                $this->saveOrFail($myTotalDebt, 'Umumiy qarz yangilanmadi.');
 
                 $transaction->commit();
                 return $this->redirect(['index']);
@@ -615,31 +639,69 @@ class SkladController extends Controller
     public function actionDelete($id)
     {
         $request = Yii::$app->request;
-
-        $model = $this->findModel($id); 
-        $warehouseHistories = WarehouseHistory::find()->where(['sklad_id' => $id])->all();
-        foreach ($warehouseHistories as $value) {
-            $warehouse = Warehouse::find()->andWhere(['brand_id' => $value->brand_id])
-                                ->andWhere(['product_category_id' => $value->product_category_id])
-                                ->andWhere(['type' => $value->type])
-                                ->andWhere(['size' => $value->size])->one();
-            $warehouse->count = $warehouse->count - $value->count;
-            $warehouse->save(false);
-            $value->delete();
+        $deleteReason = trim((string)$request->post('delete_reason', ''));
+        if ($deleteReason === '') {
+            $deleteReason = 'Sabab kiritilmagan.';
         }
-        $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $model->consignor_id])->one();
-        $myTotalDebt->total_debt = $myTotalDebt->total_debt - $model->my_total_debt;
-        $myTotalDebt->save(false);
 
-        $this->findModel($id)->delete();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $this->lockSkladForUpdate($id);
+            $model = $this->findModel($id);
+            $consignor = Consignor::findOne($model->consignor_id);
+            if (!$consignor) {
+                throw new NotFoundHttpException('Yuk jo\'natuvchi topilmadi.');
+            }
 
-        $deleteReason = Yii::$app->request->post('delete_reason');
-        $elegantHistoryUpdate = new ElegantHistoryUpdate();
-        $elegantHistoryUpdate->title = $model->consignor0->name . " ning ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanadagi import qilingan mahsulotlar o'chirildi...";
-        $elegantHistoryUpdate->comment = $deleteReason;
-        $elegantHistoryUpdate->status = 2;
-        $elegantHistoryUpdate->type = 1;
-        $elegantHistoryUpdate->save(false);
+            $myTotalDebt = MyTotalDebt::find()->where(['consignor_id' => $model->consignor_id])->one();
+            if (!$myTotalDebt) {
+                throw new \RuntimeException('Ushbu yuk jo\'natuvchi uchun umumiy qarz topilmadi.');
+            }
+            $this->lockMyTotalDebtForUpdate($myTotalDebt->id);
+            $myTotalDebt = MyTotalDebt::findOne($myTotalDebt->id);
+
+            $warehouseHistories = WarehouseHistory::find()->where(['sklad_id' => $id])->all();
+            foreach ($warehouseHistories as $value) {
+                $warehouse = Warehouse::find()->andWhere(['brand_id' => $value->brand_id])
+                    ->andWhere(['product_category_id' => $value->product_category_id])
+                    ->andWhere(['type' => $value->type])
+                    ->andWhere(['size' => $value->size])->one();
+                if (!$warehouse) {
+                    throw new \RuntimeException('Ombordagi mahsulot topilmadi. O\'chirish bekor qilindi.');
+                }
+
+                $this->lockWarehouseForUpdate($warehouse->id);
+                $warehouse = Warehouse::findOne($warehouse->id);
+                $warehouse->count = (float)$warehouse->count - (float)$value->count;
+                $this->saveOrFail($warehouse, 'Ombor qoldig\'i yangilanmadi.');
+
+                if ($value->delete() === false) {
+                    throw new \RuntimeException('Mahsulot tarixi o\'chirilmadi.');
+                }
+            }
+
+            $myTotalDebt->total_debt = $this->calculateConsignorTotalDebt($model->consignor_id, $myTotalDebt->id) - (float)$model->my_total_debt;
+            $myTotalDebt->update_by = Yii::$app->user->identity->id;
+            $myTotalDebt->cr_date = date('Y-m-d H:i:s');
+            $this->saveOrFail($myTotalDebt, 'Umumiy qarz yangilanmadi.');
+
+            $elegantHistoryUpdate = new ElegantHistoryUpdate();
+            $elegantHistoryUpdate->title = $consignor->name . " ning ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanadagi import qilingan mahsulotlar o'chirildi...";
+            $elegantHistoryUpdate->comment = $deleteReason;
+            $elegantHistoryUpdate->status = 2;
+            $elegantHistoryUpdate->type = 1;
+            $this->saveOrFail($elegantHistoryUpdate, 'O\'chirish tarixi saqlanmadi.');
+
+            if ($model->delete() === false) {
+                throw new \RuntimeException('Kirim hujjati o\'chirilmadi.');
+            }
+            $this->refreshConsignorDebtSnapshots($model->consignor_id, $myTotalDebt->id);
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
 
         if($request->isAjax){
             /*
@@ -759,7 +821,7 @@ class SkladController extends Controller
         $relativeHistory->count = $row['count'];
         $relativeHistory->cr_date = date('Y-m-d H:i:s');
         $relativeHistory->cr_date_time = date('Y-m-d H:i:s');
-        $relativeHistory->save(false);
+        $this->saveOrFail($relativeHistory, 'Mahsulot tarixi saqlanmadi.');
     }
 
     protected function savePrice($warehouseId, $price)
@@ -770,7 +832,7 @@ class SkladController extends Controller
             $modelPrices->warehouse_id = $warehouseId;
         }
         $modelPrices->price = $price;
-        $modelPrices->save(false);
+        $this->saveOrFail($modelPrices, 'Mahsulot narxi saqlanmadi.');
     }
 
     protected function findOrCreateMyTotalDebt($consignorId)
@@ -782,6 +844,78 @@ class SkladController extends Controller
             $myTotalDebt->total_debt = 0;
         }
         return $myTotalDebt;
+    }
+
+    protected function calculateConsignorTotalDebt($consignorId, $myTotalDebtId)
+    {
+        $documentDebt = Sklad::find()
+            ->where(['consignor_id' => $consignorId])
+            ->sum('my_total_debt');
+        $paidDebt = MyTotalDebtHistory::find()
+            ->where(['my_total_debt_id' => $myTotalDebtId])
+            ->sum('all_summ_dollar + discount_amount');
+
+        return round((float)$documentDebt - (float)$paidDebt, 2);
+    }
+
+    protected function refreshConsignorDebtSnapshots($consignorId, $myTotalDebtId)
+    {
+        $documents = Sklad::find()
+            ->where(['consignor_id' => $consignorId])
+            ->orderBy(['cr_date' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+        $payments = MyTotalDebtHistory::find()
+            ->where(['my_total_debt_id' => $myTotalDebtId])
+            ->orderBy(['cr_date' => SORT_ASC, 'id' => SORT_ASC])
+            ->all();
+
+        $paymentIndex = 0;
+        $balance = 0;
+        foreach ($documents as $document) {
+            while (
+                isset($payments[$paymentIndex])
+                && $payments[$paymentIndex]->cr_date < $document->cr_date
+            ) {
+                $balance -= (float)$payments[$paymentIndex]->all_summ_dollar
+                    + (float)$payments[$paymentIndex]->discount_amount;
+                $paymentIndex++;
+            }
+
+            $document->old_my_total_debt = round($balance, 2);
+            $balance += (float)$document->my_total_debt;
+            $this->saveOrFail($document, 'Kirim hujjati qoldig\'i yangilanmadi.');
+        }
+    }
+
+    protected function lockSkladForUpdate($id)
+    {
+        Yii::$app->db->createCommand(
+            'SELECT `id` FROM `sklad` WHERE `id` = :id FOR UPDATE',
+            [':id' => (int)$id]
+        )->queryScalar();
+    }
+
+    protected function lockMyTotalDebtForUpdate($id)
+    {
+        Yii::$app->db->createCommand(
+            'SELECT `id` FROM `my_total_debt` WHERE `id` = :id FOR UPDATE',
+            [':id' => (int)$id]
+        )->queryScalar();
+    }
+
+    protected function lockWarehouseForUpdate($id)
+    {
+        Yii::$app->db->createCommand(
+            'SELECT `id` FROM `warehouse` WHERE `id` = :id FOR UPDATE',
+            [':id' => (int)$id]
+        )->queryScalar();
+    }
+
+    protected function saveOrFail($model, $message)
+    {
+        if (!$model->save(false)) {
+            throw new \RuntimeException($message);
+        }
     }
 
     /**
