@@ -359,7 +359,7 @@ input:checked + .slider:before {
           </div>
           <div class="form-group row m-b-15 align-items-center">
             <label class="col-sm-6 col-form-label">
-              <h5 class="m-0"><b>Jami qaytarilgan summa ($)</b></h5>
+              <h5 class="m-0"><b>Mijozga qaytarilgan summa ($)</b></h5>
             </label>
             <div class="col-sm-6">
               <input type="number" class="form-control" name="all_summ_dollar"/>

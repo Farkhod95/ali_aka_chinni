@@ -631,7 +631,6 @@ class VozvratOrderController extends Controller
                 $elegantHistoryUpdate->comment = $updateReason . ' <br><b style="color:#e97171">' . 'Ostatka: '. $model->old_total_debt .'$, '. 'Mahsulot summasi: '. ($all_product_summ_new).'$, '. 'Qaytarilgan summa : '. $model->all_summ_dollar .'$, '. 'Qolgan qarz: '. $model->total_debt.'$ </b>';
                 $elegantHistoryUpdate->status = 1;
                 $elegantHistoryUpdate->type = 2;
-                $elegantHistoryUpdate->vozvrat_order_id = $model->id;
                 $elegantHistoryUpdate->save(false);
 
             }else{
@@ -640,7 +639,6 @@ class VozvratOrderController extends Controller
                 $elegantHistoryUpdate->comment = $updateReason;
                 $elegantHistoryUpdate->status = 1;
                 $elegantHistoryUpdate->type = 2;
-                $elegantHistoryUpdate->vozvrat_order_id = $model->id;
                 $elegantHistoryUpdate->save(false);
             }
             Yii::$app->session->setFlash('success', 'Ma\'lumotlar muvaffaqiyatli yangilandi.');
@@ -660,41 +658,23 @@ class VozvratOrderController extends Controller
     public function actionDelete($id)
     {
         $request = Yii::$app->request;
-        $model = $this->findModel($id); 
-        if ($model->confirmation == 1) {
-            $summ = $this->getVozvratDiscount($model->product_summ_dollar, $model->all_summ_dollar);
-            $orderAccount = OrderAccount::find()->where(['client_id' => $model->client_id])->one();
-            if ($orderAccount) {
-                $orderAccount->total_debt = round($orderAccount->total_debt + $summ, 2);
-                $orderAccount->save(false);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $this->deleteVozvratOrder($this->findModel($id), Yii::$app->request->post('delete_reason'));
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error($e->getMessage(), __METHOD__);
+            if($request->isAjax){
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'title'=> '<div style="text-align:center"><b style="font-size:16px;color:red">O\'chirishda xatolik</b></div>',
+                    'content'=> '<div class="alert alert-danger">'.Html::encode($e->getMessage()).'</div>',
+                    'footer'=> Html::button('Yopish',['class'=>'btn btn-default pull-left','data-dismiss'=>"modal"])
+                ];
             }
+            throw $e;
         }
-
-        $productAccountHistory = ProductAccountHistory::find()->where(['vozvrat_order_id' => $id])->all();
-        foreach ($productAccountHistory as $value) {
-            ProductAccountHistory::find()->where(['id' => $value['id']])->one()->delete();
-        }
-        $productAccount = ProductAccount::find()->where(['vozvrat_order_id' => $id])->all();
-        foreach ($productAccount as $value) {
-            // echo "<pre>";
-            // print_r($value['count']);
-            // echo "<pre>";
-            $warehouseValue = Warehouse::find()->andWhere(['id' => (int)$value->warehouse_id])->one();
-            if ($warehouseValue && $value->type_sklad_id == 1) {
-                $warehouseValue->count = $warehouseValue->count - $value['count'];
-                $warehouseValue->save(false);
-            }
-            ProductAccount::find()->where(['id' => $value['id']])->one()->delete();
-        } 
-
-        $deleteReason = Yii::$app->request->post('delete_reason');
-        $elegantHistoryUpdate = new ElegantHistoryUpdate();
-        $elegantHistoryUpdate->title = $model->client->fio . " ning Vozvrat qilgan buyurtmasi o'chirildi...";
-        $elegantHistoryUpdate->comment = $deleteReason; #"Vozvrat qilingan buyurtma o'chirildi. (product_summ_dollar: " . $model->product_summ_dollar .", comment:". $model->comment .")";
-        $elegantHistoryUpdate->status = 2;
-        $elegantHistoryUpdate->type = 2;
-        $elegantHistoryUpdate->save(false);
-        $this->findModel($id)->delete();
 
         if($request->isAjax){
             /*
@@ -721,28 +701,28 @@ class VozvratOrderController extends Controller
     {        
         $request = Yii::$app->request;
         $pks = explode(',', $request->post( 'pks' )); // Array or selected records primary keys
-        foreach ( $pks as $pk ) {
-            $model = $this->findModel($pk);
-            if ($model->confirmation == 1) {
-                $summ = $this->getVozvratDiscount($model->product_summ_dollar, $model->all_summ_dollar);
-                $orderAccount = OrderAccount::find()->where(['client_id' => $model->client_id])->one();
-                if ($orderAccount) {
-                    $orderAccount->total_debt = round($orderAccount->total_debt + $summ, 2);
-                    $orderAccount->save(false);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            foreach ( $pks as $pk ) {
+                $pk = trim($pk);
+                if ($pk === '') {
+                    continue;
                 }
+                $this->deleteVozvratOrder($this->findModel($pk), Yii::$app->request->post('delete_reason'));
             }
-            foreach (ProductAccountHistory::find()->where(['vozvrat_order_id' => $model->id])->all() as $history) {
-                $history->delete();
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error($e->getMessage(), __METHOD__);
+            if($request->isAjax){
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'title'=> '<div style="text-align:center"><b style="font-size:16px;color:red">O\'chirishda xatolik</b></div>',
+                    'content'=> '<div class="alert alert-danger">'.Html::encode($e->getMessage()).'</div>',
+                    'footer'=> Html::button('Yopish',['class'=>'btn btn-default pull-left','data-dismiss'=>"modal"])
+                ];
             }
-            foreach (ProductAccount::find()->where(['vozvrat_order_id' => $model->id])->all() as $product) {
-                $warehouseValue = Warehouse::find()->andWhere(['id' => (int)$product->warehouse_id])->one();
-                if ($warehouseValue && $product->type_sklad_id == 1) {
-                    $warehouseValue->count = $warehouseValue->count - $product->count;
-                    $warehouseValue->save(false);
-                }
-                $product->delete();
-            }
-            $model->delete();
+            throw $e;
         }
 
         if($request->isAjax){
@@ -758,6 +738,54 @@ class VozvratOrderController extends Controller
             return $this->redirect(['index']);
         }
        
+    }
+
+    private function deleteVozvratOrder(VozvratOrder $model, $deleteReason = null)
+    {
+        if ((int)$model->confirmation === 1) {
+            $summ = $this->getVozvratDiscount($model->product_summ_dollar, $model->all_summ_dollar);
+            $orderAccount = OrderAccount::find()->where(['client_id' => $model->client_id])->one();
+            if (!$orderAccount) {
+                throw new \RuntimeException('Mijoz qarz hisobi topilmadi.');
+            }
+            $orderAccount->total_debt = round((float)$orderAccount->total_debt + $summ, 2);
+            if (!$orderAccount->save(false)) {
+                throw new \RuntimeException('Mijoz qarzini yangilab bo\'lmadi.');
+            }
+        }
+
+        foreach (ProductAccountHistory::find()->where(['vozvrat_order_id' => $model->id])->all() as $history) {
+            if ($history->delete() === false) {
+                throw new \RuntimeException('Vozvrat tarixi o\'chirilmadi.');
+            }
+        }
+
+        foreach (ProductAccount::find()->where(['vozvrat_order_id' => $model->id])->all() as $product) {
+            $warehouseValue = Warehouse::find()->andWhere(['id' => (int)$product->warehouse_id])->one();
+            if ($warehouseValue && (int)$product->type_sklad_id === 1) {
+                $warehouseValue->count = (float)$warehouseValue->count - (float)$product->count;
+                if (!$warehouseValue->save(false)) {
+                    throw new \RuntimeException('Ombor sonini yangilab bo\'lmadi.');
+                }
+            }
+
+            if ($product->delete() === false) {
+                throw new \RuntimeException('Vozvrat mahsuloti o\'chirilmadi.');
+            }
+        }
+
+        $elegantHistoryUpdate = new ElegantHistoryUpdate();
+        $elegantHistoryUpdate->title = $model->client->fio . " ning Vozvrat qilgan buyurtmasi o'chirildi...";
+        $elegantHistoryUpdate->comment = $deleteReason;
+        $elegantHistoryUpdate->status = 2;
+        $elegantHistoryUpdate->type = 2;
+        if (!$elegantHistoryUpdate->save(false)) {
+            throw new \RuntimeException('O\'chirish tarixi saqlanmadi.');
+        }
+
+        if ($model->delete() === false) {
+            throw new \RuntimeException('Vozvrat buyurtmasi o\'chirilmadi.');
+        }
     }
 
     private function getVozvratDiscount($productSum, $returnedSum)

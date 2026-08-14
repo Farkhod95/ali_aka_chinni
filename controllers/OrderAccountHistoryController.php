@@ -84,6 +84,23 @@ class OrderAccountHistoryController extends Controller
         return date('Y-m-d', strtotime($date)) . ' 23:59:59';
     }
 
+    private function getDebtRepaymentAppliedAmount(DebtRepayment $model)
+    {
+        $exchangeRate = (float)$model->exchange_rate;
+        $sumSom = $exchangeRate > 0 ? (float)$model->sum_som / $exchangeRate : 0;
+        $sumCart = $exchangeRate > 0 ? (float)$model->summ_cart / $exchangeRate : 0;
+        $sumTransfers = $exchangeRate > 0 ? (float)$model->sum_transfers / $exchangeRate : 0;
+        $paidOnly = round((float)$model->summ_dollar + $sumSom + $sumCart + $sumTransfers, 2);
+        $discount = (float)$model->discount_amount;
+        $storedTotal = round((float)$model->all_summ_dollar, 2);
+
+        if (abs($storedTotal - round($paidOnly + $discount, 2)) < 0.01) {
+            return $storedTotal;
+        }
+
+        return round($storedTotal + $discount, 2);
+    }
+
     private function getDebtRepaymentTotalBetween($clientId, $fromTime, $toTime = null)
     {
         $timeExpression = "COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59'))";
@@ -97,9 +114,12 @@ class OrderAccountHistoryController extends Controller
             $query->andWhere($timeExpression . ' <= :toTime', [':toTime' => $toTime]);
         }
 
-        return (float)$query
-            ->select(new Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
-            ->scalar();
+        $total = 0;
+        foreach ($query->all() as $repayment) {
+            $total += $this->getDebtRepaymentAppliedAmount($repayment);
+        }
+
+        return round($total, 2);
     }
 
     private function recalculateClientOrderDebtsAfter(OrderAccountHistory $model)
@@ -2152,16 +2172,7 @@ class OrderAccountHistoryController extends Controller
 
                 foreach ($nextOrders as $nextOrder) {
                     $nextOrderTime = $nextOrder->cr_date_time ?: ($nextOrder->date . ' 23:59:59');
-                    $repaymentTimeExpression = "COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59'))";
-                    $summaDebt = (float) DebtRepayment::find()
-                        ->where(['client_id' => $orderAccountHistory->client_id])
-                        ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
-                        ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
-                        ->andWhere($repaymentTimeExpression . ' > :previousDebtTime', [':previousDebtTime' => $previousDebtTime])
-                        ->andWhere($repaymentTimeExpression . ' <= :nextOrderTime', [':nextOrderTime' => $nextOrderTime])
-                        ->select(new Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
-                        ->scalar();
-                    $summaDebt = $summaDebt ?: 0.0;
+                    $summaDebt = $this->getDebtRepaymentTotalBetween($orderAccountHistory->client_id, $previousDebtTime, $nextOrderTime);
 
                     $nextOrder->total_debt_old = $previousDebt;
                     $nextOrder->total_debt_today = round(
@@ -2177,13 +2188,7 @@ class OrderAccountHistoryController extends Controller
                     $nextOrder->save(false);
                 }
 
-                $afterLastRepayment = (float) DebtRepayment::find()
-                    ->where(['client_id' => $orderAccountHistory->client_id])
-                    ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
-                    ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
-                    ->andWhere("COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59')) > :previousDebtTime", [':previousDebtTime' => $previousDebtTime])
-                    ->select(new Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
-                    ->scalar();
+                $afterLastRepayment = $this->getDebtRepaymentTotalBetween($orderAccountHistory->client_id, $previousDebtTime);
                 $orderAccount->total_debt = round($previousDebt - ($afterLastRepayment ?: 0.0), 2);
                 $orderAccount->save(false);
 

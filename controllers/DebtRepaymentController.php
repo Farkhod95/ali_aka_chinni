@@ -86,6 +86,23 @@ class DebtRepaymentController extends Controller
         return date('Y-m-d', strtotime($model->date)) . ' 23:59:59';
     }
 
+    private function getDebtRepaymentAppliedAmount(DebtRepayment $model)
+    {
+        $exchangeRate = (float)$model->exchange_rate;
+        $sumSom = $exchangeRate > 0 ? (float)$model->sum_som / $exchangeRate : 0;
+        $sumCart = $exchangeRate > 0 ? (float)$model->summ_cart / $exchangeRate : 0;
+        $sumTransfers = $exchangeRate > 0 ? (float)$model->sum_transfers / $exchangeRate : 0;
+        $paidOnly = round((float)$model->summ_dollar + $sumSom + $sumCart + $sumTransfers, 2);
+        $discount = (float)$model->discount_amount;
+        $storedTotal = round((float)$model->all_summ_dollar, 2);
+
+        if (abs($storedTotal - round($paidOnly + $discount, 2)) < 0.01) {
+            return $storedTotal;
+        }
+
+        return round($storedTotal + $discount, 2);
+    }
+
     private function getDebtRepaymentTotalBetween($clientId, $fromTime, $toTime = null)
     {
         $timeExpression = "COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59'))";
@@ -99,9 +116,12 @@ class DebtRepaymentController extends Controller
             $query->andWhere($timeExpression . ' <= :toTime', [':toTime' => $toTime]);
         }
 
-        return (float)$query
-            ->select(new \yii\db\Expression('COALESCE(SUM(COALESCE(all_summ_dollar, 0) + COALESCE(discount_amount, 0)), 0)'))
-            ->scalar();
+        $total = 0;
+        foreach ($query->all() as $repayment) {
+            $total += $this->getDebtRepaymentAppliedAmount($repayment);
+        }
+
+        return round($total, 2);
     }
 
     private function recalculateClientOrderDebtsFrom($clientId, $previousDebt, $previousTime)
@@ -372,40 +392,10 @@ class DebtRepaymentController extends Controller
     public function actionDelete($id)
     {
         $request = Yii::$app->request;
-        $debtRepayment = $this->findModel($id);
-        $orderAccount = OrderAccount::find()->where(['id' => $debtRepayment->order_account_id])->one();
-        if (!$orderAccount) {
-            throw new NotFoundHttpException('Mijoz qarz hisobi topilmadi.');
-        }
-        if (!$debtRepayment->client) {
-            throw new NotFoundHttpException('Mijoz topilmadi.');
-        }
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $clientId = (int)$debtRepayment->client_id;
-            $repaymentTime = $this->getDebtRepaymentCalcTime($debtRepayment);
-            $previousOrder = OrderAccountHistory::find()
-                ->where(['client_id' => $clientId])
-                ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
-                ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
-                ->andWhere("COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59')) <= :repaymentTime", [':repaymentTime' => $repaymentTime])
-                ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC])
-                ->one();
-
-            $previousDebt = $previousOrder ? (float)$previousOrder->total_debt : 0.0;
-            $previousTime = $previousOrder ? $this->getHistoryCalcTime($previousOrder) : '1970-01-01 00:00:00';
-
-            $deletedAmount = round((float)$debtRepayment->all_summ_dollar + (float)$debtRepayment->discount_amount, 2);
-            $elegantHistoryUpdate = new ElegantHistoryUpdate();
-            $elegantHistoryUpdate->title = $debtRepayment->client->fio . " ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada to'lagan qarzi o'chirildi...";
-            $elegantHistoryUpdate->comment = $deletedAmount . " $ qarz to'lagani o'chirildi";
-            $elegantHistoryUpdate->status = 2;
-            $elegantHistoryUpdate->type = 2;
-            $elegantHistoryUpdate->save(false);
-
-            $debtRepayment->delete();
-            $this->recalculateClientOrderDebtsFrom($clientId, $previousDebt, $previousTime);
+            $this->deleteDebtRepayment($this->findModel($id));
             $transaction->commit();
         } catch (\Throwable $e) {
             $transaction->rollBack();
@@ -448,9 +438,28 @@ class DebtRepaymentController extends Controller
     {        
         $request = Yii::$app->request;
         $pks = explode(',', $request->post( 'pks' )); // Array or selected records primary keys
-        foreach ( $pks as $pk ) {
-            $model = $this->findModel($pk);
-            $model->delete();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            foreach ( $pks as $pk ) {
+                $pk = trim($pk);
+                if ($pk === '') {
+                    continue;
+                }
+                $this->deleteDebtRepayment($this->findModel($pk));
+            }
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::error($e->getMessage(), __METHOD__);
+            if($request->isAjax){
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'title'=> '<div style="text-align:center"><b style="font-size:16px;color:red">O\'chirishda xatolik</b></div>',
+                    'content'=> '<div class="alert alert-danger">'.Html::encode($e->getMessage()).'</div>',
+                    'footer'=> Html::button('Yopish',['class'=>'btn btn-default pull-left','data-dismiss'=>"modal"])
+                ];
+            }
+            throw $e;
         }
 
         if($request->isAjax){
@@ -466,6 +475,46 @@ class DebtRepaymentController extends Controller
             return $this->redirect(['index']);
         }
        
+    }
+
+    private function deleteDebtRepayment(DebtRepayment $debtRepayment)
+    {
+        $orderAccount = OrderAccount::find()->where(['id' => $debtRepayment->order_account_id])->one();
+        if (!$orderAccount) {
+            throw new NotFoundHttpException('Mijoz qarz hisobi topilmadi.');
+        }
+        if (!$debtRepayment->client) {
+            throw new NotFoundHttpException('Mijoz topilmadi.');
+        }
+
+        $clientId = (int)$debtRepayment->client_id;
+        $repaymentTime = $this->getDebtRepaymentCalcTime($debtRepayment);
+        $previousOrder = OrderAccountHistory::find()
+            ->where(['client_id' => $clientId])
+            ->andWhere(['or', ['!=', 'is_worker', 1], ['is', 'is_worker', null]])
+            ->andWhere(['or', ['is_delete' => null], ['<>', 'is_delete', 1]])
+            ->andWhere("COALESCE(cr_date_time, CONCAT(`date`, ' 23:59:59')) <= :repaymentTime", [':repaymentTime' => $repaymentTime])
+            ->orderBy(['date' => SORT_DESC, 'id' => SORT_DESC])
+            ->one();
+
+        $previousDebt = $previousOrder ? (float)$previousOrder->total_debt : 0.0;
+        $previousTime = $previousOrder ? $this->getHistoryCalcTime($previousOrder) : '1970-01-01 00:00:00';
+
+        $deletedAmount = $this->getDebtRepaymentAppliedAmount($debtRepayment);
+        $elegantHistoryUpdate = new ElegantHistoryUpdate();
+        $elegantHistoryUpdate->title = $debtRepayment->client->fio . " ". \Yii::$app->formatter->asDatetime(date('Y-m-d'), 'php:d.m.Y ') ." sanada to'lagan qarzi o'chirildi...";
+        $elegantHistoryUpdate->comment = $deletedAmount . " $ qarz to'lagani o'chirildi";
+        $elegantHistoryUpdate->status = 2;
+        $elegantHistoryUpdate->type = 2;
+        if (!$elegantHistoryUpdate->save(false)) {
+            throw new \RuntimeException('O\'chirish tarixi saqlanmadi.');
+        }
+
+        if ($debtRepayment->delete() === false) {
+            throw new \RuntimeException('Qarz to\'lovi o\'chirilmadi.');
+        }
+
+        $this->recalculateClientOrderDebtsFrom($clientId, $previousDebt, $previousTime);
     }
 
     /**
